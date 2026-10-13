@@ -160,6 +160,22 @@
 
   .footer{margin-top:20px;padding-top:10px;border-top:1px solid var(--line);
     display:flex;justify-content:space-between;align-items:center}
+  .pill{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);
+    padding:3px 8px;font-size:9px;letter-spacing:.16em;font-family:var(--fm);text-transform:uppercase}
+  /* sekwencery statów (bez suwaków) */
+  .statmod{display:flex;flex-direction:column;gap:6px;min-width:318px}
+  .statrow{display:flex;align-items:center;gap:8px}
+  .sname{font-size:10px;letter-spacing:.16em;color:var(--mut);width:98px;text-transform:uppercase}
+  .sval{min-width:64px;padding:4px 10px;font-size:16px;text-align:right;font-family:var(--fm);letter-spacing:.05em}
+  .stbtn{width:34px;height:30px;border:1px solid var(--line);background:var(--alu-hi);border-radius:2px;
+    display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:15px;cursor:pointer;
+    box-shadow:0 2px 0 var(--alu-lo)}
+  .stbtn:active{transform:translateY(2px);box-shadow:none;background:var(--dark);color:var(--lcdtxt)}
+  .statrow.lvl .sname{color:var(--ink)}
+  .statrow.lvl .sval{font-size:20px;color:var(--amber)}
+  /* pasek zmian oczekujących */
+  .stage{margin-top:16px;padding:11px 14px;border:1px solid var(--line);background:var(--panel);
+    display:flex;align-items:center;gap:12px;border-radius:2px}
   .finishbtn{display:flex;gap:6px}
   .fbtn{padding:7px 12px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;
     border:1px solid var(--line);border-radius:2px;background:var(--alu-hi);box-shadow:0 2px 0 var(--alu-lo)}
@@ -168,7 +184,7 @@
   .hidden{display:none}
 </style>
 </head>
-<body>
+<body class="anod">
 <div class="chassis" id="chassis">
   <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
 
@@ -181,7 +197,9 @@
     <div class="hatch" title="hazard"></div>
     <div class="mid">
       <div class="grille" title="speaker / wentylacja — motyw"></div>
-      <div class="metal">MODEL RZR–01 · FW 0.1.0 · NO. 0042</div>
+      <span class="pill"><span class="led g" style="width:5px;height:5px"></span>MD5 12/12</span>
+      <span class="pill"><span class="led o" style="width:5px;height:5px"></span>KOPIA AUTO</span>
+      <div class="metal">RZR–01 · FW 0.1.0 · NO. 0042</div>
       <div class="leds">
         <span class="led g" title="zapis: OK"></span>
         <span class="led a" title="ostrzeżenie"></span>
@@ -239,20 +257,18 @@
 
         <!-- pasek przyrządów -->
         <div class="bench">
-          <div class="unit">
-            <span class="cap">runy</span>
-            <div class="fader" data-pct="62" data-read="620"><div class="fill"></div><div class="capk"></div></div>
-            <div class="readout lcd">620</div>
-          </div>
-          <div class="unit">
-            <span class="cap">vigor</span>
-            <div class="fader" data-pct="92" data-read="99"><div class="fill"></div><div class="capk"></div></div>
-            <div class="readout lcd">99</div>
-          </div>
-          <div class="unit">
-            <span class="cap">mind</span>
-            <div class="fader" data-pct="28" data-read="28"><div class="fill"></div><div class="capk"></div></div>
-            <div class="readout lcd">28</div>
+          <div class="statmod">
+            <span class="cap">staty — slot 00 · przytrzymaj + / − (auto-repeat)</span>
+            <div class="statrow"><span class="sname">vigor</span><div class="sval lcd">99</div>
+              <div class="stbtn" data-dir="1">+</div><div class="stbtn" data-dir="-1">−</div></div>
+            <div class="statrow"><span class="sname">mind</span><div class="sval lcd">28</div>
+              <div class="stbtn" data-dir="1">+</div><div class="stbtn" data-dir="-1">−</div></div>
+            <div class="statrow"><span class="sname">endurance</span><div class="sval lcd">18</div>
+              <div class="stbtn" data-dir="1">+</div><div class="stbtn" data-dir="-1">−</div></div>
+            <div class="statrow"><span class="sname">dexterity</span><div class="sval lcd">30</div>
+              <div class="stbtn" data-dir="1">+</div><div class="stbtn" data-dir="-1">−</div></div>
+            <div class="statrow lvl"><span class="sname">level</span><div class="sval lcd" id="lvlout">162</div>
+              <span class="cap">= suma 8 statów − 79 · pozostałe 4 poza kadrem</span></div>
           </div>
           <div class="unit">
             <span class="cap">pokrętło</span>
@@ -280,6 +296,18 @@
 
         <div class="danger" style="margin-top:16px">
           <div class="inner">uwaga — eldenring.exe działa · zapis zablokowany</div>
+        </div>
+
+        <div class="stage">
+          <span class="cap" style="color:var(--amber)">2 zmiany oczekują · nic jeszcze nie zapisano · kopia gold trzymana osobno</span>
+          <div class="keyrow" style="gap:8px;margin-left:auto">
+            <div class="key silk" data-silk="co się zmieni">PODGLĄD</div>
+            <div class="key orange" data-silk="zapis + backup">ZASTOSUJ</div>
+            <div class="hazard" style="position:relative;margin-top:17px">
+              <div class="key">ODRZUĆ</div>
+              <span class="cap" style="position:absolute;top:-17px;left:0;right:0;text-align:center">utrata zmian</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -335,7 +363,7 @@
   <div class="footer">
     <span class="metal">CNC ALUMINIUM · 2K MOLDING · MADE BY P FOR HE</span>
     <div class="finishbtn">
-      <div class="fbtn" id="anodBtn">anodize: silver</div>
+      <div class="fbtn" id="anodBtn">anodize: black</div>
       <div class="fbtn">scale 1:1</div>
     </div>
   </div>
@@ -356,27 +384,21 @@
   });
   // --- przełączniki
   document.querySelectorAll('.sw').forEach(s=>s.addEventListener('click',()=>s.classList.toggle('on')));
-  // --- fadery (przeciąganie; data-pct = pozycja, data-read = tekst LCD)
-  function setFader(f,pct){
-    pct=Math.max(0,Math.min(100,pct));
-    const travel=f.clientHeight-14-8;      // margines 4px góra/dół, cap 14px
-    const bottom=4+pct/100*travel;
-    f.querySelector('.capk').style.bottom=bottom+'px';
-    f.querySelector('.fill').style.height=(bottom+7)+'px';
-    const ro=f.parentElement.querySelector('.readout');
-    if(ro&&f.dataset.live)ro.textContent=Math.round(pct);
-  }
-  document.querySelectorAll('.fader').forEach(f=>{
-    const pct=parseFloat(f.dataset.pct||'50');
-    setFader(f,pct);
-    const ro=f.parentElement.querySelector('.readout');
-    if(ro)ro.textContent=f.dataset.read||String(Math.round(pct));
-    const move=ev=>{const r=f.getBoundingClientRect(); f.dataset.live="1";
-      setFader(f,(1-(ev.clientY-r.top-7)/(r.height-14))*100);};
-    f.addEventListener('pointerdown',e=>{f.setPointerCapture(e.pointerId);move(e);
-      f.onpointermove=move;});
-    f.addEventListener('pointerup',()=>f.onpointermove=null);
+  // --- sekwencery statów: + / − z auto-repeatem (klik = 1, przytrzymanie = szybko)
+  document.querySelectorAll('.stbtn').forEach(b=>{
+    const dir=+b.dataset.dir, row=b.closest('.statrow');
+    let hold, rep;
+    const bang=()=>{const el=row.querySelector('.sval');
+      el.textContent=Math.max(1,Math.min(99,(+el.textContent)+dir)); recalc();};
+    b.addEventListener('pointerdown',e=>{e.preventDefault(); bang();
+      hold=setTimeout(()=>{rep=setInterval(bang,70);},380);});
+    ['pointerup','pointerleave','pointercancel'].forEach(ev=>
+      b.addEventListener(ev,()=>{clearTimeout(hold);clearInterval(rep);}));
   });
+  function recalc(){
+    const vals=[...document.querySelectorAll('.sval')].map(e=>+e.textContent);
+    document.getElementById('lvlout').textContent=vals.reduce((a,b)=>a+b,0)-79;
+  }
   // --- pokrętło
   const knob=document.getElementById('knob'), ro4=document.getElementById('ro4');
   let ang=0, drag=false;

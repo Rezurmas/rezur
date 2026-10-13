@@ -99,9 +99,11 @@ ER-Save-Lab/
 │   ├── report/                   text and JSON output
 │   ├── gui/                      api.py (bridge), app.py (shell + selftest), web/ (UI + i18n)
 │   └── data/db_er/               item / flag / spell / grace tables
-├── tests/run_all.py              48 tests on copies of real saves
+├── tests/run_all.py              49 tests on copies of real saves
 ├── tests/smoke_cli.py            135 CLI invocations
 ├── tests/bridge_audit.py         51 GUI-bridge calls on a save copy (isolated %APPDATA%)
+├── tests/exe_e2e.py              the packaged exe: every CLI command + write flow on save copies
+├── tests/gui_panels_check.py     live window over CDP: 13 panels, staged edit, EN/PL, search
 ├── tools/                        fix_torrent, copy_slot, build_exe.cmd, sanitize_public.py, gh_login.sh
 ├── packaging/rezur.spec          PyInstaller → dist\rezur.exe (one file)
 ├── docs/screenshots/             GUI screenshots used by the README
@@ -249,6 +251,12 @@ workflow for the datamined flag names) live in the helper notes shipped with the
 - writing to the live save is blocked while the game runs (`_guard_game`, config `guard_live`);
 - tests: `run_all.py` (behaviour), `smoke_cli.py` (every command), `bridge_audit.py` (GUI bridge);
   the GUI itself is verified in a real window via `--selftest`.
+- end-to-end checks of the shipped artifacts (not of the source tree):
+  `exe_e2e.py` runs `dist/rezur.exe` through every CLI subcommand — writes only on copies, in an
+  isolated `%APPDATA%`, asserting exit codes, the backup invariant and the container MD5 after each
+  stage — and `gui_panels_check.py` drives the live window over CDP: all 13 panels, exactly one
+  visible, no `undefined/NaN` in the DOM text, a staged stat edit increments the change counter and
+  DISCARD clears it, EN↔PL switch and live search.
 
 ---
 

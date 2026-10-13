@@ -112,9 +112,41 @@ def _remember_save(path):
         pass
 
 
-def _resolve_save(args):
-    """Kolejność: --save → zapamiętany last_save → najnowszy save w %APPDATA%."""
-    explicit = getattr(args, "save", None)
+def _save_from_rest(rest):
+    """Wyciąga `--save` podany PO nazwie komendy wewnętrznej (`rezur stage stats --save PLIK …`)."""
+    if not rest:
+        return None
+    for i, tok in enumerate(rest):
+        if tok == "--save" and i + 1 < len(rest):
+            return rest[i + 1]
+        if tok.startswith("--save="):
+            return tok.split("=", 1)[1]
+    return None
+
+
+def _strip_save(argv):
+    """Usuwa `--save` z argumentów komendy wewnętrznej — staging sam wskazuje kopię roboczą.
+
+    Bez tego drugi `--save` (na oryginał) wygrywał w argparse i edycja szła do oryginału,
+    zamiast do kopii roboczej.
+    """
+    out, skip = [], False
+    for tok in argv:
+        if skip:
+            skip = False
+            continue
+        if tok == "--save":
+            skip = True
+            continue
+        if tok.startswith("--save="):
+            continue
+        out.append(tok)
+    return out
+
+
+def _resolve_save(args, rest=None):
+    """Kolejność: --save → (staging) --save z komendy wewnętrznej → last_save → najnowszy save."""
+    explicit = getattr(args, "save", None) or _save_from_rest(rest)
     if explicit:
         _remember_save(explicit)
         return explicit
@@ -1006,14 +1038,15 @@ STAGEABLE = {
 
 def cmd_stage(args):
     """Edytuj w kopii roboczej (oryginał nietknięty) — zmiany oczekujące."""
-    path = _resolve_save(args)
     rest = list(args.rest)
+    path = _resolve_save(args, rest=rest)
     if not rest or rest[0].startswith("-"):
         print("użycie: rezur stage <komenda edycji> [opcje...]")
         print("  np.: rezur stage stats --slot 0 --set vigor=61")
+        print("       rezur stage stats --save PLIK --slot 0 --set vigor=61")
         print(f"  komendy: {', '.join(sorted(STAGEABLE))}")
         return 2
-    cmd, op_args = rest[0], rest[1:]
+    cmd, op_args = rest[0], _strip_save(rest[1:])
     if cmd not in STAGEABLE:
         print(f"staging dotyczy komend edytujących: {', '.join(sorted(STAGEABLE))}")
         return 2

@@ -23,6 +23,9 @@ instructions, in English and Polish, are in `HOW-TO-RUN.txt` inside the ZIP.
 
 - **one-file Windows build** — PyInstaller `--onefile`, bundled data tables and GUI assets, so the
   window cannot come up blank; native WebView2 file dialogs (tkinter no longer needed)
+- **`stage` honours `--save` given after the inner command** — `rezur stage stats --save FILE …`
+  now stages that file (the flag used to be swallowed by the staging layer, which then fell back to
+  the default save and could even hand the inner `--save` to the original file)
 - **CLI survives Windows pipes** — output is forced to UTF-8; every command usable from `cmd`,
   PowerShell and Git Bash (`rezur.exe list-fixes | head` works)
 - **repo cleanup** — English `README.md`/`ARCHITECTURE.md` with a screenshot gallery, MIT `LICENSE`,

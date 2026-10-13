@@ -108,6 +108,7 @@ python -m rezur watch [--interval 600]                   # auto-backups: game st
 python -m rezur watch --once                             # one check
 python -m rezur risk [--slot N] [--json]                 # online-risk scan + return path to GOLD
 python -m rezur stage stats --slot 0 --set vigor=61      # edit the work copy (zero risk)
+python -m rezur stage stats --save FILE --slot 0 --set vigor=61   # same, explicit save file
 python -m rezur pending [--diff] [--undo]                # pending changes: count, diff, undo last
 python -m rezur apply                                    # commit: 1 backup + 1 write + journal entry
 python -m rezur discard                                  # drop the draft, original untouched
@@ -162,10 +163,12 @@ appearance · teleport · risk · backups · history · settings** — plus a ch
 ## Verification
 
 ```bash
-python tests/run_all.py         # 48 tests
+python tests/run_all.py         # 49 tests
 python tests/smoke_cli.py       # 135 CLI invocations
 python tests/bridge_audit.py    # 51 GUI-bridge calls
 python -m rezur gui --selftest  # opens the real window: bridge, panels, live search, language switch
+python tests/exe_e2e.py         # the packaged dist/rezur.exe: every CLI command + write flow, on save copies
+python tests/gui_panels_check.py  # the live window: all 13 panels, staged edit + DISCARD, EN/PL, live search
 ```
 
 The GUI selftest prints, from a live WebView2 window:

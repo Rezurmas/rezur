@@ -1237,6 +1237,49 @@ def t_spell_catalogue():
 
 
 @test
+def t_stage_cli_honours_save_after_command():
+    """`rezur stage stats --save PLIK …` staginguje TEN plik — i nie tyka oryginału.
+
+    Regresja: `--save` podany po nazwie komendy wewnętrznej był ignorowany przez warstwę
+    stagingu (a drugi `--save` w argv komendy wewnętrznej mógł kierować edycję na oryginał).
+    """
+    import contextlib
+    import hashlib
+    import io
+
+    from rezur import cli
+
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        old_appdata = os.environ.get("APPDATA")
+        os.environ["APPDATA"] = str(Path(td) / "appdata")  # config + staging w izolacji
+        try:
+            p = Path(td) / "ER0000.sl2"
+            shutil.copy2(src, p)
+            before = hashlib.md5(p.read_bytes()).hexdigest()
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                rc = cli.main(["stage", "stats", "--save", str(p), "--slot", "0", "--set", "mind=41"])
+                assert rc == 0, buf.getvalue()
+                assert "zmiany oczekujące" in buf.getvalue(), buf.getvalue()
+                assert hashlib.md5(p.read_bytes()).hexdigest() == before, "staging ruszył ORYGINAŁ!"
+                buf.truncate(0), buf.seek(0)
+                cli.main(["pending", "--save", str(p)])
+                assert "stats" in buf.getvalue() and "mind=41" in buf.getvalue(), buf.getvalue()
+                buf.truncate(0), buf.seek(0)
+                rc = cli.main(["apply", "--save", str(p)])
+                assert rc == 0, buf.getvalue()
+            assert hashlib.md5(p.read_bytes()).hexdigest() != before, "apply nie zapisał"
+            chk = SaveFile(p)
+            assert all(s["ok"] for s in chk.section_md5_status()), "po apply sumy sekcji muszą być OK"
+        finally:
+            if old_appdata is None:
+                os.environ.pop("APPDATA", None)
+            else:
+                os.environ["APPDATA"] = old_appdata
+
+
+@test
 def t_release_packaging_ready():
     """Wydanie jednoplikowe: entry.py + interfejs w datas + launcher/instrukcja + UTF-8 w CLI."""
     spec = (ROOT / "packaging" / "rezur.spec").read_text(encoding="utf-8")

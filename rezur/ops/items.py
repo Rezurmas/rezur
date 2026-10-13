@@ -9,7 +9,7 @@ slot jest PARSOWANY OD NOWA (nasz parser i tak znajduje wszystko po zawartości)
 import struct
 
 from ..core import checksums, gaitem, inventory, items_db
-from ..core.profiles import roster, summary_from_slot, summary_bytes, write_summary
+from ..core.profiles import roster
 from ..core.slots import SLOT_BODY, Slot
 from .stats import _resync_summary
 

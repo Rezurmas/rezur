@@ -8,7 +8,6 @@ import struct
 
 from ..core import profiles as P
 from ..core.checksums import EMPTY_SLOT_MD5
-from ..core.reader import utf16
 
 
 def _slot_summary_name(save, idx):
@@ -61,7 +60,6 @@ def copy_character_file(path, src, dst, clear_source=False, apply=False):
     report = {"path": str(path), "from": src, "to": dst}
     # dry-run: tylko odczyt nagłówków
     se = sf.slot_entries[src]
-    de = sf.slot_entries[dst]
     src_version = struct.unpack_from("<I", sf.data, se["off"] + 16)[0]
     if src_version == 0:
         raise ValueError(f"slot{src} jest pusty — nie ma czego kopiować")

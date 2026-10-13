@@ -2,7 +2,6 @@
 
 import base64
 import json
-import struct
 import zlib
 
 from .. import __product__, __version__

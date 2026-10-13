@@ -27,3 +27,6 @@ packages = [
     "rezur.report",
     "rezur.api",
 ]
+
+[tool.setuptools.package-data]
+rezur = ["data/*.txt", "data/db_er/*.json"]

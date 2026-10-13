@@ -15,7 +15,7 @@ Ogon (slot-relative, bez przerw — zweryfikowane):
 
 import struct
 
-from .reader import f32, i32, u8, u16, u32, u64, utf16, v3f, v4f
+from .reader import i32, u8, u16, u32, u64, utf16, v3f, v4f
 
 SLOT_BODY = 0x280000
 HORSE_HP_OFF = 0x20

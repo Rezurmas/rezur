@@ -9,7 +9,7 @@ import struct
 
 from ..core import checksums, items_db
 from ..core.profiles import roster
-from ..core.slots import SLOT_BODY, Slot
+from ..core.slots import Slot
 from .items import inventory_hit, parse_selector
 
 SPELL_SLOTS = 14

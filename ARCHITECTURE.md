@@ -128,6 +128,18 @@ CLI → fixes.apply_fixes(dry_run=False) → mutacja przez SaveFile
 **copy**:
 `CLI → ops.copy_character → (slot 0x280000 + profil 0x24C + touch_slot/touch_ud10) → write`
 
+**staging** (zmiany oczekujące — stan `idle → staged → applied/discarded`):
+```
+CLI (stage <komenda …>) → staging.begin: kopia robocza w %APPDATA%\rezur\staging\
+        → komenda edycji pisze do brudnopisu (SaveFile.write rozpoznaje work-path:
+          bez backupu, bez dziennika; licznik zmian rośnie tylko przy realnej różnicy bajtów)
+CLI (pending)  → manifest: lista operacji (+ --diff: porównanie sekcji bajt w bajt z oryginałem)
+CLI (apply)    → weryfikacja brudnopisu → GOLD → backup oryginału (stagebak) → atomowy zapis
+                 → wpis w dzienniku (z nazwą backupu) → sprzątanie stagingu → 12/12 MD5
+CLI (discard)  → skasowanie brudnopisu; oryginał NIETKNIĘTY
+Błąd weryfikacji przy apply → zmiany ZOSTAJĄ (nic nie tracimy, można poprawić)
+```
+
 **GUI (F6, docelowo)**: SPA wysyła JSON do `/api/*`; endpointy wołają **te same
 funkcje** co CLI; SSE `/api/events` niesie postęp (np. „dodano 240 itemów…").
 
@@ -152,10 +164,28 @@ Kontrakt (F6): szczegółowa lista endpointów — docstring w `rezur/api/server
   (te same funkcje co CLI: doctor, fixes, stats, items, equipment, slots, backupy).
 - Bind wyłącznie 127.0.0.1 + token w nagłówku; plik save'a nie opuszcza maszyny.
 - UI: karty postaci, panel ustaleń (finding → przycisk naprawy), ekwipunek + skrzynia,
-  panel EQ (22 gniazda: broń/zbroja/talizman), suwaki statystyk, flagi/łaski,
-  historia backupów. Tryb bezpieczny: zawsze najpierw podgląd zmian, potem zapis.
+  panel EQ (22 gniazda: broń/zbroja/talizman), staty −/+ z auto-repeat (bez suwaków),
+  flagi/łaski, historia backupów. Tryb bezpieczny: zawsze najpierw podgląd zmian, potem zapis.
 - Zależność: `pip install pywebview` (bez kompilatora). Prace ruszają dopiero
   na wyraźne polecenie He — teraz priorytetem jest backend.
+
+### Stany aplikacji (kontrakt dla GUI — „żeby nic nie zaskakiwało")
+
+| stan | kiedy | UI |
+|---|---|---|
+| `empty` | brak wybranego pliku | „wskaż lub przeciągnij ER0000.sl2" + lista ostatnich |
+| `loading` | wczytywanie ~29 MB | wskaźnik nieoznaczony + czas (info pokazuje ms); okno nie może zamarznąć |
+| `ready` | plik wczytany | karty postaci, panele aktywne |
+| `staged` | ≥1 zmiana oczekująca | licznik zmian + PODGLĄD / ZASTOSUJ / ODRZUĆ (= staging: `stage/pending/apply/discard`) |
+| `busy` | apply w toku | blokada kontrolek + faza („zapisuję", „weryfikuję") |
+| `failed` | błąd zapisu | zmiany ZOSTAJĄ, komunikat co poszło nie tak (staging nienaruszony) |
+| `done` | zapis OK | zielony: nazwa backupu + 12/12 MD5 + wpis w historii (`log`) |
+
+- Zamknięcie okna w stanie `staged` → dialog wprost: **Zapisz / Odrzuć / Wróć** (nigdy OK/Anuluj).
+- Oryginał zmieniony poza sesją (gra zapisała) → `apply` wstrzymane z komunikatem;
+  w CLI świadomy override to `--force`.
+- Historia operacji (`rezur log` = dziennik edycji) jest jednym ze źródeł panelu
+  „ostatnie zmiany" i znacznika „plik modyfikowany" (patrz `risk`).
 
 ## 7. Rozszerzalność
 
@@ -170,10 +200,11 @@ Kontrakt (F6): szczegółowa lista endpointów — docstring w `rezur/api/server
 | Faza | Zakres | Gdzie | Status |
 |---|---|---|---|
 | F1 | parser + raport + doctor | `core/`, `diag/`, `report/` | ✅ v0.1.0 |
-| F2 | edycja statystyk/runów/imienia (walidacja levelu) | `ops/stats.py` | następne |
-| F3 | itemy (gaitem + inventory + baza `db_er`) | `core/gaitem.py`, `ops/items.py` | plan |
-| F4 | świat: event flags, łaski, bossy | `core/flags.py`, `ops/flags.py` | plan |
-| F5 | transfer: import/eksport postaci (JSON), cross-save | `ops/transfer.py` | plan |
+| F2 | edycja statystyk/runów/imienia (walidacja levelu) | `ops/stats.py` | ✅ |
+| F3 | itemy (gaitem + inventory + baza `db_er`) | `core/gaitem.py`, `ops/items.py` | ✅ |
+| F4 | świat: event flags, łaski, bossy | `core/flags.py`, `ops/flags.py` | ✅ |
+| F5 | transfer: import/eksport postaci (JSON), cross-save | `ops/transfer.py` | ✅ |
+| F5b | zaufanie: vault (GOLD/piny), watch, risk, staging + log | `core/vault.py`, `ops/watch.py`, `risk.py`, `staging.py` | ✅ |
 | F6 | GUI: lokalny webview (pywebview / WebView2) + API JSON | `api/`, `web/` | plan — start na GO od He |
 | F7 | pakowanie: `.exe` / pywebview / skróty | `packaging/` | plan |
 

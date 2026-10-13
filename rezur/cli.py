@@ -47,6 +47,7 @@ from . import __product__, __version__
 from . import config as CONF
 from . import fixes as F
 from . import risk
+from . import staging
 from .core import items_db
 from .core.profiles import roster
 from .core.savefile import SaveFile, default_save_path
@@ -141,11 +142,21 @@ def _guard_game(path=""):
     return True
 
 
+def _pending_hint(path):
+    n = staging.op_count(path)
+    if n:
+        print(f"! {n} zmian oczekujących (staging) — `rezur pending` | `rezur apply` | `rezur discard`")
+
+
 def cmd_info(args):
+    t0 = time.perf_counter()
     sf = _load(args)
+    dt = time.perf_counter() - t0
     print(R.fmt_container(sf))
+    print(f"(wczytanie: {dt * 1000:.0f} ms · {sf.path.stat().st_size / 1e6:.1f} MB)")
     print()
     print(R.fmt_characters(sf))
+    _pending_hint(sf.path)
     return 0
 
 
@@ -156,6 +167,7 @@ def cmd_doctor(args):
         print(json.dumps(J.save_to_dict(sf, findings), indent=2, ensure_ascii=False))
     else:
         print(R.fmt_doctor(sf, findings))
+    _pending_hint(sf.path)
     return 1 if any(f.level == "error" for f in findings) else 0
 
 
@@ -895,6 +907,129 @@ def cmd_risk(args):
     return 1 if res["verdict"] == "red" else 0
 
 
+STAGEABLE = {
+    "fix", "stats", "item", "equip", "unequip", "spells", "appearance", "teleport",
+    "world", "unlock", "flags", "graces", "copy", "swap", "clear", "steamid", "import",
+}
+
+
+def cmd_stage(args):
+    """Edytuj w kopii roboczej (oryginał nietknięty) — zmiany oczekujące."""
+    path = args.save or str(default_save_path())
+    rest = list(args.rest)
+    if not rest or rest[0].startswith("-"):
+        print("użycie: rezur stage <komenda edycji> [opcje...]")
+        print("  np.: rezur stage stats --slot 0 --set vigor=61")
+        print(f"  komendy: {', '.join(sorted(STAGEABLE))}")
+        return 2
+    cmd, op_args = rest[0], rest[1:]
+    if cmd not in STAGEABLE:
+        print(f"staging dotyczy komend edytujących: {', '.join(sorted(STAGEABLE))}")
+        return 2
+    try:
+        work = staging.begin(path)
+    except FileNotFoundError:
+        print(f"nie ma pliku: {path}")
+        return 2
+    before = staging.md5_file(work)
+    argv = [cmd, "--save", str(work), *op_args]
+    if "--apply" not in argv:
+        argv.append("--apply")
+    print(f"staging → {work}")
+    rc = main(argv)
+    if rc != 0:
+        print("(komenda nie przeszła — nic nie doliczam)")
+        return rc
+    if staging.md5_file(work) == before:
+        print("bez zmian danych — nic nie doliczam do zmian oczekujących.")
+        return 0
+    n = staging.record_op(path, cmd, " ".join(op_args) or "(bez opcji)")
+    print(f"→ zmiany oczekujące: {n}   (`rezur apply` zatwierdza, `rezur discard` odrzuca)")
+    return 0
+
+
+def cmd_pending(args):
+    path = args.save or str(default_save_path())
+    man = staging.load_manifest(path)
+    if not man:
+        print("brak zmian oczekujących — edytuj przez: rezur stage <komenda> ...")
+        return 0
+    print(f"ZMIANY OCZEKUJĄCE: {len(man['ops'])} (od {man['created']})")
+    for i, op in enumerate(man["ops"], 1):
+        print(f"  {i:>2d}. [{op['ts']}] {op['op']}: {op['summary']}")
+    if staging.original_changed(path):
+        print("  !! oryginał zmienił się od rozpoczęcia stagingu (gra zapisała?) — apply wymaga --force")
+    if args.diff:
+        try:
+            so = SaveFile(path)
+            sw = SaveFile(staging.work_path(path))
+            changed = []
+            for e in so.entries:
+                a = so.data[e["off"] + 16: e["off"] + e["size"]]
+                b = sw.data[e["off"] + 16: e["off"] + e["size"]]
+                if a != b:
+                    changed.append(e["name"])
+            print("  zmienione sekcje: " + (", ".join(changed) if changed else "brak różnic bajtowych"))
+        except (OSError, ValueError) as e:
+            print(f"  (nie udało się policzyć różnic: {e})")
+    print("  → zatwierdź: python -m rezur apply   |   odrzuć: python -m rezur discard")
+    return 0
+
+
+def cmd_apply(args):
+    path = args.save or str(default_save_path())
+    if staging.op_count(path) == 0:
+        print("brak zmian oczekujących — edytuj przez: rezur stage <komenda> ...")
+        return 2
+    if not _guard_game(path):
+        return 3
+    try:
+        res = staging.apply(path, force=args.force)
+    except RuntimeError as e:
+        print(f"wstrzymane: {e}")
+        return 3
+    except ValueError as e:
+        print(f"ODRZUCONO ZAPIS: {e}")
+        print("zmiany oczekujące ZOSTAJĄ — popraw brudnopis albo `rezur discard`")
+        return 1
+    print(f"zastosowano {res['ops']} zmian. backup: {res['backup']}")
+    print(f"sumy sekcji po zapisie: {res['md5_ok']}/{res['md5_total']} OK")
+    return 0
+
+
+def cmd_discard(args):
+    path = args.save or str(default_save_path())
+    res = staging.discard(path)
+    if res["ops"]:
+        print(f"odrzucono {res['ops']} zmian — oryginał nietknięty.")
+    elif res["removed"]:
+        print("usunięto brudnopis stagingu (bez zmian do odrzucenia).")
+    else:
+        print("brak zmian oczekujących.")
+    return 0
+
+
+def cmd_log(args):
+    path = args.save or str(default_save_path())
+    from .core import journal
+
+    es = journal.load(path)["entries"]
+    if args.json:
+        print(json.dumps(es, indent=2, ensure_ascii=False))
+        return 0
+    print(f"HISTORIA OPERACJI — {path}")
+    if not es:
+        print("  (pusto — dziennik zapisuje każdą udaną modyfikację)")
+        return 0
+    for e in es[-40:]:
+        note = f"  ← backup: {e['note']}" if e.get("note") else ""
+        print(f"  {e['ts']}  {journal.OP_LABELS.get(e['op'], e['op']):<28s}{note}")
+    n = staging.op_count(path)
+    if n:
+        print(f"  (+ {n} zmian oczekujących — jeszcze niezapisanych)")
+    return 0
+
+
 def cmd_config(args):
     if args.set:
         if "=" not in args.set:
@@ -1134,6 +1269,31 @@ def main(argv=None):
     sp.add_argument("--slot", type=int, default=None, help="tylko jeden slot")
     sp.add_argument("--json", action="store_true")
     sp.set_defaults(func=cmd_risk)
+
+    sp = sub.add_parser("stage", help="edytuj w kopii roboczej (zmiany oczekujące)")
+    add_save(sp)
+    sp.add_argument("rest", nargs=argparse.REMAINDER, help="komenda edycji i jej opcje")
+    sp.set_defaults(func=cmd_stage)
+
+    sp = sub.add_parser("pending", help="zmiany oczekujące: licznik + podgląd")
+    add_save(sp)
+    sp.add_argument("--diff", action="store_true", help="pokaż zmienione sekcje (bajt w bajt)")
+    sp.set_defaults(func=cmd_pending)
+
+    sp = sub.add_parser("apply", help="zatwierdź zmiany oczekujące (1 backup + 1 zapis)")
+    add_save(sp)
+    sp.add_argument("--force", action="store_true",
+                    help="nawet jeśli oryginał zmienił się od rozpoczęcia stagingu")
+    sp.set_defaults(func=cmd_apply)
+
+    sp = sub.add_parser("discard", help="odrzuć zmiany oczekujące (oryginał nietknięty)")
+    add_save(sp)
+    sp.set_defaults(func=cmd_discard)
+
+    sp = sub.add_parser("log", help="historia operacji (dziennik edycji)")
+    add_save(sp)
+    sp.add_argument("--json", action="store_true")
+    sp.set_defaults(func=cmd_log)
 
     sp = sub.add_parser("config", help="konfiguracja Rezura")
     sp.add_argument("--set", default=None, help="klucz=wartość")

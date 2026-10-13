@@ -80,12 +80,16 @@ class SaveFile:
         Kolejność: GOLD → backup → zapis do .tmp-rezur → WERYFIKACJA kandydata
         (BND4 + sumy MD5 wszystkich sekcji) → dopiero potem podmiana oryginału.
         Zwraca ścieżkę backupu (albo None, jeśli pliku jeszcze nie było).
-        """
-        from .. import config
-        from . import vault
 
+        Kopia robocza stagingu (…/rezur/staging/…): zapis bez backupu i bez
+        wpisu w dzienniku — to brudnopis; realny zapis robi `rezur apply`.
+        """
+        from .. import config, staging
+        from . import journal, vault
+
+        work_mode = staging.is_work_path(self.path)
         bak = None
-        if self.path.exists():
+        if self.path.exists() and not work_mode:
             vault.ensure_gold(self.path)
             stamp = time.strftime("%Y%m%d-%H%M%S")
             bak = self.path.with_name(f"{self.path.name}.{backup_tag}-{stamp}")
@@ -106,10 +110,10 @@ class SaveFile:
             except OSError:
                 pass
             raise
-        from . import journal
-
-        journal.record(self.path, backup_tag)
-        return bak
+        if not work_mode:
+            journal.record(self.path, backup_tag, note=Path(bak).name if bak else None)
+            return bak
+        return "(brudnopis stagingu — backup powstanie na `rezur apply`)"
 
 
 def verify_save_bytes(data):

@@ -28,6 +28,7 @@ OP_LABELS = {
     "steamidbak": "SteamID",
     "importbak": "import postaci",
     "restorebak": "przywrócenie kopii",
+    "stagebak": "zatwierdzenie zmian (staging)",
     "test": "test",
 }
 

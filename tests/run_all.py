@@ -838,6 +838,88 @@ def t_risk_detects_impossible_upgrade():
         assert res["verdict"] == "red", res["verdict"]
 
 
+@test
+def t_staging_flow_apply_once():
+    from rezur import staging
+    from rezur.core import journal
+
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        assert staging.op_count(p) == 0
+        work = staging.begin(p)
+        assert work.is_file() and work.read_bytes() == p.read_bytes()
+
+        # edycja brudnopisu: pyknięcie w zapas slotu + przeliczenie MD5
+        sf = SaveFile(work)
+        e = sf.slot_entries[0]
+        sf.data[e["off"] + 16 + 0x280000 - 1] ^= 0xFF
+        sf.touch_slot(0)
+        sf.write(backup_tag="stagework")  # brudnopis: bez backupu, bez dziennika
+        assert not list(Path(work).parent.glob("*stagework*")), "brudnopis nie robi backupów"
+        assert journal.summary(p)["count"] == 0, "brudnopis nie pisze do dziennika oryginału"
+
+        staging.record_op(p, "stats", "--set vigor=61 (test)")
+        assert staging.op_count(p) == 1
+        orig_before = p.read_bytes()
+        staged = work.read_bytes()
+        res = staging.apply(p)
+        assert res["md5_ok"] == res["md5_total"] == 12, res
+        assert res["backup"] and "stagebak" in res["backup"]
+        assert p.read_bytes() == staged and p.read_bytes() != orig_before
+        assert staging.op_count(p) == 0 and not work.exists()
+        j = journal.summary(p)
+        assert j["count"] == 1 and j["ops"].get("zatwierdzenie zmian (staging)") == 1, j
+        assert "stagebak" in journal.load(p)["entries"][-1]["note"]
+
+
+@test
+def t_staging_failure_keeps_changes():
+    from rezur import staging
+
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        orig = p.read_bytes()
+        work = staging.begin(p)
+        work.write_bytes(b"to nie jest save")  # brudnopis psujemy
+        staging.record_op(p, "stats", "test")
+        denied = ""
+        try:
+            staging.apply(p)
+        except ValueError as ex:
+            denied = str(ex)
+        assert "weryfikacja" in denied, denied or "apply nie odrzucił zepsutego brudnopisu"
+        assert p.read_bytes() == orig, "oryginał ruszony mimo błędu"
+        assert staging.op_count(p) == 1 and work.is_file(), "zmiany muszą ZOSTAĆ po błędzie"
+        staging.discard(p)
+        assert staging.op_count(p) == 0 and not work.exists()
+
+
+@test
+def t_staging_blocks_when_original_changed():
+    from rezur import staging
+
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        staging.begin(p)
+        staging.record_op(p, "stats", "test")
+        os.utime(p, (time.time() + 10, time.time() + 10))
+        assert staging.original_changed(p)
+        blocked = ""
+        try:
+            staging.apply(p)
+        except RuntimeError as ex:
+            blocked = str(ex)
+        assert "zmienił się" in blocked, blocked or "apply nie wstrzymał się przy zmienionym oryginale"
+        assert staging.op_count(p) == 1
+        staging.discard(p)
+
+
 def main():
     ok = fail = 0
     for t in _tests:

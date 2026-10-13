@@ -14,6 +14,8 @@ GOLD (niekasowalne) + przypinane + rotacja, auto-kopiec `watch` przy grze, zapis
 z weryfikacją kandydata przed podmianą, wersja patcha per postać z ostrzeżeniem `patch_old`.
 **Świadomość banów:** `rezur risk` — skan danych niemożliwych (staty, ulepszenia broni,
 ilości), znacznik „plik modyfikowany" (dziennik edycji) i gotowa droga powrotu do GOLD.
+**Stany bezpieczne (staging):** `stage → pending → apply/discard` — edycje na kopii roboczej,
+jeden backup przy zatwierdzeniu, historia operacji w `rezur log`.
 GUI (F6): lokalny webview (pywebview) — **start dopiero na GO**; plan w `ARCHITECTURE.md`.
 
 ## Szybki start
@@ -68,6 +70,11 @@ python -m rezur backups --restore NAZWA [--apply]
 python -m rezur watch [--interval 600]    # auto-kopie: start gry + co interwał (Ctrl+C kończy)
 python -m rezur watch --once              # jeden przebieg kontrolny
 python -m rezur risk [--slot N] [--json]  # ryzyko online: dane niemożliwe + znacznik modyfikacji + powrót do GOLD
+python -m rezur stage stats --slot 0 --set vigor=61   # edytuj w kopii roboczej (bez ryzyka)
+python -m rezur pending [--diff]          # zmiany oczekujące: licznik + podgląd sekcji
+python -m rezur apply                     # zatwierdź: 1 backup + 1 zapis + wpis w historii
+python -m rezur discard                   # odrzuć: oryginał nietknięty
+python -m rezur log [--json]              # historia operacji (dziennik edycji)
 python -m rezur config                    # backup_retention / auto_doctor / guard_live / watch_interval
 python -m rezur list-fixes                # lista napraw
 ```
@@ -81,6 +88,7 @@ rezur/
   core/    format: bnd4, sloty, sumy (MD5 + PlayerDataHash), profile, SaveFile, vault (GOLD/piny/rotacja),
            journal (dziennik edycji → znacznik „modyfikowany")
   risk.py  ryzyko online: dane niemożliwe (staty/ulepszenia/ilości) + znacznik + droga do GOLD
+  staging.py  zmiany oczekujące: kopia robocza + manifest (stage/pending/apply/discard)
   games/   rejestr gier (teraz: Elden Ring; struktura pod kolejne)
   diag/    silnik diagnostyki (checks → Finding z kodem i przypisaną naprawą)
   fixes/   rejestr napraw: torrent, checksums, playerhash, summary, weather, dlc
@@ -90,8 +98,8 @@ rezur/
   report/  wyjście tekstowe i JSON
   api/     warstwa HTTP/JSON pod GUI (F6 — most do webview; placeholder)
   cli.py   python -m rezur
-tests/     run_all.py — 35 testów na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
-           smoke_cli.py — przebieg KAŻDEJ komendy CLI (~110 wywołań) na kopii save'a
+tests/     run_all.py — 38 testów na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
+           smoke_cli.py — przebieg KAŻDEJ komendy CLI (125 wywołań) na kopii save'a
 ARCHITECTURE.md   frontend/backend, przepływy, roadmapa
 ```
 

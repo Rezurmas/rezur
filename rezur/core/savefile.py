@@ -75,11 +75,12 @@ class SaveFile:
             checksums.write_section_md5(self.data, e["off"], e["size"])
 
     def write(self, backup_tag="rezurbak"):
-        """Backup obok pliku + zapis atomowy. Zwraca ścieżkę backupu."""
+        """Backup obok pliku (z rotacją wg config) + zapis atomowy. Zwraca ścieżkę backupu."""
         stamp = time.strftime("%Y%m%d-%H%M%S")
         bak = self.path.with_name(f"{self.path.name}.{backup_tag}-{stamp}")
         if self.path.exists():
             shutil.copy2(self.path, bak)
+            self._prune_backups()
         tmp = self.path.with_name(self.path.name + ".tmp-rezur")
         with open(tmp, "wb") as f:
             f.write(bytes(self.data))
@@ -87,6 +88,23 @@ class SaveFile:
             os.fsync(f.fileno())
         os.replace(tmp, self.path)
         return bak
+
+    def _prune_backups(self):
+        from .. import config
+
+        keep = config.load().get("backup_retention", 0)
+        if not keep:
+            return
+        baks = sorted(
+            self.path.parent.glob(f"{self.path.name}.*bak-*"),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        for old in baks[keep:]:
+            try:
+                old.unlink()
+            except OSError:
+                pass
 
 
 def default_save_path():

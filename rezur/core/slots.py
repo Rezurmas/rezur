@@ -148,6 +148,37 @@ class Slot:
             self.reason = "horse offset out of slot"
             return False
 
+        # --- dalej: control, plama krwi, menu, trophy, gaitem-game-data, tutorial,
+        #     liczniki GameMan, last_rested_grace, ... az do event flags
+        o += 0x28
+        self.offsets["control"] = o
+        o += 1
+        self.offsets["blood_stain"] = o
+        o += 0x44
+        o += 4 + 4  # unk 0x120, unk 0x88
+        self.offsets["menu"] = o
+        menu_size = u32(self.raw, o + 4)
+        if not (0 < menu_size <= 0x10000):
+            self.reason = f"menu size 0x{menu_size:X} out of range"
+            return False
+        o += 8 + menu_size
+        o += 0x34  # trophy equip data
+        o += 0x1B588  # gaitem_game_data (i64 + 14000 x 8B)
+        self.offsets["tutorial"] = o
+        tut_size = u32(self.raw, o + 4)
+        if not (0 < tut_size <= 0x10000):
+            self.reason = f"tutorial size 0x{tut_size:X} out of range"
+            return False
+        o += 8 + tut_size
+        o += 3 + 4 + 4 + 1 + 4  # gameman 3B, deaths, ctype, online, ctype_online
+        self.offsets["last_rested_grace"] = o
+        self.last_rested_grace = u32(self.raw, o)
+        o += 4 + 1 + 4 + 4  # not_alone, countdown, unk 0x124
+        self.offsets["event_flags"] = o
+        if o + 0x1BF99F + 1 > SLOT_BODY:
+            self.reason = "event flags out of slot"
+            return False
+
         # --- ogon: szukanie SteamID64 (8 B LE)
         sidb = struct.pack("<Q", self.save.steam_id())
         i = self.raw.find(sidb)
@@ -277,6 +308,18 @@ class Slot:
             self.offsets["spells"],
             self.tail["hash"],
         )
+
+    def event_flags(self):
+        o = self.offsets["event_flags"]
+        return bytes(self.raw[o : o + 0x1BF99F])
+
+    def get_flag(self, event_id):
+        from .flags import get_flag
+
+        return get_flag(self.event_flags(), event_id)
+
+    def inventory_offsets(self):
+        return self.offsets["inventory_held"], self.offsets["storage"]
 
     def character(self):
         """Skrót postaci do raportów."""

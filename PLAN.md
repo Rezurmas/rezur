@@ -164,7 +164,7 @@ erlab serve                               # GUI webowe (F6)
 | **F3** | Itemey: `item add/find`, upgrade, affinity, Ashes of War | L | dodany item widoczny w grze (inwentarz + skrzynia); brak duplikatów handle; rekordy 8/16/21 B poprawne per typ |
 | **F4** | Świat: `flags`, `graces unlock`, bossy, regiony | L | odblokowane łaski widoczne na mapie; flaga bossa ustawiona → boss martwy; pełna zgodność z nazwaną bazą flag |
 | **F5** | Chirurgia: `copy` postaci (slot↔slot, save↔save), SteamID patcher, import PS4 | M | skopiowana postać ładuje się jako osobny slot; SteamID podmieniony → gra przyjmuje save na innym koncie |
-| **F6** | GUI webowe lokalne (`erlab serve`) | M | drag&drop save'a w przeglądarce, karty postaci, suwaki statystyk, wyszukiwarka itemów, przełączniki flag; wszystko na 127.0.0.1, plik nie opuszcza kompa |
+| **F6** | GUI natywne w **Clay** (C) + most HTTP do silnika Python | M | okno: karty postaci, panel napraw, wyszukiwarka itemów, suwaki statystyk, flagi; Clay = layout, renderer win32_gdi/raylib; cała logika zostaje w Pythonie |
 | **F7** | Pakowanie: `.exe` (PyInstaller) + skróty + README | S | dwuklik działa na twoim PC bez Pythona |
 
 Kolejność jest zależna: F1→F2→F3 to szkielet. F4 może iść równolegle po F2 (flagi to osobny
@@ -201,4 +201,4 @@ blok pamięci). F6 dopiero gdy rdzeń jest nie do zepsucia. **Startujemy: F1.**
 1. Zakres F4: pełny edytor flag (jak w Hapfel1) czy tylko "unlock all łaski + bossy + regiony"?
 2. Tempo prac: F1+F2 jednym cięgiem (mamy działający edytor statystyk), czy po każdej fazie
    przerwa na testy w grze?
-3. Nazwa/CLI: `erlab` zostaje? (można zmienić na cokolwiek)
+3. Nazwa/CLI: **rozstrzygnięte** — produkt to *Rezur Saves Configurator*, komenda `rezur`.

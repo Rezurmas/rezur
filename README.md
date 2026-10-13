@@ -9,7 +9,9 @@ Zbudowany na zweryfikowanym od podstaw formacie zapisu (v250–261, 1.16-era).
 formatu, diagnostyka, naprawy, edycja statów/runów/itemów/flag, ekwipunek (dodaj/usuń/ilość/przenieś),
 EQ postaci (22 gniazda), broń (poziom/affinity/AoW), czary, wygląd, teleport,
 nazwane flagi świata (22 grupy: bossowie, mapy, cookbooki…), masowe nadawanie kategorii,
-kopiowanie/podmiana/czyszczenie slotów, transfer postaci, backupy z rotacją.
+kopiowanie/podmiana/czyszczenie slotów, transfer postaci. **Zaufanie do pliku:** kopie
+GOLD (niekasowalne) + przypinane + rotacja, auto-kopiec `watch` przy grze, zapis atomowy
+z weryfikacją kandydata przed podmianą, wersja patcha per postać z ostrzeżeniem `patch_old`.
 GUI (F6): lokalny webview (pywebview) — **start dopiero na GO**; plan w `ARCHITECTURE.md`.
 
 ## Szybki start
@@ -57,8 +59,13 @@ python -m rezur clear --slot 3 --apply    # wyczyść slot
 python -m rezur export --slot 0 --out lmfh.json
 python -m rezur import --to 3 --in lmfh.json --apply
 python -m rezur steamid --set 7656119xxxxxxxxxx [--apply]
-python -m rezur backups                   # kopie obok save'a (+ --restore NAZWA [--apply])
-python -m rezur config                    # backup_retention / auto_doctor / guard_live
+python -m rezur backups                   # kopie obok save'a (markery GOLD/PIN)
+python -m rezur backups --gold            # niekasowalna kopia GOLD (powstaje raz na plik)
+python -m rezur backups --pin NAZWA       # przypnij kopię (rotacja jej nie ruszy)
+python -m rezur backups --restore NAZWA [--apply]
+python -m rezur watch [--interval 600]    # auto-kopie: start gry + co interwał (Ctrl+C kończy)
+python -m rezur watch --once              # jeden przebieg kontrolny
+python -m rezur config                    # backup_retention / auto_doctor / guard_live / watch_interval
 python -m rezur list-fixes                # lista napraw
 ```
 
@@ -68,26 +75,29 @@ Bez `--save` narzędzie bierze najnowszy save z `%APPDATA%\EldenRing\*\ER0000.sl
 
 ```
 rezur/
-  core/    format: bnd4, sloty, sumy (MD5 + PlayerDataHash), profile, SaveFile
+  core/    format: bnd4, sloty, sumy (MD5 + PlayerDataHash), profile, SaveFile, vault (GOLD/piny/rotacja)
   games/   rejestr gier (teraz: Elden Ring; struktura pod kolejne)
   diag/    silnik diagnostyki (checks → Finding z kodem i przypisaną naprawą)
   fixes/   rejestr napraw: torrent, checksums, playerhash, summary, weather, dlc
   ops/     staty/runy/imie, itemy (gaitem+inventory: dodaj/usuń/ilość/przenieś/upgrade/affinity/AoW),
            EQ (22 gniazda), czary, wygląd, teleport, świat (nazwane flagi), masowe nadawanie,
-           kopie/podmiana/czyszczenie slotów, SteamID, transfer JSON, backupy
+           kopie/podmiana/czyszczenie slotów, SteamID, transfer JSON, backupy, watch (auto-kopie przy grze)
   report/  wyjście tekstowe i JSON
   api/     warstwa HTTP/JSON pod GUI (F6 — most do webview; placeholder)
   cli.py   python -m rezur
-tests/     run_all.py — 28 testów na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
-           smoke_cli.py — przebieg KAŻDEJ komendy CLI (~100 wywołań) na kopii save'a
+tests/     run_all.py — 32 testy na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
+           smoke_cli.py — przebieg KAŻDEJ komendy CLI (106 wywołań) na kopii save'a
 ARCHITECTURE.md   frontend/backend, przepływy, roadmapa
 ```
 
 ## Zasady bezpieczeństwa
 
-- zapis **tylko** przez `SaveFile.write()`: backup obok pliku + zapis atomowy,
+- zapis **tylko** przez `SaveFile.write()`: GOLD (raz na plik) + backup z rotacją + zapis atomowy;
+  kandydat jest weryfikowany (BND4 + sumy MD5 wszystkich sekcji) ZANIM podmieni oryginał,
+- kopie GOLD i przypięte (`--pin`) są niekasowalne — rotacja je omija,
+- `rezur watch` robi auto-kopie przy starcie gry i co `watch_interval` sekund (weryfikacja odrzuca kopię zrobioną w trakcie zapisu gry),
 - CLI domyślnie w trybie dry-run; `--apply` wymagany do zapisu,
 - przy działającej grze zapis jest blokowany,
-- po naprawie automatyczna re-diagnostyka.
+- po naprawie automatyczna re-diagnostyka; `doctor` flaguje też postacie ze starego patcha gry (`patch_old`).
 
 Szczegóły techniczne formatu i zweryfikowane pułapki: skill `elden-ring-save-repair`.

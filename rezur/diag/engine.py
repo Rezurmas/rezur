@@ -117,6 +117,16 @@ def run_diagnostics(save, expect_steamid=None):
                                                 "(mogą blokować wczytanie)", slot=i, fix="dlc")
             )
 
+        # BaseVersion — postać zapisana pod starszym patchem gry
+        bv = slot.base_version()
+        if bv["is_latest"] == 0:
+            findings.append(
+                Finding(WARNING, "patch_old",
+                        f"postać ze starszego patcha gry (base={bv['version']}, slot=v{ch['version']}) — "
+                        "wczytaj ją raz na aktualnym patchu, żeby gra ją odświeżyła; "
+                        "stare postacie potrafią crashować grę i edytory", slot=i)
+            )
+
         # PlayerGameDataHash
         try:
             if not slot.player_hash_matches():

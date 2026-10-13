@@ -19,7 +19,8 @@ def fmt_container(save):
 def fmt_characters(save):
     r = roster(save)
     lines = [
-        f"{'slot':<4s} {'postać':<18s} {'lvl':>4s} {'czas':>8s} {'runy (pamięć)':>14s}  {'mapa':<12s} {'torrent':<9s}"
+        f"{'slot':<4s} {'postać':<18s} {'lvl':>4s} {'czas':>8s} {'runy (pamięć)':>14s}  "
+        f"{'mapa':<12s} {'torrent':<9s} {'patch':<7s}"
     ]
     for i in range(10):
         prof = r[i]
@@ -34,9 +35,11 @@ def fmt_characters(save):
         t = h["state_name"]
         if h["hp"] == 0 and h["state"] == STATE_ACTIVE:
             t += " !!"
+        pv = ch["patch"]
+        ptxt = f"b{pv['version']}" + ("  !!" if pv["is_latest"] == 0 else "")
         lines.append(
             f"{i:<4d} {ch['name']:<18s} {ch['level']:>4d} {ch['seconds']/3600:7.1f}h "
-            f"{ch['runes_memory']:>14,d}  {ch['map_name']:<12s} {t:<9s}"
+            f"{ch['runes_memory']:>14,d}  {ch['map_name']:<12s} {t:<9s} {ptxt:<7s}"
         )
     return "\n".join(lines)
 

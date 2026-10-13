@@ -298,6 +298,20 @@ class Slot:
         d = self.tail["dlc"]
         return list(self.raw[d : d + 4]) + [sum(1 for x in self.raw[d + 4 : d + 50] if x)]
 
+    def base_version(self):
+        """Blok BaseVersion w ogonie: kopia, wersja bazowa, czy aktualna (0/1).
+
+        is_latest == 0 → postać zapisana pod starszym patchem gry; gra odświeża
+        ją przy pierwszym wczytaniu na aktualnym patchu. Stare postacie potrafią
+        crashować grę i edytory (crash zaraz po wczytaniu save'a).
+        """
+        b = self.tail["basever"]
+        return {
+            "copy": u32(self.raw, b),
+            "version": u32(self.raw, b + 4),
+            "is_latest": u32(self.raw, b + 8),
+        }
+
     def player_hash_matches(self):
         from .checksums import player_hash_matches
 
@@ -334,5 +348,6 @@ class Slot:
             "seconds": self.play_time_ms // 1000,
             "map_id": self.map_id,
             "map_name": self.map_name(),
+            "patch": self.base_version(),
             "horse": self.horse(),
         }

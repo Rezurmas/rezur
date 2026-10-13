@@ -51,8 +51,10 @@ from .core.profiles import roster
 from .core.savefile import SaveFile, default_save_path
 from .core.slots import Slot
 from .diag import run_diagnostics
-from .ops.backups import list_backups, restore
+from .ops.backups import ensure_gold, list_backups, restore, set_pin
 from .ops.copy_slot import clear_character_file, copy_character_file, swap_characters_file
+from .ops.watch import run_loop as watch_loop
+from .ops.watch import run_once as watch_once
 from .ops.flags import graces as graces_data
 from .ops.flags import get_flag as flag_get
 from .ops.flags import set_flag as flag_set
@@ -776,6 +778,26 @@ def cmd_import(args):
 
 def cmd_backups(args):
     path = args.save or str(default_save_path())
+    if getattr(args, "gold", False):
+        try:
+            res = ensure_gold(path)
+        except FileNotFoundError:
+            print(f"nie ma pliku: {path}")
+            return 2
+        print(("zrobiono" if res["created"] else "już jest") + f" kopia GOLD: {res['path']}")
+        return 0
+    if args.pin or args.unpin:
+        raw = args.pin or args.unpin
+        baks = list_backups(path)
+        hit = next((b for b in baks if b["name"] in (raw, Path(raw).name)), None)
+        name = hit["name"] if hit else Path(raw).name
+        if not hit and not Path(raw).is_file():
+            print(f"nie znalazłem kopii: {raw}")
+            return 2
+        pins = set_pin(path, name, on=bool(args.pin))
+        print(("przypięto" if args.pin else "odpięto") + f": {name}")
+        print("przypięte: " + (", ".join(pins) if pins else "(brak)"))
+        return 0
     if args.restore:
         baks = list_backups(path)
         hit = next((b for b in baks if b["name"] == args.restore), None)
@@ -794,12 +816,35 @@ def cmd_backups(args):
         return 0
     baks = list_backups(path)
     print(f"kopie dla {path}:")
-    for b in baks[:40]:
+    for b in baks[:60]:
         when = time.strftime("%Y-%m-%d %H:%M", time.localtime(b["mtime"]))
-        print(f"  {when}  {b['name']}  ({b['size'] / 1e6:.1f} MB)")
+        mark = "GOLD" if b["gold"] else ("PIN " if b["pinned"] else "    ")
+        print(f"  {mark} {when}  {b['name']}  ({b['size'] / 1e6:.1f} MB)")
     if not baks:
         print("  (brak — powstają przy każdym zapisie)")
+    else:
+        g = next((b for b in baks if b["gold"]), None)
+        print("  " + (f"GOLD: {g['name']}" if g else "GOLD: (brak — powstanie przy pierwszej modyfikacji)"))
+        n_pin = sum(1 for b in baks if b["pinned"])
+        if n_pin:
+            print(f"  przypięte: {n_pin}")
     return 0
+
+
+def cmd_watch(args):
+    """Auto-kopiec: kopia przy starcie gry i co interwał, dopóki gra działa."""
+    path = args.save or str(default_save_path())
+    interval = args.interval if args.interval is not None else CONF.load().get("watch_interval", 600)
+    if args.once:
+        res = watch_once(path, interval=interval)
+        if not res["running"]:
+            print("gra nie działa — nic do robienia (kopia powstanie, gdy wystartuje).")
+        elif res["made"]:
+            print(f"gra działa ({res['reason']}) → kopia: {res['made']}")
+        else:
+            print(f"gra działa; nic nie robię ({res['reason']})")
+        return 0
+    return watch_loop(path, interval=interval)
 
 
 def cmd_config(args):
@@ -1020,11 +1065,21 @@ def main(argv=None):
     sp.add_argument("--apply", action="store_true")
     sp.set_defaults(func=cmd_import)
 
-    sp = sub.add_parser("backups", help="kopie: lista / przywracanie")
+    sp = sub.add_parser("backups", help="kopie: lista / przywracanie / GOLD / przypinanie")
     add_save(sp)
     sp.add_argument("--restore", default=None, help="nazwa pliku kopii")
+    sp.add_argument("--gold", action="store_true", help="zrób niekasowalną kopię GOLD (raz na plik)")
+    sp.add_argument("--pin", default=None, help="przypnij kopię — rotacja jej nie skasuje")
+    sp.add_argument("--unpin", default=None, help="odepnij kopię")
     sp.add_argument("--apply", action="store_true")
     sp.set_defaults(func=cmd_backups)
+
+    sp = sub.add_parser("watch", help="auto-kopiec: kopia przy starcie gry i co interwał")
+    add_save(sp)
+    sp.add_argument("--interval", type=int, default=None,
+                    help="sekundy między kopiami (domyślnie z config: watch_interval)")
+    sp.add_argument("--once", action="store_true", help="jeden przebieg kontrolny i wyjście")
+    sp.set_defaults(func=cmd_watch)
 
     sp = sub.add_parser("config", help="konfiguracja Rezura")
     sp.add_argument("--set", default=None, help="klucz=wartość")

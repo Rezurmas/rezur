@@ -7,9 +7,11 @@ Fikstury: pliki z backups/ (NIE są modyfikowane — mutujące testy piszą do t
 """
 
 import glob
+import os
 import shutil
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -687,6 +689,85 @@ def t_grant_whetblades():
         s = chk.slots()[2]
         assert s.parse(r[2]["name"], r[2]["level"]), s.reason
         assert all(k["ok"] for k in chk.section_md5_status())
+
+
+@test
+def t_vault_gold_single_and_prune_protects():
+    from rezur.core import vault
+
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        orig = p.read_bytes()
+        SaveFile(p).write(backup_tag="rezurbak")
+        g = vault.gold_backup(p)
+        assert g and Path(g["path"]).read_bytes() == orig, "GOLD nie trzyma stanu sprzed zapisu"
+        SaveFile(p).write(backup_tag="rezurbak")
+        assert len([b for b in vault.list_backups(p) if b["gold"]]) == 1, "więcej niż jeden GOLD"
+
+        base = time.time() + 1000  # "przyszłe" czasy, żeby sortowanie było niezależne od zegara
+        for i in range(5):
+            dst = p.with_name(f"ER0000.sl2.rezurbak-20200101-00000{i}")
+            shutil.copy(p, dst)
+            os.utime(dst, (base + i, base + i))
+        pinned = "ER0000.sl2.rezurbak-20200101-000000"
+        vault.set_pin(p, pinned, on=True)
+        assert vault.is_pinned(p, pinned)
+        vault.prune(p, keep=2)
+        names = {b["name"] for b in vault.list_backups(p)}
+        assert vault.gold_backup(p)["name"] in names, "rotacja skasowała GOLD"
+        assert pinned in names, "rotacja skasowała przypiętą kopię"
+        left = [n for n in names if n.startswith("ER0000.sl2.rezurbak-20200101")]
+        assert len(left) == 3, left  # 2 najnowsze + przypięta
+
+
+@test
+def t_write_verify_refuses_corrupt():
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        orig = p.read_bytes()
+        sf = SaveFile(p)
+        e = sf.slot_entries[2]
+        sf.data[e["off"] + 16 + 0x1000] ^= 0xFF  # psujemy dane slotu BEZ przeliczenia MD5
+        denied = False
+        try:
+            sf.write(backup_tag="test")
+        except ValueError as ex:
+            denied = "weryfikacja" in str(ex)
+        assert denied, "zapis z zepsutą sumą MD5 nie został odrzucony"
+        assert p.read_bytes() == orig, "oryginał zmieniony mimo odrzuconej weryfikacji"
+        assert not list(Path(td).glob("*.tmp-rezur")), "został plik tymczasowy"
+
+
+@test
+def t_watch_once():
+    from rezur.ops import watch
+
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        res = watch.run_once(p, interval=600)
+        if watch.game_running():
+            assert res["made"], f"gra działa, a nie zrobiono kopii: {res}"
+            assert Path(res["made"]).is_file()
+            assert ".launchbak-" in res["made"]
+        else:
+            assert res == {"running": False, "made": None, "reason": "gra nie działa"}
+
+
+@test
+def t_patch_old_flagged():
+    sf = SaveFile(fixture(PREFIX_GLOB))
+    fs = run_diagnostics(sf)
+    hits = [f for f in fs if f.code == "patch_old"]
+    assert hits, "postacie ze starego patcha nie zostały oflagowane"
+    slots = {f.slot for f in hits}
+    assert 0 in slots and 1 in slots, slots
+    assert 2 not in slots, "postać na aktualnym patchu oflagowana bez powodu"
 
 
 def main():

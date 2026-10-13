@@ -75,36 +75,51 @@ class SaveFile:
             checksums.write_section_md5(self.data, e["off"], e["size"])
 
     def write(self, backup_tag="rezurbak"):
-        """Backup obok pliku (z rotacją wg config) + zapis atomowy. Zwraca ścieżkę backupu."""
-        stamp = time.strftime("%Y%m%d-%H%M%S")
-        bak = self.path.with_name(f"{self.path.name}.{backup_tag}-{stamp}")
-        if self.path.exists():
-            shutil.copy2(self.path, bak)
-            self._prune_backups()
-        tmp = self.path.with_name(self.path.name + ".tmp-rezur")
-        with open(tmp, "wb") as f:
-            f.write(bytes(self.data))
-            f.flush()
-            os.fsync(f.fileno())
-        os.replace(tmp, self.path)
-        return bak
+        """GOLD (raz) + backup obok pliku (rotacja wg config) + zapis atomowy.
 
-    def _prune_backups(self):
+        Kolejność: GOLD → backup → zapis do .tmp-rezur → WERYFIKACJA kandydata
+        (BND4 + sumy MD5 wszystkich sekcji) → dopiero potem podmiana oryginału.
+        Zwraca ścieżkę backupu (albo None, jeśli pliku jeszcze nie było).
+        """
         from .. import config
+        from . import vault
 
-        keep = config.load().get("backup_retention", 0)
-        if not keep:
-            return
-        baks = sorted(
-            self.path.parent.glob(f"{self.path.name}.*bak-*"),
-            key=lambda p: p.stat().st_mtime,
-            reverse=True,
-        )
-        for old in baks[keep:]:
+        bak = None
+        if self.path.exists():
+            vault.ensure_gold(self.path)
+            stamp = time.strftime("%Y%m%d-%H%M%S")
+            bak = self.path.with_name(f"{self.path.name}.{backup_tag}-{stamp}")
+            shutil.copy2(self.path, bak)
+            vault.prune(self.path, config.load().get("backup_retention", 0))
+
+        tmp = self.path.with_name(self.path.name + ".tmp-rezur")
+        try:
+            with open(tmp, "wb") as f:
+                f.write(bytes(self.data))
+                f.flush()
+                os.fsync(f.fileno())
+            verify_save_bytes(tmp.read_bytes())
+            os.replace(tmp, self.path)
+        except BaseException:
             try:
-                old.unlink()
+                tmp.unlink(missing_ok=True)
             except OSError:
                 pass
+            raise
+        return bak
+
+
+def verify_save_bytes(data):
+    """Kandydat na zapis: musi być jawnym BND4 ze zgodnymi sumami wszystkich sekcji."""
+    if not bnd4.is_plaintext_bnd4(data):
+        raise ValueError("weryfikacja zapisu: to nie jest jawny BND4 — oryginał nietknięty")
+    entries = bnd4.parse_entries(bytearray(data))
+    for e in entries:
+        if not checksums.section_md5_ok(data, e["off"], e["size"]):
+            raise ValueError(
+                f"weryfikacja zapisu: suma MD5 sekcji {e['name']} się nie zgadza — oryginał nietknięty"
+            )
+    return True
 
 
 def default_save_path():

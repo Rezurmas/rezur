@@ -4,6 +4,7 @@ Klucze:
     backup_retention (int)  — ile kopii *bak-* trzymać na plik (najnowsze), 0 = bez limitu
     auto_doctor (bool)      — czy po `fix --apply` pokazywać re-diagnostykę
     guard_live (bool)       — czy blokować zapis do żywego save'a przy działającej grze
+    watch_interval (int)    — co ile sekund kopia (watch), gdy gra działa
 """
 
 import json
@@ -14,6 +15,7 @@ DEFAULTS = {
     "backup_retention": 20,
     "auto_doctor": True,
     "guard_live": True,
+    "watch_interval": 600,
 }
 
 

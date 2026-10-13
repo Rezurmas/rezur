@@ -1,13 +1,15 @@
 [project]
 name = "rezur-saves-configurator"
-version = "0.2.0"
-description = "Rezur Saves Configurator — konfigurator i naprawiacz save'ów Elden Ring (.sl2): diagnostyka, auto-naprawy, kopiowanie postaci, patcher SteamID"
+version = "0.2.1"
+description = "Unofficial Elden Ring (PC/Steam) save configurator and repair tool: own .sl2 parser, diagnostics + fixes (incl. the Torrent hang), stat/item/flag/spell editing, GOLD backups with rotation, staging-first edits, CLI + GUI (pywebview/WebView2)."
+readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 dependencies = []
 
 [project.optional-dependencies]
-web = ["fastapi>=0.110", "uvicorn>=0.29"]
+gui = ["pywebview>=5.0", "pythonnet>=3.0"]
+build = ["pyinstaller>=6.0"]
 
 [project.scripts]
 rezur = "rezur.cli:main"
@@ -25,8 +27,8 @@ packages = [
     "rezur.fixes",
     "rezur.ops",
     "rezur.report",
-    "rezur.api",
+    "rezur.gui",
 ]
 
 [tool.setuptools.package-data]
-rezur = ["data/*.txt", "data/db_er/*.json"]
+rezur = ["data/*.txt", "data/db_er/*.json", "gui/web/*"]

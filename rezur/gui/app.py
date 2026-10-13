@@ -55,12 +55,16 @@ def _selftest(win):
     print(f"[selftest] live-search INVENTORY: rows_before={before} rows_after_typing_seed={after}")
 
     js("document.querySelector('#invAdd') && document.querySelector('#invAdd').click(); 'open'")
-    time.sleep(0.8)
-    js("(function(){var i=document.querySelector('#qu2'); i.value='mimi'; i.dispatchEvent(new Event('input')); return 'typed';})()")
-    time.sleep(1.4)
-    sugg = js("document.querySelectorAll('#suggBox .srow').length")
-    first = js("(document.querySelector('#suggBox .srow .sname')||{}).textContent")
-    print(f"[selftest] suggestions('mimi'): hits={sugg} first={first!r}")
+    time.sleep(1.2)
+    sugg, first = None, None
+    for attempt in range(3):  # zimny start exe potrafi dogonić listę dopiero za drugim razem
+        js("(function(){var i=document.querySelector('#qu2'); i.value='mimi'; i.dispatchEvent(new Event('input')); return 'typed';})()")
+        time.sleep(1.4 if attempt == 0 else 2.0)
+        sugg = js("document.querySelectorAll('#suggBox .srow').length")
+        first = js("(document.querySelector('#suggBox .srow .sname')||{}).textContent")
+        if sugg:
+            break
+    print(f"[selftest] suggestions('mimi'): hits={sugg} first={first!r} (proba {attempt + 1})")
     js("document.querySelector('.mact .key') && document.querySelector('.mact .key').click(); 'close'")
     time.sleep(0.5)
 

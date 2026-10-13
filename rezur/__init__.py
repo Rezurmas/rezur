@@ -15,5 +15,5 @@ cli/api są cienkimi adapterami nad warstwami.
 """
 
 __product__ = "Rezur Saves Configurator"
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __short__ = "rezur"

@@ -1,6 +1,6 @@
 # Rezur Saves Configurator — architecture
 
-> Status: v0.2.0 — CLI + library + GUI (pywebview / WebView2, 13 panels, EN/PL).
+> Status: v0.2.1 — CLI + library + GUI (pywebview / WebView2, 13 panels, EN/PL).
 > Overriding rule: **no logic lives in the interface**. The CLI and the GUI are thin adapters
 > over the same engine.
 

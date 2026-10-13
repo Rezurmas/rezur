@@ -1405,7 +1405,7 @@ def main(argv=None):
 
     sp = sub.add_parser("gui", help="okno GUI (pywebview / WebView2)")
     add_save(sp)
-    sp.add_argument("--selftest", action="store_true", help="otwórz i zamknij po 6 s")
+    sp.add_argument("--selftest", action="store_true", help="otwórz, sprawdź most i przełącz język EN/PL, zamknij (~30 s)")
     sp.set_defaults(func=cmd_gui)
 
     sp = sub.add_parser("config", help="konfiguracja Rezura")

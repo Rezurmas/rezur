@@ -1,6 +1,6 @@
 # Rezur Saves Configurator — architektura i plan
 
-> Status: v0.1.0 — działa warstwa CLI + biblioteka. GUI zaplanowane (F6).
+> Status: v0.2.0 — CLI + biblioteka + GUI (pywebview/WebView2, 13 paneli, EN/PL).
 > Zasada nadrzędna: **żadna logika nie żyje w interfejsie**. CLI i przyszłe API/GUI
 > są cienkimi adapterami nad tym samym rdzeniem.
 
@@ -171,8 +171,20 @@ Kontrakt (F6): szczegółowa lista endpointów — docstring w `rezur/api/server
 - 13 paneli: POSTACIE · DOKTOR · STATY · EKWIPUNEK · ZAŁOŻONE · ŚWIAT · CZARY · WYGLĄD ·
   TELEPORT · RYZYKO · KOPIE · HISTORIA · USTAWIENIA; pasek zmian na dole (PODGLĄD/COFNIJ/
   ZASTOSUJ/ODRZUĆ), dialogi wprost (ZAPISZ/ODRZUĆ/WRÓĆ), blokada przy działającej grze.
-- `--selftest`: okno otwiera się, odpytuje `window.__rezurBooted` i zamyka — dymny test
-  mostu bez klikania (używane przy każdej zmianie).
+- **Język (i18n):** domyślnie **EN**; przełącznik `EN/PL` — pill w nagłówku i przyciski
+  w USTAWIENIACH; wybór idzie do configu (`ui_lang`, walidacja `en|pl`) i przeładowuje okno;
+  słowniki `I18N.en/pl` w `app.js`, `t()` czyta klucz, komunikaty doctora tłumaczone po kodzie
+  (`FIND_EN`), liczby przez `toLocaleString` wg języka.
+- `--selftest`: okno otwiera się, odpytuje `window.__rezurBooted`/`__rezurLoaded`, liczy
+  metody mostu (`Object.keys(window.pywebview.api).length`) i panele, drukuje etykiety 13
+  zakładek, potem PRZEŁĄCZA JĘZYK na żywo (EN→PL→EN, zapis w configu + reload) i zamyka —
+  dymny test mostu bez klikania (używane przy każdej zmianie).
+- **`tests/bridge_audit.py`:** audyt „czy wszystko połączone" — woła KAŻDĄ metodę `GuiApi`
+  na kopii save'a w izolowanym `%APPDATA%` (49 wywołań: load/doctor/risk/staging/apply/
+  backupy/restore/config/panele) i raportuje wynik; kod wyjścia ≠0 gdy coś nie działa.
+- **Testy strażnicze:** `t_ui_lang_default_and_switch` (EN domyślnie, zapis wyboru, śmieci
+  odrzucane) i `t_gui_i18n_and_wiring` (klucze EN/PL zgodne, każdy `t(...)` ma tłumaczenie,
+  każdy uchwyt JS istnieje w HTML, 13 zakładek = 13 paneli i etykiety w obu językach).
 
 ### Stany aplikacji (kontrakt dla GUI — „żeby nic nie zaskakiwało")
 
@@ -211,12 +223,13 @@ Kontrakt (F6): szczegółowa lista endpointów — docstring w `rezur/api/server
 | F5 | transfer: import/eksport postaci (JSON), cross-save | `ops/transfer.py` | ✅ |
 | F5b | zaufanie: vault (GOLD/piny), watch, risk, staging + log | `core/vault.py`, `ops/watch.py`, `risk.py`, `staging.py` | ✅ |
 | F5c | luki: torn-write, liczniki ekwipunku, grupy colosseum/baseny/regiony, `find`, cofanie zmian | `core/savefile.py`, `fixes/invcounters.py`, `db_er/event_flags_extra.json`, `cli.find`, `staging.undo` | ✅ |
-| F6 | GUI: pywebview (WebView2) + most JS↔silnik, 13 paneli w stylu engineering-series | `gui/api.py`, `gui/app.py`, `gui/web/` | ✅ v0.2 |
+| F6 | GUI: pywebview (WebView2) + most JS↔silnik, 13 paneli w stylu engineering-series, i18n EN (domyślny) / PL, audyt mostu + testy strażnicze | `gui/api.py`, `gui/app.py`, `gui/web/`, `tests/bridge_audit.py` | ✅ v0.2 |
 | F7 | pakowanie: `.exe` / pywebview / skróty | `packaging/` | plan |
 
 ## 9. Konwencje
 
-- identyfikatory EN, komunikaty dla użytkownika PL;
+- identyfikatory EN, komunikaty dla użytkownika PL; **GUI ma warstwę języka** (`ui_lang`:
+  EN domyślnie, PL opcjonalnie) — teksty w `I18N`, komunikaty silnika tłumaczone po kodzie;
 - zero zależności w `core`; wszystko opcjonalne przez extras w `pyproject.toml`;
 - każdy zapis = backup + atomic + (w CLI) re-diagnostyka;
 - zakaz pisania do żywego save'a przy działającej grze (`_guard_game`, sprawdza

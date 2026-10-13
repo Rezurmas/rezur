@@ -16,12 +16,13 @@
       <span class="pill" title="sumy sekcji"><span class="led" id="ledMd5"></span><span id="txtMd5">MD5 —/—</span></span>
       <span class="pill" title="stan gry"><span class="led" id="ledGame"></span><span id="txtGame">GRA: STOP</span></span>
       <span class="pill" title="backup przy każdym zapisie"><span class="led o" style="width:5px;height:5px"></span>KOPIA AUTO</span>
+      <span class="pill" id="pillLang" style="cursor:pointer" title="language / język">EN</span>
       <span class="metal" id="txtVer">FW —</span>
     </div>
   </header>
 
   <div class="banner hidden" id="gameBanner">
-    <b>UWAGA</b> eldenring.exe działa — zapis do żywego savea zablokowany · edytuj kopię roboczą (staging), zastosuj po zamknięciu gry
+    <b id="bannerLead">UWAGA</b> <span id="bannerTxt">eldenring.exe działa — zapis do żywego save'a zablokowany · edytuj kopię roboczą (staging), zastosuj po zamknięciu gry</span>
   </div>
 
   <div class="mid2">
@@ -84,15 +85,12 @@
 <div class="overlay hidden" id="empty">
   <div class="emptybox">
     <h2>REZUR — SAVES CONFIGURATOR</h2>
-    <div class="sub">wskaż plik ER0000.sl2, żeby zacząć</div>
+    <div class="sub" id="emptySub">wskaż plik ER0000.sl2, żeby zacząć</div>
     <div class="inline">
       <button class="key" id="btnPick2">WSKAŻ PLIK .SL2</button>
       <button class="key" id="btnRecent">OTWÓRZ OSTATNI / NAJNOWSZY</button>
     </div>
-    <div class="note" id="emptyNote" style="margin-top:18px">
-      typowa ścieżka: <span class="mono">%APPDATA%\EldenRing\&lt;steamid&gt;\ER0000.sl2</span><br>
-      edycje zawsze lądują najpierw w kopii roboczej — oryginał rusza dopiero przy ZASTOSUJ.
-    </div>
+    <div class="note" id="emptyNote" style="margin-top:18px"></div>
   </div>
 </div>
 

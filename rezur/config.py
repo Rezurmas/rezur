@@ -6,6 +6,7 @@ Klucze:
     guard_live (bool)       — czy blokować zapis do żywego save'a przy działającej grze
     watch_interval (int)    — co ile sekund kopia (watch), gdy gra działa
     last_save (str)         — ostatnio używany plik save'a (pamięć między uruchomieniami)
+    ui_lang (str)           — język GUI: "en" (domyślny) albo "pl"
 """
 
 import json
@@ -18,6 +19,7 @@ DEFAULTS = {
     "guard_live": True,
     "watch_interval": 600,
     "last_save": None,
+    "ui_lang": "en",
 }
 
 
@@ -55,6 +57,10 @@ def set_value(key, raw):
         val = raw.strip().lower() in ("1", "true", "tak", "yes", "on")
     elif isinstance(ref, int):
         val = int(raw)
+    elif key == "ui_lang":
+        val = raw.strip().lower()
+        if val not in ("en", "pl"):
+            raise ValueError(f"ui_lang: 'en' albo 'pl' (dostałem {raw!r})")
     else:
         val = raw
     cfg = load()

@@ -1089,6 +1089,78 @@ def t_gui_api_flow():
         api.discard(str(p))
 
 
+@test
+def t_ui_lang_default_and_switch():
+    """ui_lang: domyślnie EN, przełączanie EN↔PL zapisuje się, śmieci odrzucane."""
+    from rezur import config as CONF
+
+    with tempfile.TemporaryDirectory() as td:
+        old = os.environ.get("APPDATA")
+        os.environ["APPDATA"] = td  # izolacja: własny config.json
+        try:
+            assert CONF.load()["ui_lang"] == "en", CONF.load()
+            CONF.set_value("ui_lang", "pl")
+            assert CONF.load()["ui_lang"] == "pl"
+            CONF.set_value("ui_lang", "PL")  # normalizacja wielkości liter
+            assert CONF.load()["ui_lang"] == "pl"
+            CONF.set_value("ui_lang", "en")
+            assert CONF.load()["ui_lang"] == "en"
+            bad = ""
+            try:
+                CONF.set_value("ui_lang", "de")
+            except ValueError as ex:
+                bad = str(ex)
+            assert bad, "ui_lang przyjął nieobsługiwany język"
+            assert CONF.load()["ui_lang"] == "en", "config zmieniony po błędzie"
+            assert (Path(td) / "rezur" / "config.json").is_file()
+        finally:
+            if old is None:
+                os.environ.pop("APPDATA", None)
+            else:
+                os.environ["APPDATA"] = old
+
+
+@test
+def t_gui_i18n_and_wiring():
+    """Most GUI: słowniki EN/PL zgodne, każdy t(...) ma tłumaczenie, uchwyty HTML istnieją."""
+    import re
+
+    root = Path(__file__).resolve().parent.parent
+    js = (root / "rezur" / "gui" / "web" / "app.js").read_text(encoding="utf-8")
+    html = (root / "rezur" / "gui" / "web" / "index.html").read_text(encoding="utf-8")
+
+    i_en = js.index("\n  en: {") + 9
+    i_pl_raw = js.index("\n  pl: {")
+    i_pl = i_pl_raw + 9
+    i_end = js.index("\n};", i_pl)
+    en, pl = js[i_en:i_pl_raw], js[i_pl:i_end]
+    key = re.compile(r"(?:^|, ) *([A-Za-z_][A-Za-z0-9_]*):", re.M)
+    ken, kpl = set(key.findall(en)), set(key.findall(pl))
+    assert len(ken) > 120, f"nie sparsowano słownika EN (kluczy: {len(ken)})"
+    assert ken == kpl, f"rozjazd kluczy EN/PL: {sorted(ken ^ kpl)}"
+
+    used = set(re.findall(r'(?<![A-Za-z0-9_])t\("([A-Za-z0-9_]+)"', js))
+    missing = sorted(u for u in used if u not in ken)
+    assert not missing, f"klucze w kodzie bez tłumaczenia: {missing}"
+
+    chrome = ["status", "toasts", "busy", "busyTxt", "modal", "mbox", "pendN", "pendW",
+              "btnApply", "btnDiscard", "btnUndo", "btnPreview", "ledOk", "ledFile", "ledMd5",
+              "ledGame", "txtFile", "txtMd5", "txtGame", "txtVer", "gameBanner", "railPath",
+              "ctx", "empty", "emptyNote", "emptySub", "btnPick", "btnPick2", "btnRecent",
+              "bannerLead", "bannerTxt", "pillLang"]
+    miss = [c for c in chrome if f'id="{c}"' not in html]
+    assert not miss, f"JS szuka uchwytów, których nie ma w HTML: {miss}"
+    assert 'id="btnDiscard"' in html and "btnDiscard span" in js, "przycisk ODRZUĆ bez <span>"
+
+    tabs = re.findall(r'data-tab="([a-z]+)"', html)
+    assert len(tabs) == 13, f"zakładek w HTML: {len(tabs)}"
+    miss2 = [t for t in tabs if f'id="panel-{t}"' not in html]
+    assert not miss2, f"zakładki bez paneli: {miss2}"
+    for t in tabs:
+        for name, d in (("en", en), ("pl", pl)):
+            assert re.search(rf"^    tabs: \{{.*\b{t}:", d, re.M), f"brak etykiety zakładki {t} ({name})"
+
+
 def main():
     ok = fail = 0
     for t in _tests:

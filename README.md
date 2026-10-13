@@ -20,6 +20,9 @@ jeden backup przy zatwierdzeniu, historia operacji w `rezur log`.
 engineering-series (czarna anoda + pomarańcz, LCD dot-matrix, zero suwaków): postacie,
 doktor, staty, ekwipunek, założone, świat, czary, wygląd, teleport, ryzyko, kopie,
 historia, ustawienia — każda edycja przez kopię roboczą, na dole pasek zmian.
+**Język GUI:** domyślnie **angielski**; przełącznik `EN/PL` w nagłówku (pill) i w
+Ustawieniach — zapisywany w configu (`ui_lang`), okno przeładowuje się samo.
+Most JS↔silnik ma audyt: `python tests/bridge_audit.py` (każde wywołanie API na kopii save'a).
 
 ## Szybki start
 
@@ -79,10 +82,15 @@ python -m rezur apply                     # zatwierdź: 1 backup + 1 zapis + wpi
 python -m rezur discard                   # odrzuć: oryginał nietknięty
 python -m rezur log [--json]              # historia operacji (dziennik edycji)
 python -m rezur find "uchi" [--json]      # szukaj: itemy, flagi świata, łaski, lokacje
-python -m rezur gui [--save PLIK]         # OKNO GUI (pywebview/WebView2)
-python -m rezur gui --selftest            # test dymny: otwórz i zamknij po ~7 s
-python -m rezur config                    # backup_retention / auto_doctor / guard_live / watch_interval
+python -m rezur gui [--save PLIK]         # OKNO GUI (pywebview/WebView2), język: EN (domyślny) / PL
+python -m rezur gui --selftest            # test dymny okna: most, 13 paneli, przełączenie EN→PL→EN (~30 s)
+python -m rezur config                    # backup_retention / auto_doctor / guard_live / watch_interval / ui_lang
 python -m rezur list-fixes                # lista napraw
+
+# audyty (poza CLI):
+python tests/bridge_audit.py              # most GUI↔silnik: 49 wywołań API na kopii save'a (izolowany config)
+python tests/run_all.py                   # 46 testów na kopiach prawdziwych save'ów
+python tests/smoke_cli.py                 # każda komenda CLI (132 wywołania)
 ```
 
 Bez `--save` narzędzie bierze najnowszy save z `%APPDATA%\EldenRing\*\ER0000.sl2`.
@@ -102,11 +110,12 @@ rezur/
            EQ (22 gniazda), czary, wygląd, teleport, świat (nazwane flagi), masowe nadawanie,
            kopie/podmiana/czyszczenie slotów, SteamID, transfer JSON, backupy, watch (auto-kopie przy grze)
   report/  wyjście tekstowe i JSON
-  gui/     okno pywebview: api.py (most JS↔silnik), app.py (shell), web/ (index.html+style.css+app.js)
+  gui/     okno pywebview: api.py (most JS↔silnik), app.py (shell + selftest), web/ (index.html+style.css+app.js, i18n EN/PL)
   api/     warstwa HTTP/JSON pod GUI (F6 — most do webview; placeholder)
   cli.py   python -m rezur
-tests/     run_all.py — 44 testy na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
-           smoke_cli.py — przebieg KAŻDEJ komendy CLI (132 wywołań) na kopii save'a
+tests/     run_all.py — 46 testów na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
+           smoke_cli.py — przebieg KAŻDEJ komendy CLI (132 wywołania) na kopii save'a
+           bridge_audit.py — audyt mostu GUI↔silnik: każde wywołanie API (49) na kopii save'a
 ARCHITECTURE.md   frontend/backend, przepływy, roadmapa
 ```
 

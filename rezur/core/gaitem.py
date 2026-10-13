@@ -62,10 +62,13 @@ def walk(raw, version, expect_end=None):
     return entries, o
 
 
-def make_entry_bytes(kind, handle, item_id):
-    """Serializuje nowy wpis: kind ∈ weapon/armor/gem."""
+def make_entry_bytes(kind, handle, item_id, gem_signed=0):
+    """Serializuje nowy wpis: kind ∈ weapon/armor/gem.
+
+    gem_signed: pole AoW w rekordzie broni (i32). W realnych save'ach 0 = brak,
+    a przypięty gem to handle−0x100000000 (np. 0xC0800086 → −0x3F7FFF7A)."""
     if kind == "weapon":
-        return struct.pack("<IIiiIB", handle, item_id, 0, 0, 0xFFFFFFFF, 0)
+        return struct.pack("<IIiiIB", handle, item_id, 0, 0, gem_signed, 0)
     if kind == "armor":
         return struct.pack("<IIii", handle, item_id, 0, 0)
     return struct.pack("<II", handle, item_id)

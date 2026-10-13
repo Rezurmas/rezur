@@ -517,6 +517,178 @@ def t_handle_for_prefers_exact_weapon():
         assert nm and nm.startswith("Uchigatana"), nm
 
 
+@test
+def t_world_flags_toggle():
+    src = fixture(FIXED_GLOB)
+    save_mod, ef_mod = _ref_modules()
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "t.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        from rezur.ops.world import entries, set_world, view
+
+        fid, fname, _d = entries("boss_defeat")[0]
+        v0 = view(sf, 2, "boss_defeat", str(fid))
+        before = v0["entries"][0]["value"]
+        rep = set_world(sf, 2, "boss_defeat", str(fid), not before, apply=True)
+        assert rep["set"] == 1, (rep, before)
+        sf.write(backup_tag="test")
+        chk = SaveFile(p)
+        r = P.roster(chk)
+        s = chk.slots()[2]
+        assert s.parse(r[2]["name"], r[2]["level"]), s.reason
+        assert s.get_flag(fid) == (not before)
+        assert all(k["ok"] for k in chk.section_md5_status())
+        if save_mod:
+            ref = save_mod.load_save(str(p))
+            assert ef_mod.EventFlags.get_flag(ref.get_slot(2).event_flags, fid) == (not before)
+
+
+@test
+def t_spells_memorize_forget():
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "t.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        from rezur.ops.spells import equipped, forget, memorize
+
+        v0 = equipped(sf, 0)
+        assert any(not x["empty"] for x in v0["spells"]), "lmfh powinien mieć czar"
+        at = next(k for k, x in enumerate(v0["spells"]) if x["empty"])
+        rep = memorize(sf, 0, "Scholar's Armament", at=at)
+        assert rep["at"] == at
+        assert equipped(sf, 0)["spells"][at]["name"] == "Scholar's Armament"
+        sf.write(backup_tag="test")
+        chk = SaveFile(p)
+        r = P.roster(chk)
+        s = chk.slots()[0]
+        assert s.parse(r[0]["name"], r[0]["level"]), s.reason
+        assert s.player_hash_matches(), "hash po zmianie czarów rozjechany"
+        assert all(k["ok"] for k in chk.section_md5_status())
+        sf2 = SaveFile(p)
+        forget(sf2, 0, at)
+        sf2.write(backup_tag="test")
+        assert equipped(SaveFile(p), 0)["spells"][at]["empty"]
+
+
+@test
+def t_appearance_set():
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "t.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        from rezur.ops.appearance import read, set_appearance
+
+        v0 = read(sf, 0)
+        new_body = 1 if v0["body_type"] == 0 else 0
+        set_appearance(sf, 0, body_type=new_body, gift=1)
+        sf.write(backup_tag="test")
+        chk = SaveFile(p)
+        v1 = read(chk, 0)
+        assert v1["body_type"] == new_body and v1["gift"] == 1, (v0, v1)
+        r = P.roster(chk)
+        s = chk.slots()[0]
+        assert s.parse(r[0]["name"], r[0]["level"]), s.reason
+        assert s.player_hash_matches()
+        assert all(k["ok"] for k in chk.section_md5_status())
+
+
+@test
+def t_teleport_roundtable():
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "t.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        from rezur.ops.teleport import teleport
+
+        expect = int.from_bytes(bytes([0, 0, 10, 11]), "little")
+        rep = teleport(sf, 2, dest="roundtable")
+        assert rep["to"]["map_id"] == expect
+        sf.write(backup_tag="test")
+        chk = SaveFile(p)
+        r = P.roster(chk)
+        assert r[2]["map_id"] == expect, (hex(r[2]["map_id"]), hex(expect))
+        s = chk.slots()[2]
+        assert s.parse(r[2]["name"], r[2]["level"]), s.reason
+        assert s.map_id == expect
+        xyz = s.coordinates()["xyz"]
+        assert abs(xyz[0] - (-331.0)) < 1.0 and abs(xyz[1] - (-22.0)) < 1.0, xyz
+        assert all(k["ok"] for k in chk.section_md5_status())
+
+
+@test
+def t_weapon_upgrade_affinity_aow():
+    src = fixture(FIXED_GLOB)
+    save_mod, _ = _ref_modules()
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "t.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        import struct as _st
+        from rezur.core import gaitem
+        from rezur.core.slots import Slot
+        from rezur.ops.items import add_item, equip_item, set_weapon_affinity, set_weapon_aow, set_weapon_upgrade
+
+        ex = items_db.find_exact("Uchigatana")
+        rep = add_item(sf, 0, ex[0], qty=1, upgrade=0)
+        h = rep["handle"]
+        r = P.roster(sf)
+        s = Slot(sf, 0)
+        assert s.parse(r[0]["name"], r[0]["level"]), s.reason
+        entries, _ = gaitem.walk(s.raw, s.version, expect_end=s.offsets["pgd"])
+        e = next(x for x in entries if x["handle"] == h)
+        assert e["gem"] == 0, f"pusty gem ma być 0, jest {e['gem']:#x}"
+        equip_item(sf, 0, h, at=0)
+        set_weapon_upgrade(sf, 0, h, 12)
+        set_weapon_affinity(sf, 0, h, "Blood")
+        ash = list(items_db._load()["ashes"])[0]
+        set_weapon_aow(sf, 0, h, ash)
+        sf.write(backup_tag="test")
+        chk = SaveFile(p)
+        r2 = P.roster(chk)
+        s2 = chk.slots()[0]
+        assert s2.parse(r2[0]["name"], r2[0]["level"]), s2.reason
+        entries2, _ = gaitem.walk(s2.raw, s2.version, expect_end=s2.offsets["pgd"])
+        e2 = next(x for x in entries2 if x["handle"] == h)
+        blood = items_db.find_exact("Blood Uchigatana")
+        assert blood, "brak wariantu Blood w bazie"
+        assert (e2["item_id"] & 0x0FFFFFFF) == (blood[0] & 0x0FFFFFFF) + 12, (hex(e2["item_id"]), hex(blood[0]))
+        assert e2["gem"] not in (0, 0xFFFFFFFF, -1), f"gem nieprzypięty: {e2['gem']}"
+        ids = _st.unpack_from("<22I", s2.raw, s2.offsets["item_ids"])
+        assert ids[0] == (e2["item_id"] & 0x0FFFFFFF), "item_ids nie zaktualizowane po upgrade"
+        assert s2.player_hash_matches()
+        assert all(k["ok"] for k in chk.section_md5_status())
+        if save_mod:
+            ref = save_mod.load_save(str(p))
+            g = next(x for x in ref.get_slot(0).gaitem_map if x.gaitem_handle == h)
+            assert g.item_id == e2["item_id"]
+            assert g.gem_gaitem_handle == e2["gem"]
+
+
+@test
+def t_grant_whetblades():
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "t.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        from rezur.ops.items import category_ids, grant_category
+
+        ids = category_ids("whetblades")
+        assert len(ids) >= 4, ids
+        rep = grant_category(sf, 2, "whetblades", location="storage")
+        assert rep["added"] > 0, rep
+        sf.write(backup_tag="test")
+        chk = SaveFile(p)
+        r = P.roster(chk)
+        s = chk.slots()[2]
+        assert s.parse(r[2]["name"], r[2]["level"]), s.reason
+        assert all(k["ok"] for k in chk.section_md5_status())
+
+
 def main():
     ok = fail = 0
     for t in _tests:

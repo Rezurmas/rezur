@@ -491,3 +491,239 @@ def unequip(save, slot_idx, at=None):
         _resync_summary(save, slot_idx, s)
         save.touch_slot(slot_idx)
     return {"slot": slot_idx, "unequipped": changed}
+
+
+# ---------------------------------------------------------------- broń: poziom / affinity / AoW
+
+
+_AFFIXES = ("Standard", "Heavy", "Keen", "Quality", "Fire", "Flame", "Lightning",
+            "Sacred", "Magic", "Cold", "Poison", "Blood", "Occult")
+
+
+def resolve_ash(selector):
+    """Nazwa / 0xID → pełne id Asha of War (kategoria 0x8)."""
+    t = selector.strip()
+    if t.lower().startswith("0x"):
+        v = int(t, 16)
+        if ((v >> 28) & 0xF) != 0x8:
+            v = 0x80000000 | (v & 0x0FFFFFFF)
+        return v
+    for q in (t, f"Ash of War: {t}"):
+        ex = items_db.find_exact(q)
+        if ex and ((ex[0] >> 28) & 0xF) == 0x8:
+            return ex[0]
+    hits = [r for r in items_db.search(t, 50) if r[2] == "ashes"]
+    if len(hits) == 1:
+        return hits[0][0]
+    if not hits:
+        raise ValueError(f"nie znalazłem Asha of War {t!r}")
+    raise ValueError("kilka Ashy — doprecyzuj: " + ", ".join(r[1] for r in hits[:5]))
+
+
+def _weapon_entry(s, handle):
+    entries, _ = gaitem.walk(s.raw, s.version, expect_end=s.offsets["pgd"])
+    return next((x for x in entries if x["handle"] == handle), None)
+
+
+def _sync_equipped_ids(save, s, old_masked, new_masked):
+    """Podmienia surowe id w item_ids dla gniazd wskazujących na starą broń."""
+    changed = []
+    for k in range(22):
+        off = s.abs_off + s.offsets["item_ids"] + k * 4
+        if struct.unpack_from("<I", save.data, off)[0] == old_masked:
+            struct.pack_into("<I", save.data, off, new_masked)
+            changed.append(k)
+    return changed
+
+
+def _after_weapon_change(save, s, slot_idx, equipped_slots):
+    checksums.refresh_player_hash(
+        save.data, s.abs_off, s.offsets["pgd"], s.offsets["item_ids"], s.offsets["spells"], s.tail["hash"]
+    )
+    if equipped_slots:
+        _resync_summary(save, slot_idx, s)
+    save.touch_slot(slot_idx)
+
+
+def set_weapon_upgrade(save, slot_idx, handle, upgrade):
+    """Ustawia stopień ulepszenia broni (item_id = baza + poziom)."""
+    if not (0 <= upgrade <= 25):
+        raise ValueError("upgrade 0..25")
+    s = _parsed(save, slot_idx)
+    e = _weapon_entry(s, handle)
+    if e is None or (e["handle"] & 0xF0000000) != 0x80000000:
+        raise ValueError(f"handle 0x{handle:08X} to nie broń w gaitem")
+    old = e["item_id"] & 0x0FFFFFFF
+    old_lvl = old % 100
+    if old_lvl > 25:
+        old_lvl = 0
+    new_id = (old - old_lvl) + upgrade
+    struct.pack_into("<I", save.data, s.abs_off + e["off"] + 4, new_id)
+    eq = _sync_equipped_ids(save, s, old, new_id)
+    _after_weapon_change(save, s, slot_idx, eq)
+    return {"slot": slot_idx, "handle": f"0x{handle:08X}", "old_level": old_lvl,
+            "new_level": upgrade, "item_id": new_id, "equipped_slots": eq}
+
+
+def set_weapon_affinity(save, slot_idx, handle, affinity):
+    """Zmienia affinity (Standard/Heavy/Keen/…/Blood/Occult), zachowując poziom."""
+    aff = affinity.strip().title()
+    if aff not in _AFFIXES:
+        raise ValueError(f"nieznana affinity {affinity!r} (są: {', '.join(_AFFIXES)})")
+    s = _parsed(save, slot_idx)
+    e = _weapon_entry(s, handle)
+    if e is None or (e["handle"] & 0xF0000000) != 0x80000000:
+        raise ValueError(f"handle 0x{handle:08X} to nie broń w gaitem")
+    old = e["item_id"] & 0x0FFFFFFF
+    old_lvl = old % 100
+    if old_lvl > 25:
+        old_lvl = 0
+    plain = old - old_lvl if old_lvl else old
+    nm, _c = items_db.resolve(plain)
+    if nm is None:
+        raise ValueError("nie mogę ustalić nazwy broni z bazy")
+    core = nm
+    for a in _AFFIXES[1:]:
+        if core.startswith(a + " "):
+            core = core[len(a) + 1:]
+            break
+    target = core if aff == "Standard" else f"{aff} {core}"
+    ex = items_db.find_exact(target)
+    if ex is None:
+        hits = [r for r in items_db.search(target, 20) if r[2] == "weapons"]
+        ex = hits[0] if len(hits) == 1 else None
+    if ex is None:
+        raise ValueError(f"nie znam wariantu {target!r} w bazie broni")
+    new_id = (ex[0] & 0x0FFFFFFF) + old_lvl
+    struct.pack_into("<I", save.data, s.abs_off + e["off"] + 4, new_id)
+    eq = _sync_equipped_ids(save, s, old, new_id)
+    _after_weapon_change(save, s, slot_idx, eq)
+    return {"slot": slot_idx, "handle": f"0x{handle:08X}", "old_id": old, "new_id": new_id,
+            "affinity": aff, "level": old_lvl, "equipped_slots": eq}
+
+
+def set_weapon_aow(save, slot_idx, handle, ash_full_id):
+    """Przypina Ash of War do broni (reuse wpisu gem w gaitem albo nowy wpis)."""
+    if ((ash_full_id >> 28) & 0xF) != 0x8:
+        raise ValueError(f"0x{ash_full_id:08X} to nie Ash of War (kategoria 0x8)")
+    s = _parsed(save, slot_idx)
+    e = _weapon_entry(s, handle)
+    if e is None or (e["handle"] & 0xF0000000) != 0x80000000:
+        raise ValueError(f"handle 0x{handle:08X} to nie broń w gaitem")
+    base = ash_full_id & 0x0FFFFFFF
+    entries, _ = gaitem.walk(s.raw, s.version, expect_end=s.offsets["pgd"])
+    g = next((x for x in entries if (x["handle"] & 0xF0000000) == 0xC0000000 and x["item_id"] == base), None)
+    created = False
+    if g is not None:
+        gem_handle = g["handle"]
+    else:
+        gem_handle = _insert_gaitem(save, slot_idx, "gem", base)
+        created = True
+        s = _parsed(save, slot_idx)
+        e = _weapon_entry(s, handle)
+        if e is None:
+            raise ValueError("broń zniknęła po dodaniu wpisu gem")
+    gem_signed = gem_handle - 0x100000000 if gem_handle >= 0x80000000 else gem_handle
+    struct.pack_into("<i", save.data, s.abs_off + e["off"] + 16, gem_signed)
+    save.touch_slot(slot_idx)
+    name, _c = items_db.resolve(ash_full_id)
+    return {"slot": slot_idx, "weapon": f"0x{handle:08X}", "aow": name or f"0x{base:X}",
+            "gem": f"0x{gem_handle:08X}", "gem_created": created}
+
+
+# ---------------------------------------------------------------- masowe nadawanie
+
+
+_PLAIN_AFFIXES = ("Heavy ", "Keen ", "Quality ", "Fire ", "Flame ", "Lightning ",
+                  "Sacred ", "Magic ", "Cold ", "Poison ", "Blood ", "Occult ")
+_NAME_FILTERS = {
+    "maps": lambda nm: nm.startswith("Map:"),
+    "cookbooks": lambda nm: "Cookbook" in nm,
+    "whetblades": lambda nm: "Whetblade" in nm,
+    "bell-bearings": lambda nm: "Bell Bearing" in nm,
+    "tears": lambda nm: "Tear" in nm and "dummy" not in nm.lower(),
+    "great-runes": lambda nm: nm.endswith("Great Rune"),
+    "remembrances": lambda nm: nm.startswith("Remembrance"),
+}
+
+CATEGORIES = ("weapons", "armors", "talismans", "ashes", "key-items") + tuple(_NAME_FILTERS)
+
+
+def category_ids(category):
+    """Lista pełnych id w kategorii zbiorczej (bez mutacji save'a)."""
+    tables = items_db._load()
+    if category == "weapons":
+        names = set(tables["weapons"].values())
+        out = []
+        for fid, nm in tables["weapons"].items():
+            aff = next((a for a in _PLAIN_AFFIXES if nm.startswith(a) and nm[len(a):] in names), None)
+            if aff is None:
+                out.append(fid)
+        return out
+    if category == "armors":
+        return list(tables["armors"])
+    if category == "talismans":
+        return list(tables["talismans"])
+    if category == "ashes":
+        return list(tables["ashes"])
+    if category == "key-items":
+        return sorted(0x40000000 | b for b in items_db.key_item_ids())
+    pred = _NAME_FILTERS[category]
+    kys = items_db.key_item_ids()
+    return [fid for fid, nm in tables["goods"].items()
+            if pred(nm) and (fid & 0x0FFFFFFF) in kys and (fid >> 28) == 0x4]
+
+
+def _present(save, slot_idx, fid):
+    cat = (fid >> 28) & 0xF
+    base = fid & 0x0FFFFFFF
+    if cat == 0x4:
+        return inventory_hit(save, slot_idx, 0xB0000000 | base) is not None
+    if cat == 0x2:
+        return inventory_hit(save, slot_idx, 0xA0000000 | base) is not None
+    if cat == 0x0:
+        s = _parsed(save, slot_idx)
+        entries, _ = gaitem.walk(s.raw, s.version, expect_end=s.offsets["pgd"])
+        return any((e["handle"] & 0xF0000000) == 0x80000000
+                   and (e["item_id"] & 0x0FFFFFFF) == base for e in entries)
+    return False
+
+
+def grant_category(save, slot_idx, category, location="storage", limit=None):
+    """Masowo nadaje kategorię itemów (pomija już posiadane; przy przepełnieniu staje).
+    Zwraca raport."""
+    if category not in CATEGORIES:
+        raise ValueError(f"nie znam kategorii {category!r} (są: {', '.join(CATEGORIES)})")
+    ids = category_ids(category)
+    report = {"category": category, "candidates": len(ids), "added": 0,
+              "skipped_existing": 0, "errors": 0, "stopped": None, "sample": []}
+    for fid in ids:
+        if limit and report["added"] >= limit:
+            report["stopped"] = "limit"
+            break
+        try:
+            if _present(save, slot_idx, fid):
+                report["skipped_existing"] += 1
+                continue
+        except ValueError:
+            report["errors"] += 1
+            continue
+        placed = False
+        for loc in (location, "held" if location == "storage" else "storage"):
+            try:
+                rep = add_item(save, slot_idx, fid, qty=1, location=loc)
+                report["added"] += 1
+                if len(report["sample"]) < 6:
+                    report["sample"].append(rep.get("item", f"0x{fid:08X}"))
+                placed = True
+                break
+            except ValueError as ex:
+                if "pełne" in str(ex):
+                    continue
+                report["errors"] += 1
+                placed = True
+                break
+        if not placed:
+            report["stopped"] = "ekwipunek pełny"
+            break
+    return report

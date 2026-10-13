@@ -10,10 +10,20 @@
                                | --slot N --remove ITEM
                                | --slot N --set-qty "ITEM=N"
                                | --slot N --move ITEM --to storage|held
+                               | --slot N --set-upgrade "ITEM=N"
+                               | --slot N --affinity "ITEM=Blood"
+                               | --slot N --aow "ITEM=Bloody Slash"
     python -m rezur inventory  [--save PLIK] --slot N [--storage | --all | --equipped] [--json]
     python -m rezur equipment  [--save PLIK] --slot N [--json]
     python -m rezur equip      [--save PLIK] --slot N (--handle 0x… | --item NAZWA) [--at K] [--apply]
     python -m rezur unequip    [--save PLIK] --slot N [--at K] [--apply]
+    python -m rezur spells     [--save PLIK] --slot N [--memorize NAZWA [--at K] | --forget K | --clear] [--apply]
+    python -m rezur appearance [--save PLIK] --slot N [--gender 0/1] [--body 0/1] [--gift N] [--apply]
+    python -m rezur teleport   [--save PLIK] --slot N [--to limgrave|roundtable|liurnia|altus | --map m60_XX_XX_XX] [--xyz X,Y,Z] [--apply]
+    python -m rezur world      [--save PLIK] [--groups]
+                               | --slot N --group NAZWA [--filter Q] [--json]
+                               | --slot N --group NAZWA (--set "NAZWA|ID" | --all) [--state 0/1] [--apply]
+    python -m rezur unlock     [--save PLIK] --slot N --what KATEGORIA [--location storage|held] [--max N] [--apply]
     python -m rezur flags      [--save PLIK] --slot N (--get ID | --set ID:0/1 [--apply])
     python -m rezur graces     [--save PLIK] [--list] | --slot N [--region R] [--apply]
     python -m rezur copy       [--save PLIK] --from N --to M [--clear-source] [--apply]
@@ -47,21 +57,41 @@ from .ops.flags import graces as graces_data
 from .ops.flags import get_flag as flag_get
 from .ops.flags import set_flag as flag_set
 from .ops.flags import unlock_graces
+from .ops.appearance import read as appearance_read
+from .ops.appearance import set_appearance
 from .ops.items import (
+    CATEGORIES,
     add_item,
+    category_ids,
     equip_item,
     equipment,
+    grant_category,
     handle_for,
     list_inventory,
     move_item,
     parse_selector,
     remove_item,
+    resolve_ash,
     set_item_qty,
+    set_weapon_affinity,
+    set_weapon_aow,
+    set_weapon_upgrade,
     unequip,
 )
+from .ops.spells import clear as spells_clear
+from .ops.spells import equipped as spells_equipped
+from .ops.spells import forget as spells_forget
+from .ops.spells import memorize as spells_memorize
 from .ops.stats import STAT_NAMES, rename, set_runes, set_stats
 from .ops.steamid import change_steam_id
+from .ops.teleport import LOCATIONS as TELEPORT_LOCATIONS
+from .ops.teleport import info as teleport_info
+from .ops.teleport import parse_map_name
+from .ops.teleport import teleport as teleport_do
 from .ops.transfer import export_character, import_character
+from .ops.world import groups as world_groups
+from .ops.world import set_world
+from .ops.world import view as world_view
 from .report import jsonout as J
 from .report import text as R
 
@@ -235,8 +265,10 @@ def cmd_item(args):
             print(f"  0x{fid:08X}  {name:<44s} [{cat}]")
         return 0
 
-    if args.add is None and args.remove is None and args.set_qty is None and args.move is None:
-        print('użyj: --find Q | --slot N (--add ITEM | --remove ITEM | --set-qty "ITEM=N" | --move ITEM --to held|storage)')
+    if args.add is None and args.remove is None and args.set_qty is None and args.move is None \
+            and args.set_upgrade is None and args.affinity is None and args.aow is None:
+        print('użyj: --find Q | --slot N (--add ITEM | --remove ITEM | --set-qty "ITEM=N" | --move ITEM --to held|storage'
+              ' | --set-upgrade "ITEM=N" | --affinity "ITEM=Blood" | --aow "ITEM=Ash of War")')
         return 2
     if args.slot is None:
         print("podaj --slot N")
@@ -305,6 +337,62 @@ def cmd_item(args):
         if not _guard_game(sf.path):
             return 3
         rep = set_item_qty(sf, args.slot, h, qty)
+        bak = sf.write(backup_tag="itembak")
+        for k, v in rep.items():
+            print(f"  {k}: {v}")
+        print(f"zapisane. backup: {bak}")
+        return 0
+
+    if args.set_upgrade is not None:
+        if "=" not in args.set_upgrade:
+            print('format: --set-upgrade "ITEM=N"')
+            return 2
+        sel, ns = args.set_upgrade.rsplit("=", 1)
+        lvl = int(ns)
+        h = args.handle if args.handle is not None else _sel_handle(sf, args.slot, sel.strip())
+        if not args.apply:
+            print(f"DRY-RUN: ulepszyłbym broń 0x{h:08X} na +{lvl} (slot{args.slot})")
+            return 0
+        if not _guard_game(sf.path):
+            return 3
+        rep = set_weapon_upgrade(sf, args.slot, h, lvl)
+        bak = sf.write(backup_tag="itembak")
+        for k, v in rep.items():
+            print(f"  {k}: {v}")
+        print(f"zapisane. backup: {bak}")
+        return 0
+
+    if args.affinity is not None:
+        if "=" not in args.affinity:
+            print('format: --affinity "ITEM=Blood"')
+            return 2
+        sel, aff = args.affinity.rsplit("=", 1)
+        h = args.handle if args.handle is not None else _sel_handle(sf, args.slot, sel.strip())
+        if not args.apply:
+            print(f"DRY-RUN: affinity broni 0x{h:08X} → {aff.strip()} (slot{args.slot})")
+            return 0
+        if not _guard_game(sf.path):
+            return 3
+        rep = set_weapon_affinity(sf, args.slot, h, aff.strip())
+        bak = sf.write(backup_tag="itembak")
+        for k, v in rep.items():
+            print(f"  {k}: {v}")
+        print(f"zapisane. backup: {bak}")
+        return 0
+
+    if args.aow is not None:
+        if "=" not in args.aow:
+            print('format: --aow "ITEM=Bloody Slash"')
+            return 2
+        sel, ash = args.aow.rsplit("=", 1)
+        h = args.handle if args.handle is not None else _sel_handle(sf, args.slot, sel.strip())
+        ash_id = resolve_ash(ash.strip())
+        if not args.apply:
+            print(f"DRY-RUN: przypnę Ash 0x{ash_id:08X} do broni 0x{h:08X} (slot{args.slot})")
+            return 0
+        if not _guard_game(sf.path):
+            return 3
+        rep = set_weapon_aow(sf, args.slot, h, ash_id)
         bak = sf.write(backup_tag="itembak")
         for k, v in rep.items():
             print(f"  {k}: {v}")
@@ -507,6 +595,161 @@ def cmd_unequip(args):
     return 0
 
 
+def cmd_spells(args):
+    sf = _load(args)
+    if args.memorize is not None:
+        if not args.apply:
+            where = f" w gnieździe {args.at}" if args.at is not None else " (pierwsze wolne)"
+            print(f"DRY-RUN: zapamiętam {args.memorize!r}{where}")
+            return 0
+        if not _guard_game(sf.path):
+            return 3
+        rep = spells_memorize(sf, args.slot, args.memorize, args.at)
+        bak = sf.write(backup_tag="spellbak")
+        for k, v in rep.items():
+            print(f"  {k}: {v}")
+        print(f"zapisane. backup: {bak}")
+        return 0
+    if args.forget is not None:
+        if not args.apply:
+            print(f"DRY-RUN: zwolnię gniazdo {args.forget}")
+            return 0
+        if not _guard_game(sf.path):
+            return 3
+        rep = spells_forget(sf, args.slot, args.forget)
+        bak = sf.write(backup_tag="spellbak")
+        print(f"  {rep}")
+        print(f"zapisane. backup: {bak}")
+        return 0
+    if args.clear:
+        if not args.apply:
+            print("DRY-RUN: wyczyszczę wszystkie gniazda czarów")
+            return 0
+        if not _guard_game(sf.path):
+            return 3
+        rep = spells_clear(sf, args.slot)
+        bak = sf.write(backup_tag="spellbak")
+        print(f"  {rep}")
+        print(f"zapisane. backup: {bak}")
+        return 0
+    v = spells_equipped(sf, args.slot)
+    if args.json:
+        print(json.dumps(v, ensure_ascii=False, indent=2))
+        return 0
+    used = sum(1 for x in v["spells"] if not x["empty"])
+    print(f"slot{args.slot} — czary ({used}/14):")
+    for x in v["spells"]:
+        mark = "(puste)" if x["empty"] else x["name"]
+        print(f"  [{x['slot']:>2}] {mark}")
+    return 0
+
+
+def cmd_appearance(args):
+    sf = _load(args)
+    if args.gender is None and args.body is None and args.gift is None:
+        v = appearance_read(sf, args.slot)
+        body = "B" if v["body_type"] else "A"
+        print(f"slot{args.slot}: gender={v['gender']}  typ ciała={body}  archetyp={v['archetype']}  dar={v['gift']}")
+        return 0
+    if not args.apply:
+        print(f"DRY-RUN: wygląd slot{args.slot} (gender={args.gender}, body={args.body}, gift={args.gift})")
+        return 0
+    if not _guard_game(sf.path):
+        return 3
+    rep = set_appearance(sf, args.slot, gender=args.gender, body_type=args.body, gift=args.gift)
+    bak = sf.write(backup_tag="lookbak")
+    for k, v in rep.items():
+        print(f"  {k}: {v}")
+    print(f"zapisane. backup: {bak}")
+    return 0
+
+
+def cmd_teleport(args):
+    sf = _load(args)
+    if args.to is None and args.map is None:
+        v = teleport_info(sf, args.slot)
+        print(f"slot{args.slot}: {v['map_name']} (0x{v['map_id']:08X})  xyz={[round(c, 1) for c in v['xyz']]}")
+        print(f"spawn: {v['spawn']}")
+        return 0
+    mid = parse_map_name(args.map) if args.map is not None else None
+    xyz = None
+    if args.xyz:
+        parts = [float(x) for x in args.xyz.split(",")]
+        if len(parts) != 3:
+            raise ValueError("--xyz X,Y,Z")
+        xyz = tuple(parts)
+    if not args.apply:
+        where = args.to or args.map
+        print(f"DRY-RUN: teleport slot{args.slot} → {where}" + (f"  xyz={xyz}" if xyz else ""))
+        return 0
+    if not _guard_game(sf.path):
+        return 3
+    rep = teleport_do(sf, args.slot, dest=args.to, map_id=mid, xyz=xyz)
+    bak = sf.write(backup_tag="tpbak")
+    label = f"  ({rep['to']['label']})" if rep["to"].get("label") else ""
+    print(f"  {rep['from']['map_name']}  →  {rep['to']['map_name']}{label}")
+    if rep["xyz_set"]:
+        print(f"  xyz: {rep['xyz_set']}")
+    print(f"zapisane. backup: {bak}")
+    return 0
+
+
+def cmd_world(args):
+    if args.groups or args.group is None:
+        for g, n in sorted(world_groups().items()):
+            print(f"  {g:<20s} {n:5d}")
+        print("podgląd:  world --slot N --group NAZWA [--filter Q]")
+        print('zmiana:   world --slot N --group NAZWA (--set "fragment" | --all) [--state 0/1] --apply')
+        return 0
+    sf = _load(args)
+    if args.slot is None:
+        print("podaj --slot N")
+        return 2
+    if args.set is None and not args.all:
+        v = world_view(sf, args.slot, args.group, args.filter)
+        if args.json:
+            print(json.dumps(v, ensure_ascii=False, indent=2))
+            return 0
+        for e in v["entries"]:
+            mark = {True: "[x]", False: "[ ]", None: "[?]"}[e["value"]]
+            tail = f"   ({e['desc']})" if e["desc"] else ""
+            print(f"  {mark} {e['id']:>9}  {e['name']}{tail}")
+        return 0
+    value = True if args.state is None else bool(args.state)
+    if not args.apply:
+        rep = set_world(sf, args.slot, args.group, args.set, value, args.filter, args.all, apply=False)
+        print(f"DRY-RUN [{args.group} → {value}]: do zmiany {rep['set']}, już/nieznane: {rep['already_or_unknown']}")
+        for fid, name in rep["sample"]:
+            print(f"   {fid:>9}  {name}")
+        print("dodaj --apply")
+        return 0
+    if not _guard_game(sf.path):
+        return 3
+    rep = set_world(sf, args.slot, args.group, args.set, value, args.filter, args.all, apply=True)
+    bak = sf.write(backup_tag="worldbak")
+    print(f"ustawiono {rep['set']} flag [{args.group}] → {value} (pominięto {rep['already_or_unknown']})")
+    for fid, name in rep["sample"][:6]:
+        print(f"   {fid:>9}  {name}")
+    print(f"zapisane. backup: {bak}")
+    return 0
+
+
+def cmd_unlock(args):
+    sf = _load(args)
+    if not args.apply:
+        ids = category_ids(args.what)
+        print(f"DRY-RUN: kategoria {args.what}: {len(ids)} pozycji w bazie (istniejące pomijam)")
+        return 0
+    if not _guard_game(sf.path):
+        return 3
+    rep = grant_category(sf, args.slot, args.what, location=args.location, limit=args.max)
+    bak = sf.write(backup_tag="unlockbak")
+    for k, v in rep.items():
+        print(f"  {k}: {v}")
+    print(f"zapisane. backup: {bak}")
+    return 0
+
+
 def cmd_export(args):
     sf = _load(args)
     rep = export_character(sf, args.slot, args.out)
@@ -629,6 +872,9 @@ def main(argv=None):
     sp.add_argument("--set-qty", default=None, help='np. "Crimson Flask=14"')
     sp.add_argument("--move", default=None, help="nazwa / 0xID / handle:0x…")
     sp.add_argument("--to", default=None, help="held albo storage (dla --move)")
+    sp.add_argument("--set-upgrade", default=None, help='np. "Uchigatana=10"')
+    sp.add_argument("--affinity", default=None, help='np. "Uchigatana=Blood"')
+    sp.add_argument("--aow", default=None, help='np. "Uchigatana=Bloody Slash"')
     sp.add_argument("--handle", type=lambda s: int(s, 16), default=None)
     sp.add_argument("--qty", type=int, default=1)
     sp.add_argument("--upgrade", type=int, default=0)
@@ -695,6 +941,57 @@ def main(argv=None):
     sp.add_argument("--at", type=int, default=None)
     sp.add_argument("--apply", action="store_true")
     sp.set_defaults(func=cmd_unequip)
+
+    sp = sub.add_parser("spells", help="czary: podgląd / zapamiętaj / zwolnij")
+    add_save(sp)
+    sp.add_argument("--slot", type=int, required=True)
+    sp.add_argument("--memorize", default=None)
+    sp.add_argument("--forget", type=int, default=None)
+    sp.add_argument("--clear", action="store_true")
+    sp.add_argument("--at", type=int, default=None)
+    sp.add_argument("--json", action="store_true")
+    sp.add_argument("--apply", action="store_true")
+    sp.set_defaults(func=cmd_spells)
+
+    sp = sub.add_parser("appearance", help="wygląd: gender / typ ciała / dar")
+    add_save(sp)
+    sp.add_argument("--slot", type=int, required=True)
+    sp.add_argument("--gender", type=int, default=None, choices=(0, 1))
+    sp.add_argument("--body", type=int, default=None, choices=(0, 1))
+    sp.add_argument("--gift", type=int, default=None)
+    sp.add_argument("--apply", action="store_true")
+    sp.set_defaults(func=cmd_appearance)
+
+    sp = sub.add_parser("teleport", help="przenieś postać (Limgrave/Roundtable/...)")
+    add_save(sp)
+    sp.add_argument("--slot", type=int, required=True)
+    sp.add_argument("--to", default=None, choices=tuple(TELEPORT_LOCATIONS))
+    sp.add_argument("--map", default=None, help='np. m60_36_42_00')
+    sp.add_argument("--xyz", default=None, help='np. "-331,-22,-305.8"')
+    sp.add_argument("--apply", action="store_true")
+    sp.set_defaults(func=cmd_teleport)
+
+    sp = sub.add_parser("world", help="nazwane flagi świata (bossowie, mapy, cookbooki…)")
+    add_save(sp)
+    sp.add_argument("--slot", type=int, default=None)
+    sp.add_argument("--groups", action="store_true")
+    sp.add_argument("--group", default=None)
+    sp.add_argument("--filter", default=None)
+    sp.add_argument("--set", default=None, help="fragment nazwy albo ID")
+    sp.add_argument("--all", action="store_true", help="cała grupa")
+    sp.add_argument("--state", type=int, default=None, choices=(0, 1))
+    sp.add_argument("--json", action="store_true")
+    sp.add_argument("--apply", action="store_true")
+    sp.set_defaults(func=cmd_world)
+
+    sp = sub.add_parser("unlock", help="masowo nadaj kategorię itemów")
+    add_save(sp)
+    sp.add_argument("--slot", type=int, required=True)
+    sp.add_argument("--what", required=True, choices=CATEGORIES)
+    sp.add_argument("--location", default="storage", choices=("storage", "held"))
+    sp.add_argument("--max", type=int, default=None)
+    sp.add_argument("--apply", action="store_true")
+    sp.set_defaults(func=cmd_unlock)
 
     sp = sub.add_parser("copy", help="kopiuj postać slot -> slot")
     add_save(sp)

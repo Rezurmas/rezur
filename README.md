@@ -147,4 +147,15 @@ tools\build_exe.cmd          :: albo: python -m PyInstaller packaging\rezur.spec
 :: wynik: dist\rezur.exe (jednoplikowy, bez instalatora; dane db_er wkompilowane)
 ```
 
+## Źródła danych
+
+Tabele (itemy, broń, zbroje, flagi świata, czary, łaski) powstały na podstawie danych
+z gry i publicznych projektów społeczności — **ER-Save-Editor**, **EldenRing-SaveForge**,
+**ER-Save-Lib**, **er-save-manager**, **sl2-analyzer** — i były weryfikowane krzyżowo na
+realnych save'ach (era 1.16). Rezur nie zawiera ich kodu, tylko własne implementacje
+formatu i własne pliki danych.
+
+Nazwy, teksty i zawartość gry należą do **FromSoftware / Bandai Namco**. To nieoficjalne,
+hobbystyczne narzędzie do własnych zapisów — używaj na własną odpowiedzialność.
+
 Szczegóły techniczne formatu i zweryfikowane pułapki: skill `elden-ring-save-repair`.

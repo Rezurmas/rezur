@@ -1,0 +1,76 @@
+﻿REZUR Saves Configurator - one-file release (Windows 64-bit)
+============================================================
+
+HOW TO RUN
+----------
+1. Unpack this ZIP anywhere you like (e.g. C:\Rezur or your Desktop).
+2. Double-click  START-REZUR.cmd   -> the configurator window opens.
+   (from a terminal you can also run:   rezur.exe gui )
+   A small console window stays in the background, minimized, while the app runs.
+
+The tool finds your save automatically: the newest file in
+%APPDATA%\EldenRing\*\ER0000.sl2
+
+To open a specific save file:
+
+      rezur.exe gui --save "C:\path\to\ER0000.sl2"
+
+GUI and CLI live in the same single file - just type a subcommand:
+
+      rezur.exe info                      characters + container state
+      rezur.exe doctor                    diagnostics (read-only)
+      rezur.exe fix --apply               repair everything (auto-backup first)
+      rezur.exe risk                      online-risk scan + return path to GOLD
+      rezur.exe backups --restore NAME --apply
+      rezur.exe --help                    all commands
+
+FIRST RUN - Windows SmartScreen
+-------------------------------
+The .exe is unsigned, so Windows may warn: "Windows protected your PC".
+Click  More info  ->  Run anyway.  This is normal for small indie tools.
+
+REQUIREMENTS
+------------
+Windows 10/11 64-bit with the WebView2 runtime (preinstalled on Win 10/11).
+No Python, no installer, 100% offline - your save file never leaves the machine.
+
+SAFETY
+------
+Every write makes a GOLD copy once per file plus a tagged backup with rotation,
+and the new file is verified (BND4 + all section MD5) BEFORE it replaces the
+original. Writing is blocked while eldenring.exe is running. Edits in the GUI
+always land in a work copy first - nothing touches the original until APPLY.
+
+Unofficial hobby tool. Game content belongs to FromSoftware / Bandai Namco.
+
+
+----------------------------------------------------------------------------
+JAK URUCHOMIC (PL)
+------------------
+1. Rozpakuj ten ZIP gdziekolwiek (np. C:\Rezur albo na Pulpit).
+2. Kliknij dwa razy  START-REZUR.cmd   -> otworzy sie okno konfiguratora.
+   (z terminala mozesz tez:  rezur.exe gui )
+   W tle zostaje zminimalizowane okno konsoli - tak ma byc.
+
+Narzedzie samo znajduje najnowszy save w %APPDATA%\EldenRing\*\ER0000.sl2.
+Konkretny plik:
+
+      rezur.exe gui --save "C:\sciezka\ER0000.sl2"
+
+Przy pierwszym uruchomieniu SmartScreen moze ostrzec (plik nie jest podpisany):
+"Wiecej informacji" -> "Uruchom mimo to".
+
+GUI i CLI sa w tym samym jednym pliku - wystarczy podac komende, np.
+      rezur.exe doctor
+      rezur.exe world --groups
+      rezur.exe --help
+
+Wymagania: Windows 10/11 64-bit (+ WebView2, jest w systemie). Bez Pythona,
+bez instalatora, 100% offline.
+
+Bezpieczenstwo: kazdy zapis robi kopie GOLD (raz na plik) + backup z rotacja,
+a nowy plik jest weryfikowany (BND4 + sumy MD5 wszystkich sekcji) ZANIM zastapi
+oryginal. Zapis jest blokowany, gdy dziala eldenring.exe. Edycje w GUI zawsze
+trafiaja najpierw do kopii roboczej - oryginal rusza dopiero na ZASTOSUJ.
+
+Nieoficjalne narzedzie hobbystyczne. Zawartosc gry nalezy do FromSoftware / Bandai Namco.

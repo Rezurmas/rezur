@@ -103,10 +103,15 @@ def _selftest(win):
 def run(save=None, selftest=False):
     import webview
 
+    index = web_dir() / "index.html"
+    if not index.is_file():
+        print(f"[gui] brak plików interfejsu: {index}")
+        print("[gui] w spakowanym exe dodaj 'rezur/gui/web' do datas w packaging/rezur.spec")
+        return 2
     api = GuiApi(initial_save=save)
     win = webview.create_window(
         WINDOW_TITLE,
-        str(web_dir() / "index.html"),
+        str(index),
         js_api=api,
         width=1290,
         height=840,

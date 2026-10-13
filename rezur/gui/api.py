@@ -50,6 +50,40 @@ def _live(path):
     return str(path)
 
 
+def _native_dialog(kind, **kw):
+    """Natywny dialog okna (WebView2) — bez tkinter; fallback na tkinter w dev-owym Pythonie.
+
+    kind: "open" | "save" | "folder". Zwraca ścieżkę albo None (anulowano).
+    """
+    try:
+        import webview
+
+        win = webview.windows[0] if getattr(webview, "windows", None) else None
+        if win is not None:
+            dtype = {"open": webview.OPEN_DIALOG, "save": webview.SAVE_DIALOG,
+                     "folder": webview.FOLDER_DIALOG}[kind]
+            res = win.create_file_dialog(dtype, **kw)
+            if not res:
+                return None
+            return res[0] if isinstance(res, (list, tuple)) else str(res)
+    except Exception:  # noqa: BLE001 — brak okna/nie ten backend → próbujemy tkinter
+        pass
+    try:
+        import tkinter as tk
+        from tkinter import filedialog
+
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes("-topmost", True)
+        out = (filedialog.askopenfilename() if kind == "open"
+               else filedialog.asksaveasfilename(defaultextension=".json",
+                                                 initialfile=kw.get("save_filename", "")))
+        root.destroy()
+        return out or None
+    except Exception:  # noqa: BLE001
+        return None
+
+
 class GuiApi:
     def __init__(self, initial_save=None):
         self.initial_save = initial_save
@@ -100,18 +134,7 @@ class GuiApi:
 
     def pick_save(self):
         try:
-            import tkinter as tk
-            from tkinter import filedialog
-
-            root = tk.Tk()
-            root.withdraw()
-            root.attributes("-topmost", True)
-            p = filedialog.askopenfilename(
-                title="Wskaż ER0000.sl2",
-                filetypes=[("Elden Ring save", "*.sl2"), ("wszystkie pliki", "*.*")],
-                initialdir=str(Path(os.path.expandvars(r"%APPDATA%\EldenRing"))),
-            )
-            root.destroy()
+            p = _native_dialog("open", file_types=("Elden Ring save (*.sl2)", "All files (*.*)"))
             return {"path": p} if p else {"cancelled": True}
         except Exception as e:  # noqa: BLE001
             return {"error": str(e)}
@@ -462,17 +485,7 @@ class GuiApi:
 
     def export_char(self, path, slot):
         try:
-            import tkinter as tk
-            from tkinter import filedialog
-
-            root = tk.Tk()
-            root.withdraw()
-            root.attributes("-topmost", True)
-            out = filedialog.asksaveasfilename(
-                title="Zapisz postać jako JSON", defaultextension=".json",
-                initialfile=f"slot{int(slot)}.json",
-            )
-            root.destroy()
+            out = _native_dialog("save", save_filename=f"slot{int(slot)}.json")
             if not out:
                 return {"cancelled": True}
             rep = export_character(SaveFile(path), int(slot), out)
@@ -482,15 +495,7 @@ class GuiApi:
 
     def pick_json(self):
         try:
-            import tkinter as tk
-            from tkinter import filedialog
-
-            root = tk.Tk()
-            root.withdraw()
-            root.attributes("-topmost", True)
-            p = filedialog.askopenfilename(title="Wskaż JSON postaci",
-                                           filetypes=[("JSON", "*.json")])
-            root.destroy()
+            p = _native_dialog("open", file_types=("JSON (*.json)",))
             return {"path": p} if p else {"cancelled": True}
         except Exception as e:  # noqa: BLE001
             return {"error": str(e)}

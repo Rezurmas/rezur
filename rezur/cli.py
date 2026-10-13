@@ -1167,7 +1167,17 @@ def cmd_list_fixes(args):
     return 0
 
 
+def _force_utf8():
+    """Polskie znaki w konsoli/pipe: wymuś UTF-8 na stdout/stderr (Windows = cp1252 w pipe)."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:  # noqa: BLE001 — brak reconfigure (np. obiekt bez atrybutu) → pomijamy
+            pass
+
+
 def main(argv=None):
+    _force_utf8()
     p = argparse.ArgumentParser(prog="rezur", description=f"{__product__} v{__version__}")
     sub = p.add_subparsers(dest="cmd", required=True)
 

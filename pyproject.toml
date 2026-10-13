@@ -1,6 +1,6 @@
 [project]
 name = "rezur-saves-configurator"
-version = "0.1.0"
+version = "0.2.0"
 description = "Rezur Saves Configurator — konfigurator i naprawiacz save'ów Elden Ring (.sl2): diagnostyka, auto-naprawy, kopiowanie postaci, patcher SteamID"
 requires-python = ">=3.10"
 license = { text = "MIT" }

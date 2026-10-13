@@ -1236,6 +1236,26 @@ def t_spell_catalogue():
             assert again["memorized"], again
 
 
+@test
+def t_release_packaging_ready():
+    """Wydanie jednoplikowe: entry.py + interfejs w datas + launcher/instrukcja + UTF-8 w CLI."""
+    spec = (ROOT / "packaging" / "rezur.spec").read_text(encoding="utf-8")
+    assert "gui/web" in spec, "spec nie pakuje rezur/gui/web — exe otworzy się bez interfejsu"
+    assert "entry.py" in spec, "spec nie używa packaging/entry.py (importy relatywne w __main__)"
+    entry = ROOT / "packaging" / "entry.py"
+    assert entry.is_file() and "from rezur.cli import main" in entry.read_text(encoding="utf-8"), (
+        "brak packaging/entry.py z importem pakietu"
+    )
+    for f in ("START-REZUR.cmd", "HOW-TO-RUN.txt", "RELEASE-NOTES.md"):
+        assert (ROOT / "packaging" / "release" / f).is_file(), f"brak packaging/release/{f}"
+    cmd = (ROOT / "packaging" / "release" / "START-REZUR.cmd").read_bytes()
+    assert b"\r\n" in cmd, "launcher .cmd musi mieć końce linii CRLF"
+    assert all(b < 128 for b in cmd), "launcher .cmd musi być ASCII"
+    assert (ROOT / "tools" / "make_release_zip.py").is_file(), "brak tools/make_release_zip.py"
+    cli = (ROOT / "rezur" / "cli.py").read_text(encoding="utf-8")
+    assert "_force_utf8()" in cli, "cli.main bez _force_utf8 — polskie znaki wywalą się w pipe/exe"
+
+
 def main():
     ok = fail = 0
     for t in _tests:

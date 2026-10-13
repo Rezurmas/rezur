@@ -7,20 +7,30 @@ from pathlib import Path
 ROOT = Path(SPECPATH).parent  # noqa: F821  (packaging/ -> katalog repo)
 
 datas = []
-for p in (ROOT / "rezur" / "data").rglob("*"):
-    if p.is_file():
-        rel = p.relative_to(ROOT)
-        datas.append((str(p), str(rel.parent)))
+# dane + interfejs GUI (bez web/ okno w spakowanym exe nie wystartuje)
+for sub in ("data", "gui/web"):
+    for p in (ROOT / "rezur" / sub).rglob("*"):
+        if p.is_file():
+            rel = p.relative_to(ROOT)
+            datas.append((str(p), str(rel.parent)))
 
 a = Analysis(
-    [str(ROOT / "rezur" / "__main__.py")],
+    [str(ROOT / "packaging" / "entry.py")],
     pathex=[str(ROOT)],
     binaries=[],
     datas=datas,
-    hiddenimports=[],
+    hiddenimports=[
+        # GUI w jednym pliku: pywebview + pythonnet (WebView2)
+        "webview",
+        "webview.platforms.edgechromium",
+        "webview.platforms.winforms",
+        "clr",
+        "clr_loader",
+        "pythonnet",
+    ],
     hookspath=[],
     runtime_hooks=[],
-    excludes=["tkinter", "unittest.mock", "pydoc"],
+    excludes=["unittest.mock", "pydoc"],
     noarchive=False,
 )
 pyz = PYZ(a.pure)

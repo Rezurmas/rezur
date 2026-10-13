@@ -17,6 +17,28 @@ format implementation verified byte-by-byte against real saves (v250–261, 1.16
 
 Everything runs **100% offline** — no network calls, no telemetry. The save file never leaves the machine.
 
+## Download — one file, no Python
+
+Grab the ZIP from the [latest release](https://github.com/Rezurmas/rezur/releases/latest), then:
+
+1. unpack it anywhere (e.g. `C:\Rezur`),
+2. double-click **`START-REZUR.cmd`** → the configurator window opens.
+
+`rezur.exe` is a single self-contained file that holds **both the GUI and the CLI**:
+
+```cmd
+rezur.exe gui                      :: the window (same as the launcher)
+rezur.exe info                     :: CLI: characters + container state
+rezur.exe doctor                   :: CLI: diagnostics
+rezur.exe fix --apply              :: CLI: repair everything (auto-backup first)
+rezur.exe --help                   :: all subcommands
+```
+
+It finds your save automatically (newest `%APPDATA%\EldenRing\*\ER0000.sl2`); for a specific file use
+`rezur.exe gui --save "C:\path\ER0000.sl2"`. Windows SmartScreen may warn once — the exe is
+unsigned: *More info → Run anyway*. Needs Windows 10/11 64-bit with the WebView2 runtime
+(preinstalled on both). `HOW-TO-RUN.txt` inside the ZIP repeats this in English and Polish.
+
 ![Characters](docs/screenshots/01-characters.png)
 
 | Doctor — diagnostics with one-click repairs | Inventory — live filter, staged edits |
@@ -187,8 +209,12 @@ Technical details of the save format and the verified pitfalls: see `ARCHITECTUR
 
 ```cmd
 python -m pip install pyinstaller
-tools\build_exe.cmd          :: or: python -m PyInstaller packaging\rezur.spec
-:: → dist\rezur.exe (single file, no installer; db_er data bundled)
+tools\build_exe.cmd          :: or: python -m PyInstaller --clean --noconfirm packaging\rezur.spec
+::   → dist\rezur.exe (single file, no installer; data tables bundled; GUI + CLI inside)
+
+python tools\make_release_zip.py
+::   → dist\Rezur-vX.Y.Z-win64.zip  (rezur.exe + START-REZUR.cmd + HOW-TO-RUN.txt)
+::     ready to attach to a GitHub release
 ```
 
 ## Data sources

@@ -249,3 +249,26 @@ workflow for the datamined flag names) live in the helper notes shipped with the
 - writing to the live save is blocked while the game runs (`_guard_game`, config `guard_live`);
 - tests: `run_all.py` (behaviour), `smoke_cli.py` (every command), `bridge_audit.py` (GUI bridge);
   the GUI itself is verified in a real window via `--selftest`.
+
+---
+
+## 10. One-file build (PyInstaller)
+
+`dist/rezur.exe` is a single self-contained file holding the GUI **and** the CLI.
+
+- `packaging/entry.py` is the entry point: `rezur/__main__.py` uses relative imports and PyInstaller
+  runs its script as a top-level module, so `from .cli import …` blows up there. `entry.py` does
+  `from rezur.cli import main`.
+- `packaging/rezur.spec` bundles `rezur/data/**` **and** `rezur/gui/web/**`. Without the web assets
+  the window opens with no interface; `gui.app.run()` now detects the missing `index.html` and exits
+  with code 2 and an explicit message instead of hanging.
+- pywebview + pythonnet come in as hidden imports (`webview.platforms.edgechromium`, `clr`,
+  `clr_loader`). **tkinter is not needed**: file dialogs are native WebView2 dialogs
+  (`_native_dialog` in `gui/api.py`, with a tkinter fallback for dev runs).
+- `cli.main()` forces UTF-8 on stdout/stderr: in a Windows pipe (or inside the frozen exe) Python
+  falls back to the locale code page (cp1252) and **any Polish character crashed the process** —
+  `rezur.exe list-fixes | head` must work.
+- `tools/build_exe.cmd` builds; `tools/make_release_zip.py` assembles
+  `dist/Rezur-v<version>-win64.zip` (`rezur.exe` + `START-REZUR.cmd` + `HOW-TO-RUN.txt`);
+  the launcher, instructions and release notes are versioned in `packaging/release/`;
+  `t_release_packaging_ready` (run_all) guards all of it, including the .cmd's CRLF/ASCII encoding.

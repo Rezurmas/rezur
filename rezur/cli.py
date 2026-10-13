@@ -5,12 +5,20 @@
     python -m rezur fix        [--save PLIK] [--only id,id] [--apply]
     python -m rezur stats      [--save PLIK] --slot N [--set vigor=60,mind=40]
                                [--runes N] [--runes-memory N] [--name "X"] [--apply]
-    python -m rezur item       [--save PLIK] (--find Q | --slot N --add ITEM
-                               [--qty N] [--upgrade N] [--storage] [--apply])
-    python -m rezur inventory  [--save PLIK] --slot N [--storage]
+    python -m rezur item       [--save PLIK] --find Q
+                               | --slot N --add ITEM [--upgrade N] [--storage] [--apply]
+                               | --slot N --remove ITEM
+                               | --slot N --set-qty "ITEM=N"
+                               | --slot N --move ITEM --to storage|held
+    python -m rezur inventory  [--save PLIK] --slot N [--storage | --all | --equipped] [--json]
+    python -m rezur equipment  [--save PLIK] --slot N [--json]
+    python -m rezur equip      [--save PLIK] --slot N (--handle 0x… | --item NAZWA) [--at K] [--apply]
+    python -m rezur unequip    [--save PLIK] --slot N [--at K] [--apply]
     python -m rezur flags      [--save PLIK] --slot N (--get ID | --set ID:0/1 [--apply])
     python -m rezur graces     [--save PLIK] [--list] | --slot N [--region R] [--apply]
     python -m rezur copy       [--save PLIK] --from N --to M [--clear-source] [--apply]
+    python -m rezur swap       [--save PLIK] --a N --b M [--apply]
+    python -m rezur clear      [--save PLIK] --slot N [--apply]
     python -m rezur steamid    [--save PLIK] --set ID [--apply]
     python -m rezur export     [--save PLIK] --slot N --out PLIK
     python -m rezur import     [--save PLIK] --to N --in PLIK [--apply]
@@ -34,12 +42,23 @@ from .core.savefile import SaveFile, default_save_path
 from .core.slots import Slot
 from .diag import run_diagnostics
 from .ops.backups import list_backups, restore
-from .ops.copy_slot import copy_character_file
+from .ops.copy_slot import clear_character_file, copy_character_file, swap_characters_file
 from .ops.flags import graces as graces_data
 from .ops.flags import get_flag as flag_get
 from .ops.flags import set_flag as flag_set
 from .ops.flags import unlock_graces
-from .ops.items import add_item, list_inventory
+from .ops.items import (
+    add_item,
+    equip_item,
+    equipment,
+    handle_for,
+    list_inventory,
+    move_item,
+    parse_selector,
+    remove_item,
+    set_item_qty,
+    unequip,
+)
 from .ops.stats import STAT_NAMES, rename, set_runes, set_stats
 from .ops.steamid import change_steam_id
 from .ops.transfer import export_character, import_character
@@ -201,6 +220,13 @@ def cmd_stats(args):
     return 0
 
 
+def _sel_handle(sf, slot, sel):
+    kind, val = parse_selector(sel)
+    if kind == "handle":
+        return val
+    return handle_for(sf, slot, val)
+
+
 def cmd_item(args):
     if args.find:
         res = items_db.search(args.find)
@@ -208,39 +234,92 @@ def cmd_item(args):
         for fid, name, cat in res:
             print(f"  0x{fid:08X}  {name:<44s} [{cat}]")
         return 0
-    if args.add is None or args.slot is None:
-        print("użyj: --find Q  albo  --slot N --add ITEM")
+
+    if args.add is None and args.remove is None and args.set_qty is None and args.move is None:
+        print('użyj: --find Q | --slot N (--add ITEM | --remove ITEM | --set-qty "ITEM=N" | --move ITEM --to held|storage)')
+        return 2
+    if args.slot is None:
+        print("podaj --slot N")
         return 2
     sf = _load(args)
-    a = args.add.strip()
-    if a.lower().startswith("0x"):
-        full_id, disp = int(a, 16), a
-    else:
-        ex = items_db.find_exact(a)
-        if ex:
-            full_id, disp = ex[0], ex[1]
-        else:
-            res = items_db.search(a, 6)
-            if not res:
-                print("nie znalazłem nic o tej nazwie")
-                return 2
-            if len({fid for fid, _, _ in res}) > 1:
-                print("kilka trafień — doprecyzuj (nazwa albo 0xID):")
-                for fid, name, cat in res:
-                    print(f"  0x{fid:08X}  {name} [{cat}]")
-                return 2
-            full_id, disp = res[0][0], res[0][1]
 
+    if args.add is not None:
+        a = args.add.strip()
+        if a.lower().startswith("0x"):
+            full_id, disp = int(a, 16), a
+        else:
+            ex = items_db.find_exact(a)
+            if ex:
+                full_id, disp = ex[0], ex[1]
+            else:
+                res = items_db.search(a, 6)
+                if not res:
+                    print("nie znalazłem nic o tej nazwie")
+                    return 2
+                if len({fid for fid, _, _ in res}) > 1:
+                    print("kilka trafień — doprecyzuj (nazwa albo 0xID):")
+                    for fid, name, cat in res:
+                        print(f"  0x{fid:08X}  {name} [{cat}]")
+                    return 2
+                full_id, disp = res[0][0], res[0][1]
+        if not args.apply:
+            print(f"DRY-RUN: dodałbym do slot{args.slot}: 0x{full_id:08X} '{disp}'")
+            print(f"  qty={args.qty}  upgrade={args.upgrade}  location={'storage' if args.storage else 'held'}")
+            return 0
+        if not _guard_game(sf.path):
+            return 3
+        rep = add_item(
+            sf, args.slot, full_id, qty=args.qty, upgrade=args.upgrade,
+            location="storage" if args.storage else "held",
+        )
+        bak = sf.write(backup_tag="itembak")
+        for k, v in rep.items():
+            print(f"  {k}: {v}")
+        print(f"zapisane. backup: {bak}")
+        return 0
+
+    if args.remove is not None:
+        h = args.handle if args.handle is not None else _sel_handle(sf, args.slot, args.remove)
+        if not args.apply:
+            print(f"DRY-RUN: usunąłbym handle 0x{h:08X} ze slot{args.slot}")
+            return 0
+        if not _guard_game(sf.path):
+            return 3
+        rep = remove_item(sf, args.slot, h)
+        bak = sf.write(backup_tag="itembak")
+        for k, v in rep.items():
+            print(f"  {k}: {v}")
+        print(f"zapisane. backup: {bak}")
+        return 0
+
+    if args.set_qty is not None:
+        if "=" not in args.set_qty:
+            print('format: --set-qty "ITEM=N" (albo 0xID=N / handle:0x…=N)')
+            return 2
+        sel, qs = args.set_qty.rsplit("=", 1)
+        qty = int(qs)
+        h = args.handle if args.handle is not None else _sel_handle(sf, args.slot, sel.strip())
+        if not args.apply:
+            print(f"DRY-RUN: handle 0x{h:08X} → ilość {qty} (slot{args.slot})")
+            return 0
+        if not _guard_game(sf.path):
+            return 3
+        rep = set_item_qty(sf, args.slot, h, qty)
+        bak = sf.write(backup_tag="itembak")
+        for k, v in rep.items():
+            print(f"  {k}: {v}")
+        print(f"zapisane. backup: {bak}")
+        return 0
+
+    # --move
+    to = (args.to or "storage").strip()
+    h = args.handle if args.handle is not None else _sel_handle(sf, args.slot, args.move)
     if not args.apply:
-        print(f"DRY-RUN: dodałbym do slot{args.slot}: 0x{full_id:08X} '{disp}'")
-        print(f"  qty={args.qty}  upgrade={args.upgrade}  location={'storage' if args.storage else 'held'}")
+        print(f"DRY-RUN: przeniósłbym handle 0x{h:08X} → {to} (slot{args.slot})")
         return 0
     if not _guard_game(sf.path):
         return 3
-    rep = add_item(
-        sf, args.slot, full_id, qty=args.qty, upgrade=args.upgrade,
-        location="storage" if args.storage else "held",
-    )
+    rep = move_item(sf, args.slot, h, to)
     bak = sf.write(backup_tag="itembak")
     for k, v in rep.items():
         print(f"  {k}: {v}")
@@ -250,13 +329,29 @@ def cmd_item(args):
 
 def cmd_inventory(args):
     sf = _load(args)
-    items = list_inventory(sf, args.slot, "storage" if args.storage else "held")
-    loc = "skrzynia" if args.storage else "przy sobie"
-    print(f"slot{args.slot} — ekwipunek ({loc}): {len(items)} pozycji")
-    for it in items[:500]:
-        print(f"  0x{it['handle']:08X}  x{it['qty']:<4d}  {it['name']}")
-    if len(items) > 500:
-        print(f"  ... i {len(items) - 500} więcej")
+    if args.equipped:
+        eq = equipment(sf, args.slot)
+        if args.json:
+            print(json.dumps(eq, ensure_ascii=False, indent=2))
+            return 0
+        print(f"slot{args.slot} — założone:")
+        for e in eq["equipped"]:
+            if e["empty"]:
+                continue
+            print(f"  [{e['slot']:>2}] {e['zone']:<9} 0x{e['handle']:08X}  {e['name']}")
+        return 0
+    locs = ["storage"] if args.storage else (["held", "storage"] if args.all else ["held"])
+    for loc in locs:
+        items = list_inventory(sf, args.slot, loc)
+        if args.json:
+            print(json.dumps({"slot": args.slot, "location": loc, "items": items}, ensure_ascii=False, indent=2))
+            continue
+        label = "skrzynia" if loc == "storage" else "przy sobie"
+        print(f"slot{args.slot} — ekwipunek ({label}): {len(items)} pozycji")
+        for it in items[:500]:
+            print(f"  0x{it['handle']:08X}  x{it['qty']:<4d}  {it['name']}")
+        if len(items) > 500:
+            print(f"  ... i {len(items) - 500} więcej")
     return 0
 
 
@@ -333,6 +428,82 @@ def cmd_steamid(args):
     rep = change_steam_id(sf, new)
     bak = sf.write(backup_tag="steamidbak")
     print(f"SteamID {rep['old']} -> {rep['new']}; sloty: {rep['slots'] or 'brak'}; backup: {bak}")
+    return 0
+
+
+def cmd_swap(args):
+    path = args.save or str(default_save_path())
+    if args.apply and not _guard_game(path):
+        return 3
+    r = swap_characters_file(path, args.a, args.b, apply=args.apply)
+    for k, v in r.items():
+        print(f"  {k}: {v}")
+    if not args.apply:
+        print("\nDRY-RUN. dodaj --apply, aby wykonać.")
+    return 0
+
+
+def cmd_clear(args):
+    path = args.save or str(default_save_path())
+    if args.apply and not _guard_game(path):
+        return 3
+    r = clear_character_file(path, args.slot, apply=args.apply)
+    for k, v in r.items():
+        print(f"  {k}: {v}")
+    if not args.apply:
+        print("\nDRY-RUN. dodaj --apply, aby wykonać.")
+    return 0
+
+
+def cmd_equipment(args):
+    sf = _load(args)
+    eq = equipment(sf, args.slot)
+    if args.json:
+        print(json.dumps(eq, ensure_ascii=False, indent=2))
+        return 0
+    print(f"slot{args.slot} — wyposażenie:")
+    for e in eq["equipped"]:
+        mark = "(puste)" if e["empty"] else f"0x{e['handle']:08X}  {e['name']}"
+        print(f"  [{e['slot']:>2}] {e['zone']:<9} {mark}")
+    return 0
+
+
+def cmd_equip(args):
+    sf = _load(args)
+    if args.handle is not None:
+        h = args.handle
+    elif args.item is not None:
+        h = _sel_handle(sf, args.slot, args.item)
+    else:
+        print("podaj --handle 0x… albo --item NAZWA")
+        return 2
+    if not args.apply:
+        where = f" na gniazdo {args.at}" if args.at is not None else " (pierwsze wolne)"
+        print(f"DRY-RUN: założę handle 0x{h:08X} w slot{args.slot}{where}")
+        return 0
+    if not _guard_game(sf.path):
+        return 3
+    rep = equip_item(sf, args.slot, h, args.at)
+    bak = sf.write(backup_tag="equipbak")
+    for k, v in rep.items():
+        print(f"  {k}: {v}")
+    print(f"zapisane. backup: {bak}")
+    return 0
+
+
+def cmd_unequip(args):
+    sf = _load(args)
+    if not args.apply:
+        what = f"gniazdo {args.at} (slot{args.slot})" if args.at is not None else f"wszystko (slot{args.slot})"
+        print(f"DRY-RUN: zdejmę {what}")
+        return 0
+    if not _guard_game(sf.path):
+        return 3
+    rep = unequip(sf, args.slot, args.at)
+    bak = sf.write(backup_tag="equipbak")
+    for k, v in rep.items():
+        print(f"  {k}: {v}")
+    print(f"zapisane. backup: {bak}")
     return 0
 
 
@@ -449,11 +620,16 @@ def main(argv=None):
     sp.add_argument("--apply", action="store_true")
     sp.set_defaults(func=cmd_stats)
 
-    sp = sub.add_parser("item", help="itemy: szukaj / dodaj")
+    sp = sub.add_parser("item", help="itemy: szukaj / dodaj / usuń / ilość / przenieś")
     add_save(sp)
     sp.add_argument("--find", default=None)
     sp.add_argument("--slot", type=int, default=None)
     sp.add_argument("--add", default=None)
+    sp.add_argument("--remove", default=None, help="nazwa / 0xID / handle:0x…")
+    sp.add_argument("--set-qty", default=None, help='np. "Crimson Flask=14"')
+    sp.add_argument("--move", default=None, help="nazwa / 0xID / handle:0x…")
+    sp.add_argument("--to", default=None, help="held albo storage (dla --move)")
+    sp.add_argument("--handle", type=lambda s: int(s, 16), default=None)
     sp.add_argument("--qty", type=int, default=1)
     sp.add_argument("--upgrade", type=int, default=0)
     sp.add_argument("--storage", action="store_true")
@@ -464,6 +640,9 @@ def main(argv=None):
     add_save(sp)
     sp.add_argument("--slot", type=int, required=True)
     sp.add_argument("--storage", action="store_true")
+    sp.add_argument("--all", action="store_true", help="przy sobie + skrzynia")
+    sp.add_argument("--equipped", action="store_true", help="pokaz to, co zalozone")
+    sp.add_argument("--json", action="store_true")
     sp.set_defaults(func=cmd_inventory)
 
     sp = sub.add_parser("flags", help="flagi świata (get/set)")
@@ -481,6 +660,41 @@ def main(argv=None):
     sp.add_argument("--region", default=None)
     sp.add_argument("--apply", action="store_true")
     sp.set_defaults(func=cmd_graces)
+
+    sp = sub.add_parser("swap", help="podmień miejscami dwie postacie")
+    add_save(sp)
+    sp.add_argument("--a", type=int, required=True)
+    sp.add_argument("--b", type=int, required=True)
+    sp.add_argument("--apply", action="store_true")
+    sp.set_defaults(func=cmd_swap)
+
+    sp = sub.add_parser("clear", help="wyczyść slot postaci")
+    add_save(sp)
+    sp.add_argument("--slot", type=int, required=True)
+    sp.add_argument("--apply", action="store_true")
+    sp.set_defaults(func=cmd_clear)
+
+    sp = sub.add_parser("equipment", help="co postać ma na sobie")
+    add_save(sp)
+    sp.add_argument("--slot", type=int, required=True)
+    sp.add_argument("--json", action="store_true")
+    sp.set_defaults(func=cmd_equipment)
+
+    sp = sub.add_parser("equip", help="załóż item z ekwipunku")
+    add_save(sp)
+    sp.add_argument("--slot", type=int, required=True)
+    sp.add_argument("--handle", type=lambda s: int(s, 16), default=None)
+    sp.add_argument("--item", default=None)
+    sp.add_argument("--at", type=int, default=None)
+    sp.add_argument("--apply", action="store_true")
+    sp.set_defaults(func=cmd_equip)
+
+    sp = sub.add_parser("unequip", help="zdejmij gniazdo albo wszystko")
+    add_save(sp)
+    sp.add_argument("--slot", type=int, required=True)
+    sp.add_argument("--at", type=int, default=None)
+    sp.add_argument("--apply", action="store_true")
+    sp.set_defaults(func=cmd_unequip)
 
     sp = sub.add_parser("copy", help="kopiuj postać slot -> slot")
     add_save(sp)

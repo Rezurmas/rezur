@@ -6,8 +6,9 @@ naprawy, kopiowanie postaci między slotami, patcher SteamID, raporty.
 Zbudowany na zweryfikowanym od podstaw formacie zapisu (v250–261, 1.16-era).
 
 **Status:** v0.1.0 — **backend kompletny** (CLI, bez GUI). Silnik: czytanie/pisanie
-formatu, diagnostyka, naprawy, edycja statów/runów/itemów/flag, kopiowanie i transfer
-postaci, backupy z rotacją. GUI (F6): natywne okno w **Clay (C)** — plan w `ARCHITECTURE.md`.
+formatu, diagnostyka, naprawy, edycja statów/runów/itemów/flag, ekwipunek (dodaj/usuń/ilość/przenieś),
+EQ postaci (22 gniazda), kopiowanie/podmiana/czyszczenie slotów, transfer postaci, backupy z rotacją.
+GUI (F6): lokalny webview (pywebview) — **start dopiero na GO**; plan w `ARCHITECTURE.md`.
 
 ## Szybki start
 
@@ -24,6 +25,13 @@ python -m rezur stats --slot 0            # staty/runy/imie (dry-run)
 python -m rezur stats --slot 0 --set vigor=60,mind=40 --runes 5000000 --apply
 python -m rezur item --find uchigatana    # szukaj w bazie itemów
 python -m rezur item --slot 0 --add "Uchigatana" --upgrade 5 --apply
+python -m rezur item --slot 0 --remove "Uchigatana"           # usuń z ekwipunku
+python -m rezur item --slot 0 --set-qty "Larval Tear=12"      # ustaw ilość
+python -m rezur item --slot 0 --move "Larval Tear" --to storage
+python -m rezur inventory --slot 0 --equipped                 # co założone
+python -m rezur equipment --slot 0                            # pełne EQ (22 gniazda)
+python -m rezur equip --slot 0 --item "Uchigatana" --at 0 --apply
+python -m rezur unequip --slot 0 --at 0 --apply
 python -m rezur inventory --slot 0        # ekwipunek (--storage = skrzynia)
 python -m rezur flags --slot 0 --get 600003
 python -m rezur flags --slot 0 --set 600003:1 --apply
@@ -32,6 +40,8 @@ python -m rezur graces --slot 0 [--region "Limgrave"] --apply
 
 python -m rezur copy --from 2 --to 3      # kopiowanie postaci (dry-run)
 python -m rezur copy --from 2 --to 3 --apply [--clear-source]
+python -m rezur swap --a 1 --b 2 --apply  # podmień postacie miejscami
+python -m rezur clear --slot 3 --apply    # wyczyść slot
 python -m rezur export --slot 0 --out lmfh.json
 python -m rezur import --to 3 --in lmfh.json --apply
 python -m rezur steamid --set 7656119xxxxxxxxxx [--apply]
@@ -50,11 +60,13 @@ rezur/
   games/   rejestr gier (teraz: Elden Ring; struktura pod kolejne)
   diag/    silnik diagnostyki (checks → Finding z kodem i przypisaną naprawą)
   fixes/   rejestr napraw: torrent, checksums, playerhash, summary, weather, dlc
-  ops/     staty/runy/imie, itemy (gaitem+inventory), flagi/laski, kopie slotów, SteamID, transfer JSON, backupy
+  ops/     staty/runy/imie, itemy (gaitem+inventory: dodaj/usuń/ilość/przenieś),
+           EQ (22 gniazda: podglądy, zakładanie, zdejmowanie), kopie/podmiana/czyszczenie slotów,
+           SteamID, transfer JSON, backupy
   report/  wyjście tekstowe i JSON
-  api/     warstwa HTTP/JSON pod GUI (F6 — most do aplikacji w Clay; placeholder)
+  api/     warstwa HTTP/JSON pod GUI (F6 — most do webview; placeholder)
   cli.py   python -m rezur
-tests/     run_all.py — 16 testów na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
+tests/     run_all.py — 21 testów na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
 ARCHITECTURE.md   frontend/backend, przepływy, roadmapa
 ```
 

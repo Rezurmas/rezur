@@ -337,6 +337,186 @@ def t_backups_roundtrip():
         assert Path(rep["pre_restore_copy"]).exists()
 
 
+@test
+def t_item_set_qty_move_remove():
+    src = fixture(FIXED_GLOB)
+    save_mod, _ = _ref_modules()
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "t.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        from rezur.ops.items import add_item, list_inventory, move_item, remove_item, set_item_qty
+
+        kys = items_db.key_item_ids()
+        gid = next(
+            fid
+            for fid, nm in items_db._load()["goods"].items()
+            if (fid & 0x0FFFFFFF) not in kys and "dummy" not in nm.lower()
+        )
+        rep = add_item(sf, 2, gid, qty=3)
+        h = rep["handle"]
+        set_item_qty(sf, 2, h, 9)
+        move_item(sf, 2, h, "storage")
+        sf.write(backup_tag="test")
+        chk = SaveFile(p)
+        held = list_inventory(chk, 2, "held")
+        stor = list_inventory(chk, 2, "storage")
+        assert not any(i["handle"] == h for i in held)
+        assert any(i["handle"] == h and i["qty"] == 9 for i in stor), (h, stor[:3])
+        assert all(s["ok"] for s in chk.section_md5_status())
+        if save_mod:
+            ref = save_mod.load_save(str(p))
+            s2 = ref.get_slot(2)
+            box = s2.inventory_storage_box
+            got = [it for it in box.common_items + box.key_items if it.gaitem_handle == h]
+            assert got and got[0].quantity == 9, "referencja nie widzi w skrzyni"
+        sf2 = SaveFile(p)
+        remove_item(sf2, 2, h)
+        sf2.write(backup_tag="test")
+        chk2 = SaveFile(p)
+        assert not any(i["handle"] == h for i in list_inventory(chk2, 2, "storage"))
+        assert not any(i["handle"] == h for i in list_inventory(chk2, 2, "held"))
+        assert all(s["ok"] for s in chk2.section_md5_status())
+
+
+@test
+def t_item_remove_weapon():
+    src = fixture(FIXED_GLOB)
+    save_mod, _ = _ref_modules()
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "t.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        from rezur.ops.items import add_item, remove_item
+
+        ex = items_db.find_exact("Uchigatana")
+        assert ex, "brak Uchigatany"
+        rep = add_item(sf, 2, ex[0], qty=1, upgrade=3)
+        h = rep["handle"]
+        remove_item(sf, 2, h)
+        sf.write(backup_tag="test")
+        chk = SaveFile(p)
+        r = P.roster(chk)
+        s = chk.slots()[2]
+        assert s.parse(r[2]["name"], r[2]["level"]), s.reason
+        assert all(ok["ok"] for ok in chk.section_md5_status())
+        if save_mod:
+            ref = save_mod.load_save(str(p))
+            s2 = ref.get_slot(2)
+            assert not any(g.gaitem_handle == h for g in s2.gaitem_map), "gaitem nie wyczyszczony"
+            inv = s2.inventory_held
+            assert not any(it.gaitem_handle == h for it in inv.common_items + inv.key_items)
+
+
+@test
+def t_swap_slots():
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "t.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        from rezur.ops.copy_slot import swap_characters
+
+        sf_orig = SaveFile(src)
+        blk2 = bytes(sf_orig.data[sf_orig.slot_entries[2]["off"] + 16 : sf_orig.slot_entries[2]["off"] + 16 + 0x280000])
+        swap_characters(sf, 1, 2)
+        sf.write(backup_tag="test")
+        chk = SaveFile(p)
+        r = P.roster(chk)
+        assert r[1]["name"] == "annesee" and r[2]["name"] == "hajime", (r[1]["name"], r[2]["name"])
+        blk1 = bytes(chk.data[chk.slot_entries[1]["off"] + 16 : chk.slot_entries[1]["off"] + 16 + 0x280000])
+        assert blk1 == blk2, "dane slotu nie podmienione"
+        for k in (1, 2):
+            s = chk.slots()[k]
+            assert s.parse(r[k]["name"], r[k]["level"]), s.reason
+        assert all(s["ok"] for s in chk.section_md5_status())
+
+
+@test
+def t_clear_slot():
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "t.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        from rezur.core.checksums import EMPTY_SLOT_MD5
+        from rezur.ops.copy_slot import clear_character
+
+        clear_character(sf, 1)
+        sf.write(backup_tag="test")
+        chk = SaveFile(p)
+        assert chk.slots()[1].is_empty
+        e = chk.slot_entries[1]
+        assert bytes(chk.data[e["off"] : e["off"] + 16]) == EMPTY_SLOT_MD5
+        r = P.roster(chk)
+        assert not r[1]["used"], r[1]
+        assert all(s["ok"] for s in chk.section_md5_status())
+
+
+@test
+def t_equipment_equip_unequip():
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "t.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        from rezur.ops.items import add_item, equip_item, equipment, unequip
+
+        eq0 = equipment(sf, 0)
+        assert len(eq0["equipped"]) == 22
+        assert any(not e["empty"] for e in eq0["equipped"]), "lmfh powinien mieć coś założone"
+        ex = items_db.find_exact("Uchigatana")
+        rep = add_item(sf, 0, ex[0], qty=1, upgrade=0)
+        h = rep["handle"]
+        equip_item(sf, 0, h, at=0)
+        sf.write(backup_tag="test")
+        chk = SaveFile(p)
+        eq1 = equipment(chk, 0)
+        assert eq1["equipped"][0]["handle"] == h, eq1["equipped"][0]
+        r = P.roster(chk)
+        s = chk.slots()[0]
+        assert s.parse(r[0]["name"], r[0]["level"]), s.reason
+        assert s.player_hash_matches(), "hash po eq rozjechany"
+        assert all(ok["ok"] for ok in chk.section_md5_status())
+        sf2 = SaveFile(p)
+        rep2 = unequip(sf2, 0, at=0)
+        assert rep2["unequipped"] == [0], rep2
+        sf2.write(backup_tag="test")
+        chk2 = SaveFile(p)
+        assert equipment(chk2, 0)["equipped"][0]["empty"]
+        r2 = P.roster(chk2)
+        s2 = chk2.slots()[0]
+        assert s2.parse(r2[0]["name"], r2[0]["level"]), s2.reason
+        assert s2.player_hash_matches()
+        assert all(ok["ok"] for ok in chk2.section_md5_status())
+
+
+@test
+def t_handle_for_prefers_exact_weapon():
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "t.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        from rezur.core import gaitem
+        from rezur.core.slots import Slot
+        from rezur.ops.items import add_item, handle_for
+
+        ex = items_db.find_exact("Uchigatana")
+        assert ex, "brak Uchigatany w bazie"
+        rep = add_item(sf, 0, ex[0], qty=1, upgrade=0)
+        h_new = rep["handle"]
+        h_got = handle_for(sf, 0, ex[0])
+        assert h_got == h_new, (hex(h_got), hex(h_new), "handle_for złapał nie tę broń (kolizja /10000)")
+        s = Slot(sf, 0)
+        r = P.roster(sf)
+        assert s.parse(r[0]["name"], r[0]["level"]), s.reason
+        entries, _ = gaitem.walk(s.raw, s.version, expect_end=s.offsets["pgd"])
+        e = next(x for x in entries if x["handle"] == h_got)
+        nm, _c = items_db.resolve(e["item_id"] & 0x0FFFFFFF)
+        assert nm and nm.startswith("Uchigatana"), nm
+
+
 def main():
     ok = fail = 0
     for t in _tests:

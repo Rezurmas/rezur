@@ -100,3 +100,31 @@ def write_entry(buf, off, location, inv_slot, is_key, handle, qty, acq_idx):
     struct.pack_into("<I", buf, L["equip_counter"], min(max(equip, index), top))
     struct.pack_into("<I", buf, L["acq_counter"], acq_idx)
     return base
+
+
+def _recount(buf, L):
+    common = sum(
+        1 for i in range(L["common_cap"]) if struct.unpack_from("<I", buf, L["common"] + i * ENTRY)[0]
+    )
+    key = sum(
+        1 for i in range(L["key_cap"]) if struct.unpack_from("<I", buf, L["key"] + i * ENTRY)[0]
+    )
+    struct.pack_into("<I", buf, L["common_count"], common)
+    struct.pack_into("<I", buf, L["key_count"], key)
+
+
+def clear_entry(buf, off, location, inv_slot, is_key):
+    """Zeruje wpis i przelicza liczniki. Zwraca (handle, qty) sprzed wyczyszczenia."""
+    L = layout(off, location)
+    base = (L["key"] if is_key else L["common"]) + inv_slot * ENTRY
+    h, q, _a = struct.unpack_from("<3I", buf, base)
+    buf[base : base + ENTRY] = b"\x00" * ENTRY
+    _recount(buf, L)
+    return h, q
+
+
+def set_quantity(buf, off, location, inv_slot, is_key, qty):
+    L = layout(off, location)
+    base = (L["key"] if is_key else L["common"]) + inv_slot * ENTRY
+    struct.pack_into("<I", buf, base + 4, qty & 0xFFFFFFFF)
+    return base

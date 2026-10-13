@@ -11,12 +11,11 @@
 | Pytanie | Odpowiedź |
 |---|---|
 | Backend | **Python (stdlib)** — cały silnik: `rezur.core/diag/fixes/ops`; CLI działa bez żadnych instalacji |
-| Frontend (F6) | **natywne GUI w C — biblioteka Clay** (jednoplikowa, layout w stylu flexbox, renderer-agnostyczna). Decyzja: He |
-| Renderer (F6) | `examples/win32_gdi` (czysty Win32 — zero zależności) albo `examples/raylib-*` (raylib jako lib). Kopia Clay: `references/clay/` |
-| Most GUI ↔ silnik | aplikacja C rozmawia z Pythonem po **lokalnym HTTP/JSON** (plan API niżej) — cała logika zostaje w Pythonie |
-| Stan toolchaina | na tym PC **brak kompilatora C** — do instalacji przy F6 (MSYS2/MinGW-w64, VS Build Tools albo zig cc) |
-| Dlaczego nie web SPA | Clay daje natywne okno, zero przeglądarki i pełną kontrolę renderu; web zostaje opcją na później |
-| Dlaczego nie Qt/Tkinter | odrzucone (waga/estetyka) — Clay wygrywa prostotą i podejściem „C layout GUI" |
+| Frontend (F6) | **lokalny webview — pywebview** (Windows: WebView2), UI w HTML+CSS+JS, bez build-stepu. Decyzja: He |
+| Most GUI ↔ silnik | ten sam proces Pythona: pywebview daje okno i ładuje lokalny HTML; operacje przez lokalne API JSON (plan niżej) |
+| Dlaczego nie Clay (C) | odpuszczony przez He („w clayu odpuszczamy") — brak kompilatora i wolniejsze iterowanie |
+| Dlaczego nie Electron/Tauri | przerost — pywebview korzysta z WebView2 obecnego w każdym Windows 10/11 |
+| Status | GUI startuje **dopiero na wyraźne GO od He**; na teraz liczy się wyłącznie backend |
 
 ---
 
@@ -145,19 +144,18 @@ funkcje** co CLI; SSE `/api/events` niesie postęp (np. „dodano 240 itemów…
 
 Kontrakt (F6): szczegółowa lista endpointów — docstring w `rezur/api/server.py`.
 
-## 6. GUI (F6) — natywne okno w Clay (C)
+## 6. GUI (F6) — lokalny webview (pywebview), start na GO od He
 
-- Clay liczy layout (flexbox) i emituje komendy renderowania; rysuje renderer.
-- Renderer do wyboru: `win32_gdi` (zero zależności) albo `raylib-*` (ładniejsze efekty).
-- Build: na tym PC brak kompilatora → F6 zaczyna się od instalacji toolchainu
-  (MSYS2/MinGW-w64, VS Build Tools albo zig cc).
-- Kontrakt z silnikiem: te same operacje co CLI — `rezur` wystawia lokalne HTTP/JSON
-  (endpointy w docstringu `rezur/api/server.py`); aplikacja C pyta i rysuje.
-  Opcja B (później): embed CPython w C. Python-binding Clay nie istnieje
-  (są: C++, Rust, Zig, C#, Odyn) — dlatego most przez proces, nie przez binding.
-- UI: karty postaci, panel ustaleń (finding → przycisk naprawy), wyszukiwarka itemów,
-  suwaki statystyk, przełączniki flag, historia backupów. Tryb bezpieczny:
-  najpierw podgląd zmian, potem zapis (jak CLI).
+- Decyzja He: Clay (C) odpuszczony; GUI „w webkitcie" → **pywebview**
+  (Windows: WebView2). UI = HTML+CSS+JS, bez build-stepu.
+- Okno natywne ładuje lokalny `web/index.html`; operacje przez lokalne API JSON
+  (te same funkcje co CLI: doctor, fixes, stats, items, equipment, slots, backupy).
+- Bind wyłącznie 127.0.0.1 + token w nagłówku; plik save'a nie opuszcza maszyny.
+- UI: karty postaci, panel ustaleń (finding → przycisk naprawy), ekwipunek + skrzynia,
+  panel EQ (22 gniazda: broń/zbroja/talizman), suwaki statystyk, flagi/łaski,
+  historia backupów. Tryb bezpieczny: zawsze najpierw podgląd zmian, potem zapis.
+- Zależność: `pip install pywebview` (bez kompilatora). Prace ruszają dopiero
+  na wyraźne polecenie He — teraz priorytetem jest backend.
 
 ## 7. Rozszerzalność
 
@@ -176,7 +174,7 @@ Kontrakt (F6): szczegółowa lista endpointów — docstring w `rezur/api/server
 | F3 | itemy (gaitem + inventory + baza `db_er`) | `core/gaitem.py`, `ops/items.py` | plan |
 | F4 | świat: event flags, łaski, bossy | `core/flags.py`, `ops/flags.py` | plan |
 | F5 | transfer: import/eksport postaci (JSON), cross-save | `ops/transfer.py` | plan |
-| F6 | GUI: **Clay (C)** + most HTTP/JSON do silnika Python | `api/`, `gui-clay/` | plan (kontrakt gotowy; doinstalować kompilator C) |
+| F6 | GUI: lokalny webview (pywebview / WebView2) + API JSON | `api/`, `web/` | plan — start na GO od He |
 | F7 | pakowanie: `.exe` / pywebview / skróty | `packaging/` | plan |
 
 ## 9. Konwencje

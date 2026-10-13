@@ -164,7 +164,7 @@ erlab serve                               # GUI webowe (F6)
 | **F3** | Itemey: `item add/find`, upgrade, affinity, Ashes of War | L | dodany item widoczny w grze (inwentarz + skrzynia); brak duplikatów handle; rekordy 8/16/21 B poprawne per typ |
 | **F4** | Świat: `flags`, `graces unlock`, bossy, regiony | L | odblokowane łaski widoczne na mapie; flaga bossa ustawiona → boss martwy; pełna zgodność z nazwaną bazą flag |
 | **F5** | Chirurgia: `copy` postaci (slot↔slot, save↔save), SteamID patcher, import PS4 | M | skopiowana postać ładuje się jako osobny slot; SteamID podmieniony → gra przyjmuje save na innym koncie |
-| **F6** | GUI natywne w **Clay** (C) + most HTTP do silnika Python | M | okno: karty postaci, panel napraw, wyszukiwarka itemów, suwaki statystyk, flagi; Clay = layout, renderer win32_gdi/raylib; cała logika zostaje w Pythonie |
+| **F6** | GUI w lokalnym webview (pywebview / WebView2) + API JSON | M | karty postaci, panel napraw, ekwipunek + EQ (22 gniazda), suwaki, flagi; HTML/CSS/JS bez build-stepu; start dopiero na GO od He |
 | **F7** | Pakowanie: `.exe` (PyInstaller) + skróty + README | S | dwuklik działa na twoim PC bez Pythona |
 
 Kolejność jest zależna: F1→F2→F3 to szkielet. F4 może iść równolegle po F2 (flagi to osobny

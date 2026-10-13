@@ -46,6 +46,7 @@ from pathlib import Path
 from . import __product__, __version__
 from . import config as CONF
 from . import fixes as F
+from . import risk
 from .core import items_db
 from .core.profiles import roster
 from .core.savefile import SaveFile, default_save_path
@@ -847,6 +848,53 @@ def cmd_watch(args):
     return watch_loop(path, interval=interval)
 
 
+def cmd_risk(args):
+    """Ryzyko online: dane niemożliwe + znacznik modyfikacji + droga do GOLD."""
+    sf = _load(args)
+    res = risk.scan(sf, only_slot=args.slot)
+    if args.json:
+        print(json.dumps(res, indent=2, ensure_ascii=False))
+        return 1 if res["verdict"] == "red" else 0
+    mark = {"green": "ZIELONY", "yellow": "ŻÓŁTY", "red": "CZERWONY"}
+    m = res["modified"]
+    print(f"RYZYKO ONLINE — {sf.path}")
+    if m["count"]:
+        ops = ", ".join(f"{k}×{v}" for k, v in m["ops"].items())
+        print(f"znacznik: plik MODYFIKOWANY przez Rezura — {m['count']} operacji ({ops}); ostatnia {m['last']}")
+    else:
+        print("znacznik: brak śladów Rezura w tym pliku")
+    if res["gold"]:
+        print(f"GOLD:    {res['gold']}")
+        print(f"powrót:  python -m rezur backups --restore \"{res['gold']}\" --apply")
+    else:
+        print("GOLD:    brak (powstanie przy pierwszej modyfikacji)")
+    print()
+    per = {}
+    for f in res["findings"]:
+        per.setdefault(f["slot"], []).append(f)
+    for i in range(10):
+        s = Slot(sf, i)
+        if s.is_empty or (args.slot is not None and i != args.slot):
+            continue
+        fs = per.get(i, [])
+        if any(f["level"] == "error" for f in fs):
+            v = "red"
+        elif any(f["level"] == "warning" for f in fs):
+            v = "yellow"
+        else:
+            v = "green"
+        print(f"slot{i}: {mark[v]}")
+        for f in fs:
+            print(f"   [{f['level']}] {f['message']}")
+        if not fs:
+            print("   brak danych niemożliwych, które potrafimy sprawdzić")
+    print()
+    print("NOTATKI:")
+    for n in res["notes"]:
+        print(f"  • {n}")
+    return 1 if res["verdict"] == "red" else 0
+
+
 def cmd_config(args):
     if args.set:
         if "=" not in args.set:
@@ -1080,6 +1128,12 @@ def main(argv=None):
                     help="sekundy między kopiami (domyślnie z config: watch_interval)")
     sp.add_argument("--once", action="store_true", help="jeden przebieg kontrolny i wyjście")
     sp.set_defaults(func=cmd_watch)
+
+    sp = sub.add_parser("risk", help="ryzyko online: dane niemożliwe + znacznik modyfikacji")
+    add_save(sp)
+    sp.add_argument("--slot", type=int, default=None, help="tylko jeden slot")
+    sp.add_argument("--json", action="store_true")
+    sp.set_defaults(func=cmd_risk)
 
     sp = sub.add_parser("config", help="konfiguracja Rezura")
     sp.add_argument("--set", default=None, help="klucz=wartość")

@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from rezur import fixes as F  # noqa: E402
+from rezur import risk  # noqa: E402
 from rezur.core import flags as coreflags  # noqa: E402
 from rezur.core import items_db  # noqa: E402
 from rezur.core import profiles as P  # noqa: E402
@@ -768,6 +769,73 @@ def t_patch_old_flagged():
     slots = {f.slot for f in hits}
     assert 0 in slots and 1 in slots, slots
     assert 2 not in slots, "postać na aktualnym patchu oflagowana bez powodu"
+
+
+@test
+def t_journal_marks_modifications():
+    from rezur.core import journal, vault
+
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        assert journal.summary(p)["count"] == 0
+        SaveFile(p).write(backup_tag="itembak")
+        s = journal.summary(p)
+        assert s["count"] == 1 and s["last"], s
+        assert s["ops"].get("ekwipunek") == 1, s
+        g = vault.gold_backup(p)
+        vault.restore(p, g["path"])
+        s2 = journal.summary(p)
+        assert s2["count"] == 2 and s2["ops"].get("przywrócenie kopii") == 1, s2
+
+
+@test
+def t_risk_clean_fixture_then_marks_modified():
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        res = risk.scan(sf)
+        errs = [f for f in res["findings"] if f["level"] == "error"]
+        assert not errs, errs
+        assert res["verdict"] == "green", (res["verdict"], res["findings"])
+        assert res["modified"]["count"] == 0
+        sf.write(backup_tag="editbak")
+        res2 = risk.scan(SaveFile(p))
+        assert res2["modified"]["count"] == 1, res2["modified"]
+        assert res2["gold"], "GOLD powinien istnieć po pierwszym zapisie"
+
+
+@test
+def t_risk_detects_impossible_upgrade():
+    import struct as st
+
+    from rezur.core import gaitem
+
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        r = P.roster(sf)
+        s = sf.slots()[0]
+        assert s.parse(r[0]["name"], r[0]["level"]), s.reason
+        entries, _ = gaitem.walk(s.raw, s.version, expect_end=s.offsets["pgd"])
+        w = next(
+            x for x in entries
+            if x["handle"] and ((x["handle"] >> 28) & 0xF) == 0x8 and items_db.resolve(x["item_id"])[0]
+        )
+        body = sf.entries[0]["off"] + 16
+        new_id = w["item_id"] + (47 - w["item_id"] % 100)
+        st.pack_into("<I", sf.data, body + w["off"] + 4, new_id)
+        sf.touch_slot(0)
+        sf.write(backup_tag="test")
+        res = risk.scan(SaveFile(p))
+        codes = {f["code"] for f in res["findings"]}
+        assert "upgrade_impossible" in codes, codes
+        assert res["verdict"] == "red", res["verdict"]
 
 
 def main():

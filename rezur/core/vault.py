@@ -142,4 +142,7 @@ def restore(save_path, backup_path):
     if save_path.exists():
         shutil.copy2(save_path, pre)
     shutil.copy2(backup_path, save_path)
+    from . import journal
+
+    journal.record(save_path, "restorebak")
     return {"restored_from": str(backup_path), "pre_restore_copy": str(pre)}

@@ -24,7 +24,7 @@ FIXED = sorted(glob.glob(str(ROOT / "backups" / "ER0000_FIXED_torrent_*.sl2")))[
 SUBS = (
     "info", "doctor", "fix", "stats", "item", "inventory", "equipment", "equip", "unequip",
     "spells", "appearance", "teleport", "world", "unlock", "flags", "graces", "copy", "swap",
-    "clear", "steamid", "export", "import", "backups", "watch", "config", "list-fixes",
+    "clear", "steamid", "export", "import", "backups", "watch", "risk", "config", "list-fixes",
 )
 
 
@@ -132,6 +132,9 @@ def build(P, out_json, ash, region):
     add("backups", "--pin", "nie-ma-takiej-kopii.sl2", rcs=(2,))
     add("backups", "--unpin", "nie-ma-takiej-kopii.sl2", rcs=(2,))
     add("watch", "--once")
+    add("risk")
+    add("risk", "--json")
+    add("risk", "--slot", "2")
     add("backups", "--restore", "nie-ma-takiej-kopii", rcs=(2,))
 
     # --- finał

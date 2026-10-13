@@ -12,6 +12,8 @@ nazwane flagi świata (22 grupy: bossowie, mapy, cookbooki…), masowe nadawanie
 kopiowanie/podmiana/czyszczenie slotów, transfer postaci. **Zaufanie do pliku:** kopie
 GOLD (niekasowalne) + przypinane + rotacja, auto-kopiec `watch` przy grze, zapis atomowy
 z weryfikacją kandydata przed podmianą, wersja patcha per postać z ostrzeżeniem `patch_old`.
+**Świadomość banów:** `rezur risk` — skan danych niemożliwych (staty, ulepszenia broni,
+ilości), znacznik „plik modyfikowany" (dziennik edycji) i gotowa droga powrotu do GOLD.
 GUI (F6): lokalny webview (pywebview) — **start dopiero na GO**; plan w `ARCHITECTURE.md`.
 
 ## Szybki start
@@ -65,6 +67,7 @@ python -m rezur backups --pin NAZWA       # przypnij kopię (rotacja jej nie rus
 python -m rezur backups --restore NAZWA [--apply]
 python -m rezur watch [--interval 600]    # auto-kopie: start gry + co interwał (Ctrl+C kończy)
 python -m rezur watch --once              # jeden przebieg kontrolny
+python -m rezur risk [--slot N] [--json]  # ryzyko online: dane niemożliwe + znacznik modyfikacji + powrót do GOLD
 python -m rezur config                    # backup_retention / auto_doctor / guard_live / watch_interval
 python -m rezur list-fixes                # lista napraw
 ```
@@ -75,7 +78,9 @@ Bez `--save` narzędzie bierze najnowszy save z `%APPDATA%\EldenRing\*\ER0000.sl
 
 ```
 rezur/
-  core/    format: bnd4, sloty, sumy (MD5 + PlayerDataHash), profile, SaveFile, vault (GOLD/piny/rotacja)
+  core/    format: bnd4, sloty, sumy (MD5 + PlayerDataHash), profile, SaveFile, vault (GOLD/piny/rotacja),
+           journal (dziennik edycji → znacznik „modyfikowany")
+  risk.py  ryzyko online: dane niemożliwe (staty/ulepszenia/ilości) + znacznik + droga do GOLD
   games/   rejestr gier (teraz: Elden Ring; struktura pod kolejne)
   diag/    silnik diagnostyki (checks → Finding z kodem i przypisaną naprawą)
   fixes/   rejestr napraw: torrent, checksums, playerhash, summary, weather, dlc
@@ -85,8 +90,8 @@ rezur/
   report/  wyjście tekstowe i JSON
   api/     warstwa HTTP/JSON pod GUI (F6 — most do webview; placeholder)
   cli.py   python -m rezur
-tests/     run_all.py — 32 testy na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
-           smoke_cli.py — przebieg KAŻDEJ komendy CLI (106 wywołań) na kopii save'a
+tests/     run_all.py — 35 testów na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
+           smoke_cli.py — przebieg KAŻDEJ komendy CLI (~110 wywołań) na kopii save'a
 ARCHITECTURE.md   frontend/backend, przepływy, roadmapa
 ```
 
@@ -98,6 +103,8 @@ ARCHITECTURE.md   frontend/backend, przepływy, roadmapa
 - `rezur watch` robi auto-kopie przy starcie gry i co `watch_interval` sekund (weryfikacja odrzuca kopię zrobioną w trakcie zapisu gry),
 - CLI domyślnie w trybie dry-run; `--apply` wymagany do zapisu,
 - przy działającej grze zapis jest blokowany,
+- każda udana modyfikacja dopisuje wpis do dziennika (`<save>.rezur-journal.json`);
+  `rezur risk` pokazuje znacznik „plik modyfikowany" i dokładną komendę powrotu do GOLD,
 - po naprawie automatyczna re-diagnostyka; `doctor` flaguje też postacie ze starego patcha gry (`patch_old`).
 
 Szczegóły techniczne formatu i zweryfikowane pułapki: skill `elden-ring-save-repair`.

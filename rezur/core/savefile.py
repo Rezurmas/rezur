@@ -106,6 +106,9 @@ class SaveFile:
             except OSError:
                 pass
             raise
+        from . import journal
+
+        journal.record(self.path, backup_tag)
         return bak
 
 

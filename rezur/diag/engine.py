@@ -38,6 +38,17 @@ def run_diagnostics(save, expect_steamid=None):
                 Finding(ERROR, "md5_bad", f"{s['name']}: suma MD5 sekcji się nie zgadza", fix="checksums")
             )
 
+    # --- znacznik: plik modyfikowany przez Rezura (dziennik edycji)
+    from ..core import journal
+
+    j = journal.summary(save.path)
+    if j["count"]:
+        findings.append(
+            Finding(INFO, "modified_marker",
+                    f"plik modyfikowany przez Rezura: {j['count']} operacji, ostatnia {j['last']} "
+                    "(przed grą online rozważ powrót do kopii GOLD — `rezur risk`)")
+        )
+
     # --- SteamID (opcjonalnie oczekiwany, np. nazwa folderu)
     if expect_steamid is not None and save.steam_id() != expect_steamid:
         findings.append(

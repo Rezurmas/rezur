@@ -175,6 +175,12 @@ Kontrakt (F6): szczegółowa lista endpointów — docstring w `rezur/api/server
   w USTAWIENIACH; wybór idzie do configu (`ui_lang`, walidacja `en|pl`) i przeładowuje okno;
   słowniki `I18N.en/pl` w `app.js`, `t()` czyta klucz, komunikaty doctora tłumaczone po kodzie
   (`FIND_EN`), liczby przez `toLocaleString` wg języka.
+- **Wyszukiwanie na żywo:** każde pole szukania filtruje/podpowiada w trakcie pisania
+  (debounce 170 ms, min. 2 znaki) — ekwipunek i świat filtrują listę pod spodem
+  (ranking: „zaczyna się od" → krótsze → alfabet), a dodawanie itemu / czary / zakładanie
+  pokazują listę podpowiedzi z podświetlonym trafieniem (klik albo Enter = pierwsza,
+  strzałki = wybór). Listy są inline (nic nie nachodzi na treść), wpisy buduje
+  `attachSuggest()` w `app.js`, styl `.suggbox` w `style.css`.
 - `--selftest`: okno otwiera się, odpytuje `window.__rezurBooted`/`__rezurLoaded`, liczy
   metody mostu (`Object.keys(window.pywebview.api).length`) i panele, drukuje etykiety 13
   zakładek, potem PRZEŁĄCZA JĘZYK na żywo (EN→PL→EN, zapis w configu + reload) i zamyka —

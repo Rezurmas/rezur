@@ -21,6 +21,8 @@ jeden backup przy zatwierdzeniu, historia operacji w `rezur log`.
 engineering-series (czarna anoda + pomarańcz, LCD dot-matrix, zero suwaków): postacie,
 doktor, staty, ekwipunek, założone, świat, czary, wygląd, teleport, ryzyko, kopie,
 historia, ustawienia — każda edycja przez kopię roboczą, na dole pasek zmian.
+**Wyszukiwanie na żywo:** lista filtruje się w trakcie pisania (ekwipunek, świat), a pola
+dodawania itemu / czarów / zakładania podpowiadają pozycje z podświetlonym trafieniem.
 **Język GUI:** domyślnie **angielski**; przełącznik `EN/PL` w nagłówku (pill) i w
 Ustawieniach — zapisywany w configu (`ui_lang`), okno przeładowuje się samo.
 Most JS↔silnik ma audyt: `python tests/bridge_audit.py` (każde wywołanie API na kopii save'a).

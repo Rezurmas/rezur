@@ -1152,6 +1152,14 @@ def t_gui_i18n_and_wiring():
     assert not miss, f"JS szuka uchwytów, których nie ma w HTML: {miss}"
     assert 'id="btnDiscard"' in html and "btnDiscard span" in js, "przycisk ODRZUĆ bez <span>"
 
+    # wyszukiwanie na żywo podpięte (realny dowód daje --selftest w WebView2)
+    css = (root / "rezur" / "gui" / "web" / "style.css").read_text(encoding="utf-8")
+    for needle in ("function debounce(", "function attachSuggest(", "function rankByName(",
+                   "id=\"invQ\"", "id=\"wq\"", "id=\"suggBox\"", "id=\"spSugg\"", "id=\"eqSugg\"",
+                   ".oninput = debounce(", "livehint"):
+        assert needle in js or needle in html or needle in css, f"brak elementu wyszukiwania na żywo: {needle}"
+    assert ".suggbox" in css and ".suggbox .srow" in css, "brak stylu listy podpowiedzi"
+
     tabs = re.findall(r'data-tab="([a-z]+)"', html)
     assert len(tabs) == 13, f"zakładek w HTML: {len(tabs)}"
     miss2 = [t for t in tabs if f'id="panel-{t}"' not in html]

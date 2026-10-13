@@ -256,3 +256,24 @@ select.lcdin,.lcdin.select{appearance:none}
   margin-bottom:10px;background:var(--panel);border-radius:2px}
 .riskbar .verdict{font-family:var(--fm);font-size:12px;letter-spacing:.14em}
 .riskbar.green .verdict{color:var(--led-g)} .riskbar.yellow .verdict{color:var(--led-a)} .riskbar.red .verdict{color:var(--led-r)}
+
+/* ---------- podpowiedzi (wyszukiwanie na żywo) ---------- */
+.suggbox{border:1px solid var(--line);background:var(--lcd);max-height:250px;overflow-y:auto;
+  margin-top:7px;border-radius:1px}
+.suggbox:empty{display:none}
+.suggbox .srow{display:flex;align-items:center;gap:10px;padding:5px 9px;cursor:pointer;
+  border-bottom:1px solid rgba(240,240,235,.06)}
+.suggbox .srow:last-child{border-bottom:none}
+.suggbox .srow:hover,.suggbox .srow.on{background:var(--dark2)}
+.suggbox .srow.on .sidx{color:var(--orange)}
+.suggbox .sidx{font-family:var(--fm);font-size:9px;color:var(--mut);letter-spacing:.08em;
+  width:22px;flex:0 0 auto}
+.suggbox .sname{flex:1;min-width:0;font-size:12px;color:var(--lcdtxt);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.suggbox .sname em{font-style:normal;color:var(--amber)}
+.suggbox .scat{font-family:var(--fm);font-size:8.5px;color:var(--mut);letter-spacing:.12em;
+  text-transform:uppercase;flex:0 0 auto}
+.suggbox .sempty{padding:6px 9px;font-family:var(--fm);font-size:10px;color:var(--mut)}
+.livehint{font-family:var(--fm);font-size:9px;color:var(--mut);letter-spacing:.06em}
+.livehint.on{color:var(--amber)}
+

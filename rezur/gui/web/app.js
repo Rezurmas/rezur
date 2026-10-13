@@ -10,6 +10,84 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": 
 let LANG = "en";
 const fmtInt = n => (n ?? 0).toLocaleString(LANG === "pl" ? "pl-PL" : "en-US");
 
+/* --------------------------------------------------- wyszukiwanie na żywo -- */
+
+/** nie zasypuj mostu przy każdym klawiszu */
+function debounce(fn, ms = 170) {
+  let t;
+  return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+}
+/** podświetl trafiony fragment (XSS-safe) */
+function mark(text, q) {
+  const s = String(text ?? "");
+  if (!q) return esc(s);
+  const i = s.toLowerCase().indexOf(q.toLowerCase());
+  if (i < 0) return esc(s);
+  return esc(s.slice(0, i)) + "<em>" + esc(s.slice(i, i + q.length)) + "</em>" + esc(s.slice(i + q.length));
+}
+/** sortowanie: najpierw „zaczyna się od", potem krótsze, potem alfabetycznie */
+function rankByName(rows, q) {
+  const s = (q || "").toLowerCase();
+  return rows.slice().sort((a, b) => {
+    const an = String(a.name || "").toLowerCase(), bn = String(b.name || "").toLowerCase();
+    const ap = an.startsWith(s) ? 0 : 1, bp = bn.startsWith(s) ? 0 : 1;
+    return ap - bp || an.length - bn.length || an.localeCompare(bn);
+  });
+}
+/** Podpowiedzi pod polem: lista inline (nic na siebie nie nachodzi).
+    input — pole; box — kontener .suggbox; fetchFn(q) → lista {name,...}. */
+function attachSuggest(input, box, fetchFn, opts = {}) {
+  const { min = 2, onPick = null, enterFallback = null } = opts;
+  let rows = [], active = 0;
+  const clear = () => { rows = []; active = 0; box.innerHTML = ""; };
+  const refreshActive = () => box.querySelectorAll(".srow").forEach((r, i) => r.classList.toggle("on", i === active));
+  const render = q => {
+    box.innerHTML = rows.length
+      ? rows.map((it, i) => `<div class="srow" data-i="${i}"><span class="sidx">${String(i + 1).padStart(2, "0")}</span>
+          <span class="sname">${mark(it.name, q)}</span><span class="scat">${esc(it.cat || it.tag || "")}</span></div>`).join("")
+      : `<div class="sempty">${esc(t("noHits"))}</div>`;
+    box.querySelectorAll(".srow").forEach((r, i) => {
+      r.onmousedown = e => e.preventDefault();      // nie zabieraj fokusu polu (inaczej lista zdąży zniknąć)
+      r.onmouseenter = () => { active = i; refreshActive(); };
+      r.onclick = () => pick(rows[i]);
+      r.classList.toggle("on", i === active);
+    });
+    (box.querySelector(".srow.on") || box.querySelector(".srow"))?.scrollIntoView({ block: "nearest" });
+  };
+  const pick = it => {
+    if (!it) return;
+    input.value = it.name;
+    clear();
+    if (onPick) onPick(it);
+  };
+  const look = debounce(async () => {
+    const q = input.value.trim();
+    if (q.length < min) { clear(); return; }
+    const items = await fetchFn(q);
+    rows = rankByName(items || [], q);
+    active = 0;
+    render(q);
+  });
+  input.addEventListener("input", look);
+  input.addEventListener("keydown", e => {
+    if (e.key === "ArrowDown" && rows.length) {
+      e.preventDefault(); active = (active + 1) % rows.length; refreshActive();
+      (box.querySelector(".srow.on"))?.scrollIntoView({ block: "nearest" });
+      return;
+    }
+    if (e.key === "ArrowUp" && rows.length) {
+      e.preventDefault(); active = (active - 1 + rows.length) % rows.length; refreshActive();
+      (box.querySelector(".srow.on"))?.scrollIntoView({ block: "nearest" });
+      return;
+    }
+    if (e.key !== "Enter") return;
+    if (rows.length) { e.preventDefault(); pick(rows[active] || rows[0]); }
+    else if (enterFallback) enterFallback();
+  });
+  input.addEventListener("blur", () => setTimeout(clear, 200));
+  return { clear, pickFirst: () => pick(rows[0]) };
+}
+
 const I18N = {
   en: {
     tabs: { postacie: "CHARACTERS", doktor: "DOCTOR", staty: "STATS", ekwipunek: "INVENTORY", eq: "LOADOUT", swiat: "WORLD", czary: "SPELLS", wyglad: "APPEARANCE", teleport: "TELEPORT", ryzyko: "RISK", kopie: "BACKUPS", log: "HISTORY", ustawienia: "SETTINGS" },
@@ -52,6 +130,8 @@ const I18N = {
     remove: "REMOVE", toStorage: "TO STORAGE", toHeld: "ON HAND", qty: "QTY…", setQtyTitle: "set quantity", setQtyYes: "SET",
     empty2: "(empty)", itemRemoved: "remove item", itemMoved: "move item", itemQty: "item quantity",
     addTitle1: "add item — step 1/2", addTitle2: "add item — step 2/2", fragment: "name fragment", next: "NEXT",
+    typeToSearch: "type at least 2 characters…", pickFromList: "click an entry to pick it · Enter = first one",
+    liveFilters: "filters as you type",
     pickNo: "number:", qtyColon: "qty:", upgradeColon: "upgrade:", addYes: "ADD", noHits: "no matches",
     addQueued: nm => "add: " + nm,
     loadoutHeader: s => `loadout — slot ${s}`, zones: { weapon: "WEAPONS", armor: "ARMOR", talisman: "TALISMANS" },
@@ -142,6 +222,8 @@ const I18N = {
     remove: "ZDEJMIJ", toStorage: "DO SKRZYNI", toHeld: "PRZY SOBIE", qty: "ILOŚĆ…", setQtyTitle: "ustaw ilość", setQtyYes: "USTAW",
     empty2: "(pusto)", itemRemoved: "usuń item", itemMoved: "przenieś item", itemQty: "ilość itemu",
     addTitle1: "dodaj item — krok 1/2", addTitle2: "dodaj item — krok 2/2", fragment: "fragment nazwy", next: "DALEJ",
+    typeToSearch: "wpisz min. 2 znaki…", pickFromList: "kliknij pozycję, żeby wybrać · Enter = pierwsza",
+    liveFilters: "filtruje w trakcie pisania",
     pickNo: "numer:", qtyColon: "ilość:", upgradeColon: "upgrade:", addYes: "DODAJ", noHits: "brak trafień",
     addQueued: nm => "dodaj: " + nm,
     loadoutHeader: s => `wyposażenie — slot ${s}`, zones: { weapon: "BROŃ", armor: "ZBROJA", talisman: "TALIZMANY" },
@@ -258,21 +340,23 @@ function busy(on, text = null) {
   $("#busyTxt").textContent = text || t("loading");
   updateStagebar();
 }
-function modal({ title, body = "", warn = false, actions = [] }) {
+function modal({ title, body = "", warn = false, actions = [], setup = null }) {
   return new Promise(resolve => {
     const m = $("#modal"), box = $("#mbox");
     box.innerHTML = `
       <div class="mhead ${warn ? "warn" : ""}"><span>${esc(title)}</span></div>
       <div class="mbod">${body}</div>
       <div class="mact"></div>`;
+    const done = v => { m.classList.add("hidden"); resolve(v); };
     const act = box.querySelector(".mact");
     actions.forEach(a => {
       const b = document.createElement("button");
       b.className = `key ${a.klass || ""}`;
       b.textContent = a.label;
-      b.onclick = () => { m.classList.add("hidden"); resolve(a.value); };
+      b.onclick = () => done(a.value);
       act.appendChild(b);
     });
+    if (setup) setup(box, done);   // modale z własną logiką (np. podpowiedzi na żywo)
     m.classList.remove("hidden");
     act.querySelector(".key")?.focus();
   });
@@ -633,9 +717,10 @@ function renderInventory() {
     <div class="toolbar">
       <div class="swbox ${S.inv.loc === "held" ? "on" : ""}" id="invLoc" title="${esc(t("held"))} / ${esc(t("storage"))}"><i></i></div>
       <span class="ednote">${S.inv.loc === "held" ? esc(t("held")) : esc(t("storage"))}</span>
-      <input class="lcdin" id="invQ" placeholder="${esc(t("searchInv"))}" style="width:230px" value="${esc(S.inv.q)}">
+      <input class="lcdin" id="invQ" placeholder="${esc(t("searchInv"))}" style="width:230px" value="${esc(S.inv.q)}" autocomplete="off">
       <button class="key small" id="invGo">${esc(t("search"))}</button>
       <button class="key small orange" id="invAdd">${esc(t("addItem"))}</button>
+      <span class="livehint" id="invLive">${esc(t("liveFilters"))}</span>
     </div>
     <table class="tbl"><thead><tr><th class="mono" style="width:110px">${esc(t("thHandle"))}</th><th style="width:64px">${esc(t("thQty"))}</th>
       <th>${esc(t("thName"))}</th><th class="mono" style="width:110px">${esc(t("thId"))}</th><th style="width:280px">${esc(t("thActions"))}</th></tr></thead>
@@ -646,7 +731,8 @@ function renderInventory() {
     const r = await P("inventory", S.save, S.slot, S.inv.loc, S.inv.q, S.inv.offset, 100);
     if (r.error) { toast(r.error, "err"); return; }
     S.inv.total = r.total;
-    $("#invRows").innerHTML = r.rows.map(x => `
+    const rows = S.inv.q ? rankByName(r.rows, S.inv.q) : r.rows;
+    $("#invRows").innerHTML = rows.map(x => `
       <tr><td class="mono">${x.handle_hex}</td><td class="mono">${x.qty}</td>
       <td class="grow" title="${esc(x.name)}">${esc(x.name)}</td><td class="mono">${x.hex}</td>
       <td><div class="acts">
@@ -673,38 +759,60 @@ function renderInventory() {
     });
   };
   el.querySelector("#invLoc").onclick = () => { S.inv.loc = S.inv.loc === "held" ? "storage" : "held"; S.inv.offset = 0; renderInventory(); };
-  el.querySelector("#invGo").onclick = () => { S.inv.q = $("#invQ").value.trim(); S.inv.offset = 0; renderInventory(); };
-  $("#invQ").onkeydown = e => { if (e.key === "Enter") el.querySelector("#invGo").click(); };
-  el.querySelector("#invPrev").onclick = () => { S.inv.offset = Math.max(0, S.inv.offset - 100); renderInventory(); };
-  el.querySelector("#invNext").onclick = () => { if (S.inv.offset + 100 < S.inv.total) { S.inv.offset += 100; renderInventory(); } };
+  const applyQ = () => {
+    S.inv.q = $("#invQ").value.trim();
+    S.inv.offset = 0;
+    const hint = $("#invLive");
+    if (hint) {
+      hint.classList.toggle("on", !!S.inv.q);
+      hint.textContent = S.inv.q ? `${t("liveFilters")} · „${S.inv.q}"` : t("liveFilters");
+    }
+    load();
+  };
+  el.querySelector("#invGo").onclick = () => applyQ();
+  $("#invQ").oninput = debounce(applyQ, 170);
+  $("#invQ").onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); applyQ(); } };
+  el.querySelector("#invPrev").onclick = () => { S.inv.offset = Math.max(0, S.inv.offset - 100); load(); };
+  el.querySelector("#invNext").onclick = () => { if (S.inv.offset + 100 < S.inv.total) { S.inv.offset += 100; load(); } };
   el.querySelector("#invAdd").onclick = () => addItemFlow();
   load();
 }
 async function addItemFlow() {
-  const ok1 = await modal({ title: t("addTitle1"),
-    body: `<div class="field"><label>${esc(t("fragment"))}</label><input class="lcdin" id="qu2" style="width:300px"></div>`,
-    actions: [{ label: t("next"), value: true, klass: "orange" }, { label: t("stay"), value: false }] });
-  if (ok1 !== true) return;
-  const needle = $("#qu2")?.value ?? "";
-  const r = await P("find", needle, 30);
-  if (r.error) return toast(r.error, "err");
-  const list = r.items.slice(0, 30);
-  if (!list.length) return toast(t("noHits"), "info");
-  const ok2 = await modal({ title: t("addTitle2"),
-    body: `<div class="lcd" style="max-height:220px;overflow:auto;white-space:pre">` +
-      list.map((it, i) => `${String(i + 1).padStart(2)}. ${esc(it.name)}  [${it.cat}]`).join("\n") + `</div>
+  const pick = await modal({
+    title: t("addTitle1"),
+    body: `<div class="field" style="max-width:none">
+             <label>${esc(t("fragment"))}</label>
+             <input class="lcdin" id="qu2" style="width:340px" autocomplete="off" placeholder="${esc(t("typeToSearch"))}">
+           </div>
+           <div class="suggbox" id="suggBox"></div>
+           <div class="note" style="margin-top:8px">${esc(t("pickFromList"))}</div>`,
+    actions: [{ label: t("stay"), value: false }],
+    setup: (box, done) => {
+      const inp = box.querySelector("#qu2"), list = box.querySelector("#suggBox");
+      attachSuggest(inp, list, async q => {
+        const r = await P("find", q, 24);
+        if (r.error) { toast(r.error, "err"); return []; }
+        return r.items || [];
+      }, { onPick: it => done(it) });
+      setTimeout(() => inp.focus(), 40);
+    },
+  });
+  if (!pick) return;
+  const ok2 = await modal({
+    title: t("addTitle2"),
+    body: `<div class="lcd" style="padding:8px 10px">${esc(pick.name)} <span class="scat">${esc(pick.cat || "")}</span></div>
       <div class="inline" style="margin-top:10px">
-        <span class="ednote">${esc(t("pickNo"))}</span><input class="lcdin" id="pk" type="number" value="1" style="width:70px">
         <span class="ednote">${esc(t("qtyColon"))}</span><input class="lcdin" id="qt" type="number" value="1" style="width:70px">
         <span class="ednote">${esc(t("upgradeColon"))}</span><input class="lcdin" id="up" type="number" value="0" style="width:70px">
-      </div>`, actions: [{ label: t("addYes"), value: true, klass: "orange" }, { label: t("stay"), value: false }] });
+      </div>`,
+    actions: [{ label: t("addYes"), value: true, klass: "orange" }, { label: t("stay"), value: false }],
+  });
   if (ok2 !== true) return;
-  const it = list[Math.min(list.length, Math.max(1, parseInt($("#pk")?.value ?? "1", 10))) - 1];
-  const argv = ["item", "--slot", String(S.slot), "--add", it.name, "--qty", $("#qt")?.value || "1"];
+  const argv = ["item", "--slot", String(S.slot), "--add", pick.name, "--qty", $("#qt")?.value || "1"];
   const upg = parseInt($("#up")?.value || "0", 10);
   if (upg > 0) argv.push("--upgrade", String(upg));
   if (S.inv.loc === "storage") argv.push("--storage");
-  await doStage(argv, t("addQueued", it.name));
+  await doStage(argv, t("addQueued", pick.name));
   S.inv.q = ""; renderInventory();
 }
 
@@ -734,9 +842,11 @@ async function renderEQ() {
   el.innerHTML = `<h3 class="sect">${esc(t("loadoutHeader", String(S.slot).padStart(2, "0")))}</h3>`
     + ["weapon", "armor", "talisman"].map(seg).join("")
     + `<h3 class="sect">${esc(t("equipHeader"))}</h3>
-       <div class="inline"><input class="lcdin" id="eqH" style="width:230px" placeholder="${esc(t("equipPh"))}">
+       <div class="inline"><input class="lcdin" id="eqH" style="width:230px" placeholder="${esc(t("equipPh"))}" autocomplete="off">
        <input class="lcdin" id="eqAt" type="number" style="width:90px" placeholder="${esc(t("equipAt"))}">
-       <button class="key orange" id="eqGo">${esc(t("equipBtn"))}</button></div>`;
+       <button class="key orange" id="eqGo">${esc(t("equipBtn"))}</button>
+       <span class="livehint" id="eqLive">${esc(t("liveFilters"))}</span></div>
+       <div class="suggbox" id="eqSugg"></div>`;
   el.querySelectorAll("[data-eu]").forEach(b => b.onclick = () => doStage(["unequip", "--slot", String(S.slot), "--at", b.dataset.eu], t("unequip")));
   el.querySelectorAll("[data-up]").forEach(b => b.onclick = async () => {
     const v = await modal({ title: t("upgTitle"), body: `<input class="lcdin" id="upv" type="number" value="10" style="width:90px">`,
@@ -763,14 +873,21 @@ async function renderEQ() {
     renderEQ();
   });
   el.querySelector("#eqGo").onclick = async () => {
-    const h = $("#eqH").value.trim();
-    if (!h) return;
-    const argv = ["equip", "--slot", String(S.slot), "--handle", h.startsWith("handle:") ? h.split(":")[1] : h.replace(/^0x/i, "")];
+    const v = $("#eqH").value.trim();
+    if (!v) return;
+    const argv = ["equip", "--slot", String(S.slot)];
+    const m = v.match(/^(?:handle:)?(0x[0-9a-f]+)$/i);
+    if (m) argv.push("--handle", m[1]);
+    else argv.push("--item", v);
     const at = $("#eqAt").value.trim();
     if (at !== "") argv.push("--at", at);
     await doStage(argv, t("equipQueued"));
     renderEQ();
   };
+  attachSuggest($("#eqH"), $("#eqSugg"), async q => {
+    const r = await P("inventory", S.save, S.slot, "held", q, 0, 14);
+    return r.error ? [] : r.rows.map(x => ({ name: x.name, cat: x.handle_hex }));
+  }, { min: 2, enterFallback: () => el.querySelector("#eqGo").click() });
 }
 
 /* -------------------------------------------------------- panel: ŚWIAT -- */
@@ -785,42 +902,61 @@ async function renderWorld() {
   }
   const groups = Object.keys(S.world.groups).sort();
   if (!S.world.group) S.world.group = groups.includes("boss_defeat") ? "boss_defeat" : groups[0];
-  const r = await P("world_view", S.save, S.slot, S.world.group, S.world.q, S.world.offset, 200);
-  S.world.total = r.error ? 0 : r.total;
-  S.world.rows = r.error ? [] : r.rows;
   el.innerHTML = `
     <div class="toolbar">
       <select class="lcdin" id="wgrp" style="width:230px">${groups.map(g =>
         `<option value="${g}" ${g === S.world.group ? "selected" : ""}>${g} (${S.world.groups[g]})</option>`).join("")}</select>
-      <input class="lcdin" id="wq" placeholder="${esc(t("worldFilter"))}" style="width:210px" value="${esc(S.world.q)}">
+      <input class="lcdin" id="wq" placeholder="${esc(t("worldFilter"))}" style="width:210px" value="${esc(S.world.q)}" autocomplete="off">
       <button class="key small" id="wgo">${esc(t("filter"))}</button>
       <button class="key small orange" id="wall">${esc(t("grantAll"))}</button>
+      <span class="livehint" id="wLive">${esc(t("liveFilters"))}</span>
     </div>
-    <div id="wrows">${S.world.rows.map(e => `
+    <div id="wrows"></div>
+    <div class="pager"><button class="key" id="wPrev">‹</button><span id="wInfo">—</span><button class="key" id="wNext">›</button></div>`;
+
+  const loadW = async () => {
+    const r = await P("world_view", S.save, S.slot, S.world.group, S.world.q, S.world.offset, 200);
+    S.world.total = r.error ? 0 : r.total;
+    S.world.rows = r.error ? [] : r.rows;
+    $("#wrows").innerHTML = S.world.rows.map(e => `
       <div class="worldrow">
         <span class="wid">${e.id}</span>
-        <span class="wname">${esc(e.name)}</span>
+        <span class="wname">${mark(e.name, S.world.q)}</span>
         <span class="wdesc">${esc(e.desc || "")}</span>
         <span class="swbox ${e.value ? "on" : ""}" data-fl="${e.id}" data-v="${e.value ? 1 : 0}"><i></i></span>
-      </div>`).join("") || `<div class="note">${esc(t("noRows"))}</div>`}</div>
-    <div class="pager"><button class="key" id="wPrev">‹</button><span>${S.world.offset + 1}–${Math.min(S.world.offset + 200, S.world.total)} / ${S.world.total}</span><button class="key" id="wNext">›</button></div>`;
-  el.querySelector("#wgrp").onchange = e => { S.world.group = e.target.value; S.world.offset = 0; renderWorld(); };
-  el.querySelector("#wgo").onclick = () => { S.world.q = $("#wq").value.trim(); S.world.offset = 0; renderWorld(); };
-  $("#wq").onkeydown = e => { if (e.key === "Enter") el.querySelector("#wgo").click(); };
-  el.querySelector("#wPrev").onclick = () => { S.world.offset = Math.max(0, S.world.offset - 200); renderWorld(); };
-  el.querySelector("#wNext").onclick = () => { if (S.world.offset + 200 < S.world.total) { S.world.offset += 200; renderWorld(); } };
+      </div>`).join("") || `<div class="note">${esc(t("noRows"))}</div>`;
+    $("#wInfo").textContent = S.world.total
+      ? `${S.world.offset + 1}–${Math.min(S.world.offset + 200, S.world.total)} / ${S.world.total}` : "0 / 0";
+    $("#wrows").querySelectorAll("[data-fl]").forEach(b => b.onclick = async () => {
+      const id = b.dataset.fl, cur = b.dataset.v === "1";
+      const ok = await confirmDlg(cur ? t("flagTitleClear") : t("flagTitleSet"), `ID <span class="mono">${id}</span> → ${cur ? 0 : 1}`, false, t("set"));
+      if (!ok) return;
+      await doStage(["world", "--slot", String(S.slot), "--group", S.world.group, "--set", id, "--state", cur ? "0" : "1"], t("flagQueued", id));
+      loadW();
+    });
+  };
+  const applyW = () => {
+    S.world.q = $("#wq").value.trim();
+    S.world.offset = 0;
+    const hint = $("#wLive");
+    if (hint) {
+      hint.classList.toggle("on", !!S.world.q);
+      hint.textContent = S.world.q ? `${t("liveFilters")} · „${S.world.q}"` : t("liveFilters");
+    }
+    loadW();
+  };
+  el.querySelector("#wgrp").onchange = e => { S.world.group = e.target.value; S.world.offset = 0; loadW(); };
+  el.querySelector("#wgo").onclick = () => applyW();
+  $("#wq").oninput = debounce(applyW, 170);
+  $("#wq").onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); applyW(); } };
+  el.querySelector("#wPrev").onclick = () => { if (S.world.offset > 0) { S.world.offset = Math.max(0, S.world.offset - 200); loadW(); } };
+  el.querySelector("#wNext").onclick = () => { if (S.world.offset + 200 < S.world.total) { S.world.offset += 200; loadW(); } };
   el.querySelector("#wall").onclick = async () => {
     const n = S.world.total;
     const ok = await confirmDlg(t("grantTitle", S.world.group), t("grantBody", n), false, t("grantYes", n));
-    if (ok) { await doStage(["world", "--slot", String(S.slot), "--group", S.world.group, "--all", "--state", "1"], t("groupQueued", S.world.group)); renderWorld(); }
+    if (ok) { await doStage(["world", "--slot", String(S.slot), "--group", S.world.group, "--all", "--state", "1"], t("groupQueued", S.world.group)); loadW(); }
   };
-  el.querySelectorAll("[data-fl]").forEach(b => b.onclick = async () => {
-    const id = b.dataset.fl, cur = b.dataset.v === "1";
-    const ok = await confirmDlg(cur ? t("flagTitleClear") : t("flagTitleSet"), `ID <span class="mono">${id}</span> → ${cur ? 0 : 1}`, false, t("set"));
-    if (!ok) return;
-    await doStage(["world", "--slot", String(S.slot), "--group", S.world.group, "--set", id, "--state", cur ? "0" : "1"], t("flagQueued", id));
-    renderWorld();
-  });
+  await loadW();
 }
 
 /* -------------------------------------------------------- panel: CZARY -- */
@@ -833,10 +969,12 @@ async function renderSpells() {
   if (r.error) { el.innerHTML = `<div class="note">${esc(r.error)}</div>`; return; }
   el.innerHTML = `
     <div class="toolbar">
-      <input class="lcdin" id="spQ" placeholder="${esc(t("spellPh"))}" style="width:260px">
+      <input class="lcdin" id="spQ" placeholder="${esc(t("spellPh"))}" style="width:260px" autocomplete="off">
       <button class="key small orange" id="spAdd">${esc(t("memorize"))}</button>
       <button class="key small" id="spClear">${esc(t("clearAll"))}</button>
+      <span class="livehint" id="spLive">${esc(t("liveFilters"))}</span>
     </div>
+    <div class="suggbox" id="spSugg"></div>
     <div class="grid spellgrid">${r.spells.map(sp => `
       <div class="cell ${sp.empty ? "empty" : ""}">
         <div class="cslot">${esc(t("spellSlot", sp.slot))}</div>
@@ -857,6 +995,10 @@ async function renderSpells() {
     await doStage(["spells", "--slot", String(S.slot), "--forget", b.dataset.fg], t("forgotQueued"));
     renderSpells();
   });
+  attachSuggest($("#spQ"), $("#spSugg"), async q => {
+    const f = await P("find", q, 20);
+    return f.items || [];
+  }, { min: 2, enterFallback: () => el.querySelector("#spAdd").click() });
 }
 
 /* ------------------------------------------------------ panel: WYGLĄD --- */

@@ -45,6 +45,34 @@ def _selftest(win):
     print(f"[selftest] tabs={tabs}")
     print(f"[selftest] status={status!r}")
 
+    # --- wyszukiwanie na żywo: lista zawęża się w trakcie pisania
+    js("document.querySelector('[data-tab=ekwipunek]') && document.querySelector('[data-tab=ekwipunek]').click(); 'ok'")
+    time.sleep(1.5)
+    before = js("document.querySelectorAll('#invRows tr').length")
+    js("(function(){var i=document.querySelector('#invQ'); i.value='seed'; i.dispatchEvent(new Event('input')); return 'typed';})()")
+    time.sleep(1.3)
+    after = js("document.querySelectorAll('#invRows tr').length")
+    print(f"[selftest] live-search INVENTORY: rows_before={before} rows_after_typing_seed={after}")
+
+    js("document.querySelector('#invAdd') && document.querySelector('#invAdd').click(); 'open'")
+    time.sleep(0.8)
+    js("(function(){var i=document.querySelector('#qu2'); i.value='mimi'; i.dispatchEvent(new Event('input')); return 'typed';})()")
+    time.sleep(1.4)
+    sugg = js("document.querySelectorAll('#suggBox .srow').length")
+    first = js("(document.querySelector('#suggBox .srow .sname')||{}).textContent")
+    print(f"[selftest] suggestions('mimi'): hits={sugg} first={first!r}")
+    js("document.querySelector('.mact .key') && document.querySelector('.mact .key').click(); 'close'")
+    time.sleep(0.5)
+
+    js("document.querySelector('[data-tab=swiat]') && document.querySelector('[data-tab=swiat]').click(); 'ok'")
+    time.sleep(1.5)
+    wbefore = js("document.querySelectorAll('#wrows .worldrow').length")
+    js("(function(){var i=document.querySelector('#wq'); i.value='godrick'; i.dispatchEvent(new Event('input')); return 'typed';})()")
+    time.sleep(1.4)
+    wafter = js("document.querySelectorAll('#wrows .worldrow').length")
+    wfirst = js("(document.querySelector('#wrows .wname')||{}).textContent")
+    print(f"[selftest] live-search WORLD: rows_before={wbefore} rows_after_typing_godrick={wafter} first={wfirst!r}")
+
     # --- język na żywo: EN → PL → EN (zapis w configu + przeładowanie okna)
     for step_lang, want_pill in (("pl", "PL"), ("en", "EN")):
         js(f"window.pywebview.api.config_set('ui_lang','{step_lang}'); 'ok'")

@@ -1,0 +1,20 @@
+# dane lokalne (nie do repo)
+references/
+backups/
+scratch/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+build/
+dist/
+*.egg-info/
+
+# backupy i pliki robocze save'ów
+*.rezurbak-*
+*.fixbak-*
+*.copybak-*
+*.steambak-*
+*.tmp-rezur

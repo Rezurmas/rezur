@@ -175,6 +175,12 @@ Kontrakt (F6): szczegółowa lista endpointów — docstring w `rezur/api/server
   w USTAWIENIACH; wybór idzie do configu (`ui_lang`, walidacja `en|pl`) i przeładowuje okno;
   słowniki `I18N.en/pl` w `app.js`, `t()` czyta klucz, komunikaty doctora tłumaczone po kodzie
   (`FIND_EN`), liczby przez `toLocaleString` wg języka.
+- **Tabele:** pasek narzędzi przykleja się u góry panelu (`stickBars()` ustawia `--barH`),
+  a nagłówek tabeli ląduje dokładnie pod nim (`table-layout:fixed` → kolumny zgadzają się
+  z komórkami); nic nie nachodzi na przyciski.
+- **Czary:** panel pokazuje 14 gniazd + **katalog 213 czarów** (`db_er/magic.json`, źródło:
+  SaveForge `sorceries.go`/`incantations.go`) z filtrem na żywo i stanem (w ekwipunku /
+  zapamiętany); ZAPAMIĘTAJ idzie przez staging. CLI: `python -m rezur spells --slot N --list`.
 - **Wyszukiwanie na żywo:** każde pole szukania filtruje/podpowiada w trakcie pisania
   (debounce 170 ms, min. 2 znaki) — ekwipunek i świat filtrują listę pod spodem
   (ranking: „zaczyna się od" → krótsze → alfabet), a dodawanie itemu / czary / zakładanie

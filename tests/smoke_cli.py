@@ -86,6 +86,9 @@ def build(P, out_json, ash, region):
     # --- spells / appearance / teleport
     add("spells", "--slot", "0")
     add("spells", "--slot", "0", "--json")
+    add("spells", "--slot", "0", "--list")
+    add("spells", "--slot", "0", "--list", "--filter", "heal")
+    add("spells", "--slot", "0", "--list", "--filter", "heal", "--json")
     add("spells", "--slot", "0", "--memorize", "Scholar's Armament")
     add("spells", "--slot", "0", "--memorize", "Scholar's Armament", "--apply")
     add("spells", "--slot", "0", "--clear", "--apply")

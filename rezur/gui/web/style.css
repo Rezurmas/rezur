@@ -159,9 +159,15 @@ h3.sect:first-child{margin-top:0}
 .frow .fcode{font-size:8.5px;font-family:var(--fm);color:var(--mut);letter-spacing:.06em;margin-top:2px}
 
 /* ---------- tabele ---------- */
-table.tbl{width:100%;border-collapse:collapse;font-size:12px}
+table.tbl{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
 .tbl th{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);text-align:left;
-  padding:6px 8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--alu)}
+  padding:6px 8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--alu);
+  z-index:2;box-shadow:inset 0 -1px 0 var(--line)}
+/* pasek narzędzi przykleja się nad tabelą — nic nie nachodzi na nic;
+   pasek zachodzi na padding panelu, żeby wiersze nie przeświecały nad nim */
+.toolbar.stickbar{position:sticky;top:calc(-1 * var(--padTop,14px));z-index:3;background:var(--alu);
+  padding:calc(var(--padTop,14px) + 7px) 0 8px;margin-bottom:8px;border-bottom:1px solid var(--line)}
+.toolbar.stickbar + .tbl th{top:var(--barH,44px)}
 .tbl td{padding:6px 8px;border-bottom:1px solid var(--line2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tbl td.grow{max-width:0;width:100%;white-space:nowrap}
 .tbl tr:hover td{background:var(--dark);color:var(--lcdtxt)}

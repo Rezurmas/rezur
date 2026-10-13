@@ -23,6 +23,8 @@ doktor, staty, ekwipunek, założone, świat, czary, wygląd, teleport, ryzyko, 
 historia, ustawienia — każda edycja przez kopię roboczą, na dole pasek zmian.
 **Wyszukiwanie na żywo:** lista filtruje się w trakcie pisania (ekwipunek, świat), a pola
 dodawania itemu / czarów / zakładania podpowiadają pozycje z podświetlonym trafieniem.
+**Czary:** pod 14 gniazdami jest lista wszystkich 213 czarów (nazwa z tabel gry) z filtrem
+na żywo i odznakami „w ekwipunku / zapamiętany" — klikasz ZAPAMIĘTAJ i zmiana leci do kolejki.
 **Język GUI:** domyślnie **angielski**; przełącznik `EN/PL` w nagłówku (pill) i w
 Ustawieniach — zapisywany w configu (`ui_lang`), okno przeładowuje się samo.
 Most JS↔silnik ma audyt: `python tests/bridge_audit.py` (każde wywołanie API na kopii save'a).
@@ -53,6 +55,7 @@ python -m rezur item --slot 0 --set-upgrade "Uchigatana=10" --apply     # poziom
 python -m rezur item --slot 0 --affinity "Uchigatana=Blood" --apply     # affinity
 python -m rezur item --slot 0 --aow "Uchigatana=Bloody Slash" --apply   # Ash of War
 python -m rezur spells --slot 0                                         # czary (--memorize/--forget/--clear)
+python -m rezur spells --slot 0 --list [--filter heal]                  # katalog czarów: stan „w ekwipunku / zapamiętany"
 python -m rezur appearance --slot 0                                     # gender / typ ciała / dar
 python -m rezur teleport --slot 0 --to roundtable --apply               # teleport (limgrave/liurnia/altus)
 python -m rezur world --groups                                          # 22 grupy nazwanych flag

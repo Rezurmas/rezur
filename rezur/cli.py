@@ -642,6 +642,19 @@ def cmd_unequip(args):
 
 def cmd_spells(args):
     sf = _load(args)
+    if getattr(args, "catalog", False):
+        from .ops.spells import status as spells_status
+
+        st = spells_status(sf, args.slot, args.filter, 500)
+        if args.json:
+            print(json.dumps(st, ensure_ascii=False, indent=2))
+            return 0
+        print(f"slot{args.slot} — katalog czarów ({st['count']}):")
+        for row in st["rows"]:
+            state = "zapamiętany" if row["memorized"] else ("w ekwipunku" if row["owned"] else "brak")
+            kind = "czar" if row["kind"] == "sorcery" else "inkantacja"
+            print(f"  {row['id']:>5}  [{kind:>10}] {row['name']:<34} {state}")
+        return 0
     if args.memorize is not None:
         if not args.apply:
             where = f" w gnieździe {args.at}" if args.at is not None else " (pierwsze wolne)"
@@ -1277,6 +1290,9 @@ def main(argv=None):
     sp.add_argument("--forget", type=int, default=None)
     sp.add_argument("--clear", action="store_true")
     sp.add_argument("--at", type=int, default=None)
+    sp.add_argument("--list", dest="catalog", action="store_true",
+                    help="katalog czarów do wyboru (z filtrem i stanem: w ekwipunku / zapamiętany)")
+    sp.add_argument("--filter", default=None, help="filtr katalogu (nazwa albo ID)")
     sp.add_argument("--json", action="store_true")
     sp.add_argument("--apply", action="store_true")
     sp.set_defaults(func=cmd_spells)

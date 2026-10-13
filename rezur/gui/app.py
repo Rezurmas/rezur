@@ -73,6 +73,16 @@ def _selftest(win):
     wfirst = js("(document.querySelector('#wrows .wname')||{}).textContent")
     print(f"[selftest] live-search WORLD: rows_before={wbefore} rows_after_typing_godrick={wafter} first={wfirst!r}")
 
+    js("document.querySelector('[data-tab=czary]') && document.querySelector('[data-tab=czary]').click(); 'ok'")
+    time.sleep(1.7)
+    sp_all = js("document.querySelectorAll('#spRows tr').length")
+    js("(function(){var i=document.querySelector('#spQ'); i.value='heal'; i.dispatchEvent(new Event('input')); return 'typed';})()")
+    time.sleep(1.5)
+    sp_hits = js("document.querySelectorAll('#spRows tr').length")
+    sp_first = js("(document.querySelector('#spRows .grow')||{}).textContent")
+    sp_btns = js("document.querySelectorAll('#spRows [data-mem]').length")
+    print(f"[selftest] SPELLS list: rows={sp_all} after_typing_heal={sp_hits} first={sp_first!r} buttons={sp_btns}")
+
     # --- język na żywo: EN → PL → EN (zapis w configu + przeładowanie okna)
     for step_lang, want_pill in (("pl", "PL"), ("en", "EN")):
         js(f"window.pywebview.api.config_set('ui_lang','{step_lang}'); 'ok'")

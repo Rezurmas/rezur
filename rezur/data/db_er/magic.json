@@ -1,0 +1,1067 @@
+{
+ "4000": {
+  "name": "Glintstone Pebble",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4001": {
+  "name": "Great Glintstone Shard",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4010": {
+  "name": "Swift Glintstone Shard",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4020": {
+  "name": "Glintstone Cometshard",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4021": {
+  "name": "Comet",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4030": {
+  "name": "Shard Spiral",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4040": {
+  "name": "Glintstone Stars",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4050": {
+  "name": "Star Shower",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4060": {
+  "name": "Crystal Barrage",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4070": {
+  "name": "Glintstone Arc",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4080": {
+  "name": "Cannon of Haima",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4090": {
+  "name": "Crystal Burst",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4100": {
+  "name": "Shatter Earth",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4110": {
+  "name": "Rock Blaster",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4120": {
+  "name": "Gavel of Haima",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4130": {
+  "name": "Terra Magica",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4140": {
+  "name": "Starlight",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4200": {
+  "name": "Comet Azur",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4210": {
+  "name": "Founding Rain of Stars",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4220": {
+  "name": "Stars of Ruin",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4300": {
+  "name": "Glintblade Phalanx",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4301": {
+  "name": "Carian Phalanx",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4302": {
+  "name": "Greatblade Phalanx",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4360": {
+  "name": "Rennala's Full Moon",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4361": {
+  "name": "Ranni's Dark Moon",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4370": {
+  "name": "Magic Downpour",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4380": {
+  "name": "Loretta's Greatbow",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4381": {
+  "name": "Loretta's Mastery",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4390": {
+  "name": "Magic Glintblade",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4400": {
+  "name": "Glintstone Icecrag",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4410": {
+  "name": "Zamor Ice Storm",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4420": {
+  "name": "Freezing Mist",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4430": {
+  "name": "Carian Greatsword",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4431": {
+  "name": "Adula's Moonblade",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4440": {
+  "name": "Carian Slicer",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4450": {
+  "name": "Carian Piercer",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4460": {
+  "name": "Scholar's Armament",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4470": {
+  "name": "Scholar's Shield",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4480": {
+  "name": "Lucidity",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4490": {
+  "name": "Frozen Armament",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4500": {
+  "name": "Shattering Crystal",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4510": {
+  "name": "Crystal Release",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4520": {
+  "name": "Crystal Torrent",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4600": {
+  "name": "Ambush Shard",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4610": {
+  "name": "Night Shard",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4620": {
+  "name": "Night Comet",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4630": {
+  "name": "Thops's Barrier",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4640": {
+  "name": "Carian Retaliation",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4650": {
+  "name": "Eternal Darkness",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4660": {
+  "name": "Unseen Blade",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4670": {
+  "name": "Unseen Form",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4700": {
+  "name": "Meteorite",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4701": {
+  "name": "Meteorite of Astel",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4710": {
+  "name": "Rock Sling",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4720": {
+  "name": "Gravity Well",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4721": {
+  "name": "Collapsing Stars",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4800": {
+  "name": "Magma Shot",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4810": {
+  "name": "Gelmir's Fury",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4820": {
+  "name": "Roiling Magma",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4830": {
+  "name": "Rykard's Rancor",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4900": {
+  "name": "Briars of Sin",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "4910": {
+  "name": "Briars of Punishment",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "5000": {
+  "name": "Rancorcall",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "5001": {
+  "name": "Ancient Death Rancor",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "5010": {
+  "name": "Explosive Ghostflame",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "5020": {
+  "name": "Fia's Mist",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "5030": {
+  "name": "Tibia's Summons",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "5040": {
+  "name": "Death Lightning",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "5100": {
+  "name": "Oracle Bubbles",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "5110": {
+  "name": "Great Oracular Bubble",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "6000": {
+  "name": "Catch Flame",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6001": {
+  "name": "O, Flame!",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6010": {
+  "name": "Flame Sling",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6020": {
+  "name": "Flame, Fall Upon Them",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6030": {
+  "name": "Whirl, O Flame!",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6040": {
+  "name": "Flame, Cleanse Me",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6050": {
+  "name": "Flame, Grant Me Strength",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6060": {
+  "name": "Flame, Protect Me",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6100": {
+  "name": "Giantsflame Take Thee",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6110": {
+  "name": "Flame of the Fell God",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6120": {
+  "name": "Burn, O Flame!",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6210": {
+  "name": "Black Flame",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6220": {
+  "name": "Surge, O Flame!",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6230": {
+  "name": "Scouring Black Flame",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6240": {
+  "name": "Black Flame Ritual",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6250": {
+  "name": "Black Flame Blade",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6260": {
+  "name": "Black Flame's Protection",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6270": {
+  "name": "Noble Presence",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6300": {
+  "name": "Bloodflame Talons",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6310": {
+  "name": "Bloodboon",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6320": {
+  "name": "Bloodflame Blade",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6330": {
+  "name": "Barrier of Gold",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6340": {
+  "name": "Protection of the Erdtree",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6400": {
+  "name": "Rejection",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6410": {
+  "name": "Wrath of Gold",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6420": {
+  "name": "Urgent Heal",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6421": {
+  "name": "Heal",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6422": {
+  "name": "Great Heal",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6423": {
+  "name": "Lord's Heal",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6424": {
+  "name": "Erdtree Heal",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6430": {
+  "name": "Blessing's Boon",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6431": {
+  "name": "Blessing of the Erdtree",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6440": {
+  "name": "Cure Poison",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6441": {
+  "name": "Lord's Aid",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6450": {
+  "name": "Flame Fortification",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6460": {
+  "name": "Magic Fortification",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6470": {
+  "name": "Lightning Fortification",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6480": {
+  "name": "Divine Fortification",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6490": {
+  "name": "Lord's Divine Fortification",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6500": {
+  "name": "Night Maiden's Mist",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "6510": {
+  "name": "Assassin's Approach",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6520": {
+  "name": "Shadow Bait",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6530": {
+  "name": "Darkness",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6600": {
+  "name": "Golden Vow",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6700": {
+  "name": "Discus of Light",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6701": {
+  "name": "Triple Rings of Light",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6710": {
+  "name": "Radagon's Rings of Light",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6720": {
+  "name": "Elden Stars",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6730": {
+  "name": "Law of Regression",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6740": {
+  "name": "Immutable Shield",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6750": {
+  "name": "Litany of Proper Death",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6760": {
+  "name": "Law of Causality",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6770": {
+  "name": "Order's Blade",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6780": {
+  "name": "Order Healing",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6800": {
+  "name": "Bestial Sling",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6810": {
+  "name": "Stone of Gurranq",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6820": {
+  "name": "Beast Claw",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6830": {
+  "name": "Gurranq's Beast Claw",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6840": {
+  "name": "Bestial Vitality",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6850": {
+  "name": "Bestial Constitution",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6900": {
+  "name": "Lightning Spear",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6910": {
+  "name": "Ancient Dragons' Lightning Strike",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6920": {
+  "name": "Lightning Strike",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6921": {
+  "name": "Frozen Lightning Spear",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6930": {
+  "name": "Honed Bolt",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6940": {
+  "name": "Ancient Dragons' Lightning Spear",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6941": {
+  "name": "Fortissax's Lightning Spear",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6950": {
+  "name": "Lansseax's Glaive",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6960": {
+  "name": "Electrify Armament",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6970": {
+  "name": "Vyke's Dragonbolt",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "6971": {
+  "name": "Dragonbolt Blessing",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7000": {
+  "name": "Dragonfire",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7001": {
+  "name": "Agheel's Flame",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7010": {
+  "name": "Magma Breath",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7011": {
+  "name": "Theodorix's Magma",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7020": {
+  "name": "Dragonice",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7021": {
+  "name": "Borealis's Mist",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7030": {
+  "name": "Rotten Breath",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7031": {
+  "name": "Ekzykes's Decay",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7040": {
+  "name": "Glintstone Breath",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7041": {
+  "name": "Smarag's Glintstone Breath",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7050": {
+  "name": "Placidusax's Ruin",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7060": {
+  "name": "Dragonclaw",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7080": {
+  "name": "Dragonmaw",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7090": {
+  "name": "Greyoll's Roar",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7200": {
+  "name": "Pest Threads",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7210": {
+  "name": "Swarm of Flies",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7220": {
+  "name": "Poison Mist",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7230": {
+  "name": "Poison Armament",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7240": {
+  "name": "Scarlet Aeonia",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7300": {
+  "name": "Inescapable Frenzy",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7310": {
+  "name": "The Flame of Frenzy",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7311": {
+  "name": "Unendurable Frenzy",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7320": {
+  "name": "Frenzied Burst",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7330": {
+  "name": "Howl of Shabriri",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7500": {
+  "name": "Aspects of the Crucible: Tail",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7510": {
+  "name": "Aspects of the Crucible: Horns",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7520": {
+  "name": "Aspects of the Crucible: Breath",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7530": {
+  "name": "Black Blade",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7900": {
+  "name": "Fire's Deadly Sin",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "7903": {
+  "name": "Golden Lightning Fortification",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2004300": {
+  "name": "Miriam's Vanishing",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2004310": {
+  "name": "Glintblade Trio",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2004320": {
+  "name": "Rellana's Twin Moons",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2004500": {
+  "name": "Glintstone Nail",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2004510": {
+  "name": "Glintstone Nails",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2004700": {
+  "name": "Blades of Stone",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2004710": {
+  "name": "Gravitational Missile",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2004900": {
+  "name": "Mantle of Thorns",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2004910": {
+  "name": "Impenetrable Thorns",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2005000": {
+  "name": "Rings of Spectral Light",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2006200": {
+  "name": "Vortex of Putrescence",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2006210": {
+  "name": "Mass of Putrescence",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2006300": {
+  "name": "Furious Blade of Ansbach",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2006400": {
+  "name": "Heal from Afar",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2006650": {
+  "name": "Aspects of the Crucible: Thorns",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2006660": {
+  "name": "Aspects of the Crucible: Bloom",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2006670": {
+  "name": "Minor Erdtree",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2006680": {
+  "name": "Land of Shadow",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2006690": {
+  "name": "Wrath from Afar",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2006700": {
+  "name": "Light of Miquella",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2006710": {
+  "name": "Multilayered Ring of Light",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2006800": {
+  "name": "Roar of Rugalea",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2006900": {
+  "name": "Knight's Lightning Spear",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2006910": {
+  "name": "Dragonbolt of Florissax",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2006920": {
+  "name": "Electrocharge",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007000": {
+  "name": "Bayle's Tyranny",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007010": {
+  "name": "Bayle's Flame Lightning",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007020": {
+  "name": "Ghostflame Breath",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007200": {
+  "name": "Rotten Butterflies",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007210": {
+  "name": "Pest-Thread Spears",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007300": {
+  "name": "Midra's Flame of Frenzy",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007410": {
+  "name": "Fleeting Microcosm",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2007420": {
+  "name": "Cherishing Fingers",
+  "kind": "sorcery",
+  "dlc": false
+ },
+ "2007600": {
+  "name": "Watchful Spirit",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007700": {
+  "name": "Golden Arcs",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007710": {
+  "name": "Giant Golden Arc",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007720": {
+  "name": "Spira",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007730": {
+  "name": "Divine Beast Tornado",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007740": {
+  "name": "Divine Bird Feathers",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007800": {
+  "name": "Fire Serpent",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007810": {
+  "name": "Rain of Fire",
+  "kind": "incantation",
+  "dlc": false
+ },
+ "2007820": {
+  "name": "Messmer's Orb",
+  "kind": "incantation",
+  "dlc": false
+ }
+}

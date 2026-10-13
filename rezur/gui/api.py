@@ -248,6 +248,15 @@ class GuiApi:
         except Exception as e:  # noqa: BLE001
             return {"error": str(e)}
 
+    def spell_list(self, path, slot, query="", limit=400):
+        """Katalog czarów do wyboru (z filtrem) + czy w ekwipunku / zapamiętany."""
+        try:
+            from ..ops.spells import status as spells_status
+
+            return {"ok": True, **spells_status(SaveFile(_live(path)), int(slot), query, int(limit))}
+        except Exception as e:  # noqa: BLE001
+            return {"error": str(e)}
+
     def appearance(self, path, slot):
         try:
             return {"ok": True, **appearance_read(SaveFile(_live(path)), int(slot))}

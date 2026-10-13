@@ -154,6 +154,18 @@ def main():
     ok, d = no_error(r)
     rec("spells", ok and r.get("spells") is not None, f"gniazd: {len(r.get('spells', []))}")
 
+    r = api.spell_list(str(save), slot)
+    ok, d = no_error(r)
+    rows = r.get("rows", [])
+    owned = sum(1 for x in rows if x.get("owned"))
+    rec("spell_list (katalog czarów)", ok and len(rows) > 200,
+        f"czarów: {len(rows)} · w ekwipunku: {owned}")
+
+    r = api.spell_list(str(save), slot, "heal")
+    ok, d = no_error(r)
+    rec("spell_list (filtr 'heal')", ok and r.get("count", 0) < len(rows),
+        f"trafień: {r.get('count')}")
+
     r = api.appearance(str(save), slot)
     ok, d = no_error(r)
     rec("appearance", ok, f"gender={r.get('gender')} archetyp={r.get('archetype')} gift={r.get('gift')}")

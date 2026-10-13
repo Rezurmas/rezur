@@ -5,15 +5,52 @@ PlayerDataHash pokrywa pierwsze u32 każdego gniazda, więc po każdej zmianie
 hash jest przeliczany.
 """
 
+import json
 import struct
 
 from ..core import checksums, items_db
 from ..core.profiles import roster
+from ..core.resources import data_path
 from ..core.slots import Slot
-from .items import inventory_hit, parse_selector
+from .items import inventory_hit, list_inventory, parse_selector
 
 SPELL_SLOTS = 14
 _EMPTY = 0xFFFFFFFF
+_magic_cache = None
+
+
+def _magic():
+    """{base_id: {'name', 'kind', 'dlc'}} — tabela czarów gry (db_er/magic.json)."""
+    global _magic_cache
+    if _magic_cache is None:
+        with open(data_path("db_er", "magic.json"), encoding="utf-8") as f:
+            _magic_cache = {int(k): v for k, v in json.load(f).items()}
+    return _magic_cache
+
+
+def catalogue(query=None, limit=500):
+    """Lista czarów do wyboru: [(base_id, nazwa, rodzaj)] — filtr po nazwie albo ID."""
+    q = (query or "").strip().lower()
+    out = []
+    for mid, meta in sorted(_magic().items()):
+        if q and q not in meta["name"].lower() and q != str(mid):
+            continue
+        out.append((mid, meta["name"], meta["kind"]))
+        if len(out) >= limit:
+            break
+    return out
+
+
+def status(save, slot_idx, query=None, limit=500):
+    """Czary + stan: czy są w ekwipunku (owned) i czy zapamiętane (memorized)."""
+    _parsed(save, slot_idx)     # walidacja slotu (rzuca, gdy pusty/niespójny)
+    held = {int(r["item_id"]) & 0x0FFFFFFF for r in list_inventory(save, slot_idx, "held")
+            if r.get("item_id")}
+    memo = {sp["id"] for sp in equipped(save, slot_idx)["spells"] if not sp["empty"]}
+    rows = [{"id": mid, "name": name, "kind": kind,
+             "owned": mid in held, "memorized": mid in memo}
+            for mid, name, kind in catalogue(query, limit)]
+    return {"slot": slot_idx, "count": len(rows), "rows": rows}
 
 
 def _parsed(save, i):

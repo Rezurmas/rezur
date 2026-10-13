@@ -10,6 +10,23 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": 
 let LANG = "en";
 const fmtInt = n => (n ?? 0).toLocaleString(LANG === "pl" ? "pl-PL" : "en-US");
 
+/** pasek narzędzi przyklejony u góry panelu; nagłówek tabeli ląduje dokładnie pod nim
+    (wysokość paska → zmienna --barH, bo pasek się zawija przy wąskim oknie) */
+function stickBars(panel) {
+  const bar = panel.querySelector(".toolbar");
+  if (!bar) return;
+  const scroller = panel.closest(".work") || panel.parentElement;
+  const padTop = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
+  bar.classList.add("stickbar");
+  const set = () => {
+    panel.style.setProperty("--padTop", padTop + "px");
+    panel.style.setProperty("--barH", Math.round(bar.offsetHeight - padTop + 1) + "px");
+  };
+  set();
+  requestAnimationFrame(set);
+  window.addEventListener("resize", set);
+}
+
 /* --------------------------------------------------- wyszukiwanie na żywo -- */
 
 /** nie zasypuj mostu przy każdym klawiszu */
@@ -145,6 +162,10 @@ const I18N = {
     grantYes: n => `GRANT ${n} FLAGS`, flagTitleSet: "set flag?", flagTitleClear: "clear flag?", set: "SET",
     flagQueued: id => "flag " + id, groupQueued: g => "group " + g,
     spellPh: "spell name to memorize…", memorize: "MEMORIZE", clearAll: "CLEAR ALL…", clearAllTitle: "clear all spell slots?", clearAllBody: "All 14 slots will be emptied (on the work copy).", clearYes: "CLEAR",
+    spellSlotsHdr: "memorized spells — 14 slots", spellListHdr: "spell list — pick one and press MEMORIZE",
+    spellFilter: "filter spells…", thKind: "type", thState: "state", spellsWord: "spells",
+    kindSorc: "sorcery", kindInca: "incantation",
+    memoBadge: "MEMORIZED", ownedBadge: "IN INVENTORY", missBadge: "not in inventory",
     spellSlot: n => `SLOT ${String(n).padStart(2, "0")}`, forget: "FORGET", enterSpell: "type a spell name",
     spellQueued: n => "spell: " + n, forgotQueued: "forget spell",
     appHeader: s => `appearance / archetype — slot ${s}`, sex: "sex", typeA: "0 — type A", typeB: "1 — type B",
@@ -237,6 +258,10 @@ const I18N = {
     grantYes: n => `NADAJ ${n} FLAG`, flagTitleSet: "ustawić flagę?", flagTitleClear: "zdjąć flagę?", set: "USTAW",
     flagQueued: id => "flaga " + id, groupQueued: g => "grupa " + g,
     spellPh: "nazwa czaru do zapamiętania…", memorize: "ZAPAMIĘTAJ", clearAll: "WYCZYŚĆ WSZYSTKO…", clearAllTitle: "wyczyścić wszystkie gniazda czarów?", clearAllBody: "Wszystkie 14 gniazd zostaną opróżnione (na kopii roboczej).", clearYes: "WYCZYŚĆ",
+    spellSlotsHdr: "zapamiętane czary — 14 gniazd", spellListHdr: "lista czarów — wybierz i kliknij ZAPAMIĘTAJ",
+    spellFilter: "filtruj czary…", thKind: "typ", thState: "stan", spellsWord: "czarów",
+    kindSorc: "czar", kindInca: "inkantacja",
+    memoBadge: "ZAPAMIĘTANY", ownedBadge: "W EKWIPUNKU", missBadge: "brak w ekwipunku",
     spellSlot: n => `GNIAZDO ${String(n).padStart(2, "0")}`, forget: "ZAPOMNIJ", enterSpell: "wpisz nazwę czaru",
     spellQueued: n => "czar: " + n, forgotQueued: "zapomnij czar",
     appHeader: s => `wygląd / archetyp — slot ${s}`, sex: "płeć", typeA: "0 — typ A", typeB: "1 — typ B",
@@ -723,10 +748,11 @@ function renderInventory() {
       <span class="livehint" id="invLive">${esc(t("liveFilters"))}</span>
     </div>
     <table class="tbl"><thead><tr><th class="mono" style="width:110px">${esc(t("thHandle"))}</th><th style="width:64px">${esc(t("thQty"))}</th>
-      <th>${esc(t("thName"))}</th><th class="mono" style="width:110px">${esc(t("thId"))}</th><th style="width:280px">${esc(t("thActions"))}</th></tr></thead>
+      <th>${esc(t("thName"))}</th><th class="mono" style="width:110px">${esc(t("thId"))}</th><th style="width:330px">${esc(t("thActions"))}</th></tr></thead>
       <tbody id="invRows"></tbody></table>
     <div class="pager"><button class="key" id="invPrev">‹</button><span id="invInfo"></span>
       <button class="key" id="invNext">›</button></div>`;
+  stickBars(el);
   const load = async () => {
     const r = await P("inventory", S.save, S.slot, S.inv.loc, S.inv.q, S.inv.offset, 100);
     if (r.error) { toast(r.error, "err"); return; }
@@ -913,6 +939,7 @@ async function renderWorld() {
     </div>
     <div id="wrows"></div>
     <div class="pager"><button class="key" id="wPrev">‹</button><span id="wInfo">—</span><button class="key" id="wNext">›</button></div>`;
+  stickBars(el);
 
   const loadW = async () => {
     const r = await P("world_view", S.save, S.slot, S.world.group, S.world.q, S.world.offset, 200);
@@ -961,6 +988,8 @@ async function renderWorld() {
 
 /* -------------------------------------------------------- panel: CZARY -- */
 
+let SPQ = "";   // filtr listy czarów (trzymany między odświeżeniami panelu)
+
 async function renderSpells() {
   const el = $("#panel-czary");
   const c = charOfSlot();
@@ -968,25 +997,55 @@ async function renderSpells() {
   const r = await P("spells", S.save, S.slot);
   if (r.error) { el.innerHTML = `<div class="note">${esc(r.error)}</div>`; return; }
   el.innerHTML = `
-    <div class="toolbar">
-      <input class="lcdin" id="spQ" placeholder="${esc(t("spellPh"))}" style="width:260px" autocomplete="off">
-      <button class="key small orange" id="spAdd">${esc(t("memorize"))}</button>
-      <button class="key small" id="spClear">${esc(t("clearAll"))}</button>
-      <span class="livehint" id="spLive">${esc(t("liveFilters"))}</span>
-    </div>
-    <div class="suggbox" id="spSugg"></div>
+    <h3 class="sect">${esc(t("spellSlotsHdr"))}</h3>
     <div class="grid spellgrid">${r.spells.map(sp => `
       <div class="cell ${sp.empty ? "empty" : ""}">
         <div class="cslot">${esc(t("spellSlot", sp.slot))}</div>
         <div class="cname">${sp.empty ? esc(t("emptyCell")) : esc(sp.name)}</div>
         ${sp.empty ? "" : `<div class="cact"><button class="key small" data-fg="${sp.slot}">${esc(t("forget"))}</button></div>`}
-      </div>`).join("")}</div>`;
-  el.querySelector("#spAdd").onclick = async () => {
-    const name = $("#spQ").value.trim();
-    if (!name) return toast(t("enterSpell"), "err");
-    await doStage(["spells", "--slot", String(S.slot), "--memorize", name], t("spellQueued", name));
-    renderSpells();
+      </div>`).join("")}</div>
+    <h3 class="sect">${esc(t("spellListHdr"))}</h3>
+    <div class="toolbar">
+      <input class="lcdin" id="spQ" placeholder="${esc(t("spellFilter"))}" style="width:260px" autocomplete="off" value="${esc(SPQ)}">
+      <button class="key small" id="spReload">${esc(t("refresh"))}</button>
+      <button class="key small" id="spClear">${esc(t("clearAll"))}</button>
+      <span class="livehint" id="spLive">${esc(t("liveFilters"))}</span>
+    </div>
+    <table class="tbl"><thead><tr>
+      <th style="width:110px">${esc(t("thKind"))}</th><th>${esc(t("thName"))}</th>
+      <th class="mono" style="width:80px">${esc(t("thId"))}</th>
+      <th style="width:170px">${esc(t("thState"))}</th><th style="width:150px">${esc(t("thActions"))}</th>
+    </tr></thead><tbody id="spRows"></tbody></table>`;
+  stickBars(el);
+
+  const load = async () => {
+    const res = await P("spell_list", S.save, S.slot, SPQ, 400);
+    if (res.error) { $("#spRows").innerHTML = `<tr><td colspan="5" class="note">${esc(res.error)}</td></tr>`; return; }
+    const rows = SPQ ? rankByName(res.rows, SPQ) : res.rows;
+    const hint = $("#spLive");
+    if (hint) {
+      hint.classList.toggle("on", !!SPQ);
+      hint.textContent = SPQ ? `${t("liveFilters")} · „${SPQ}" (${res.count})` : `${res.count} ${t("spellsWord")}`;
+    }
+    $("#spRows").innerHTML = rows.map(row => `
+      <tr class="${row.memorized ? "sel" : ""}">
+        <td class="mono">${esc(row.kind === "sorcery" ? t("kindSorc") : t("kindInca"))}</td>
+        <td class="grow" title="${esc(row.name)}">${mark(row.name, SPQ)}</td>
+        <td class="mono">${row.id}</td>
+        <td>${row.memorized ? `<span class="mark pin">${esc(t("memoBadge"))}</span>`
+              : row.owned ? `<span class="mark gold">${esc(t("ownedBadge"))}</span>`
+              : `<span class="note">${esc(t("missBadge"))}</span>`}</td>
+        <td><div class="acts"><button class="key small orange" data-mem="${esc(row.name)}"${row.memorized ? " disabled" : ""}>${esc(t("memorize"))}</button></div></td>
+      </tr>`).join("") || `<tr><td colspan="5" class="note">${esc(t("noHits"))}</td></tr>`;
+    $("#spRows").querySelectorAll("[data-mem]").forEach(b => b.onclick = async () => {
+      await doStage(["spells", "--slot", String(S.slot), "--memorize", b.dataset.mem], t("spellQueued", b.dataset.mem));
+      renderSpells();
+    });
   };
+
+  $("#spQ").oninput = debounce(() => { SPQ = $("#spQ").value.trim(); load(); }, 170);
+  $("#spQ").onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); SPQ = $("#spQ").value.trim(); load(); } };
+  el.querySelector("#spReload").onclick = () => renderSpells();
   el.querySelector("#spClear").onclick = async () => {
     const ok = await confirmDlg(t("clearAllTitle"), t("clearAllBody"), true, t("clearYes"));
     if (ok) { await doStage(["spells", "--slot", String(S.slot), "--clear"], t("clearAll")); renderSpells(); }
@@ -995,10 +1054,7 @@ async function renderSpells() {
     await doStage(["spells", "--slot", String(S.slot), "--forget", b.dataset.fg], t("forgotQueued"));
     renderSpells();
   });
-  attachSuggest($("#spQ"), $("#spSugg"), async q => {
-    const f = await P("find", q, 20);
-    return f.items || [];
-  }, { min: 2, enterFallback: () => el.querySelector("#spAdd").click() });
+  await load();
 }
 
 /* ------------------------------------------------------ panel: WYGLĄD --- */
@@ -1124,6 +1180,7 @@ async function renderBackups() {
           <button class="key small" data-rs="${esc(b.name)}">${esc(t("restore"))}</button>
           <button class="key small" data-pin="${esc(b.name)}" data-on="${b.pinned ? 0 : 1}">${esc(b.pinned ? t("unpin") : t("pin"))}</button>
         </div></td></tr>`).join("")}</tbody></table>`;
+  stickBars(el);
   el.querySelector("[data-act=reload]").onclick = () => renderBackups();
   el.querySelector("[data-act=gold]")?.addEventListener("click", async () => {
     const g = await P("backup_gold", S.save);
@@ -1163,6 +1220,7 @@ async function renderLog() {
     <tbody>${[...r.entries].reverse().map(e => `
       <tr><td class="mono">${esc(e.ts)}</td><td>${esc(r.labels[e.op] || e.op)}</td><td class="grow mono">${esc(e.note || "—")}</td></tr>`).join("")
       || `<tr><td colspan="3" class="note">${esc(t("logEmpty"))}</td></tr>`}</tbody></table>`;
+  stickBars(el);
   el.querySelector("[data-act=reload]").onclick = () => renderLog();
 }
 

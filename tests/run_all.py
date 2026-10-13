@@ -1155,10 +1155,13 @@ def t_gui_i18n_and_wiring():
     # wyszukiwanie na żywo podpięte (realny dowód daje --selftest w WebView2)
     css = (root / "rezur" / "gui" / "web" / "style.css").read_text(encoding="utf-8")
     for needle in ("function debounce(", "function attachSuggest(", "function rankByName(",
-                   "id=\"invQ\"", "id=\"wq\"", "id=\"suggBox\"", "id=\"spSugg\"", "id=\"eqSugg\"",
-                   ".oninput = debounce(", "livehint"):
+                   "id=\"invQ\"", "id=\"wq\"", "id=\"suggBox\"", "id=\"eqSugg\"",
+                   ".oninput = debounce(", "livehint", "spell_list", "id=\"spRows\"", "function stickBars(",
+                   "stickbar", "table-layout:fixed"):
         assert needle in js or needle in html or needle in css, f"brak elementu wyszukiwania na żywo: {needle}"
+    assert 'id="spQ"' in js, "brak pola filtra czarów"
     assert ".suggbox" in css and ".suggbox .srow" in css, "brak stylu listy podpowiedzi"
+    assert js.count("stickBars(") >= 5, "paski narzędzi nie są przyklejane we wszystkich panelach"
 
     tabs = re.findall(r'data-tab="([a-z]+)"', html)
     assert len(tabs) == 13, f"zakładek w HTML: {len(tabs)}"
@@ -1198,6 +1201,38 @@ def t_db_no_cjk_names():
     tut = {r[0]: r for r in d["tutorial_seen"]}
     assert tut[710610][1] == "About Birdseye Telescopes", tut[710610]
     assert tut[710570][1] == "About Item Crafting", tut[710570]
+
+
+@test
+def t_spell_catalogue():
+    """Katalog czarów: 200+ pozycji, filtr działa, status widzi ekwipunek i gniazda."""
+    from rezur.ops import spells as SP
+
+    cat = SP.catalogue()
+    assert len(cat) > 200, f"katalog czarów ma {len(cat)} pozycji"
+    names = {n for _i, n, _k in cat}
+    assert "Urgent Heal" in names and "Flame Sling" in names and "Glintstone Pebble" in names, sorted(names)[:5]
+    kinds = {k for _i, _n, k in cat}
+    assert kinds == {"sorcery", "incantation"}, kinds
+    hits = SP.catalogue("heal")
+    assert hits and all("heal" in n.lower() or str(i) == "heal" for i, n, _k in hits), hits[:4]
+
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        st = SP.status(sf, 0)
+        assert st["count"] == len(cat) and st["rows"], st["count"]
+        for row in st["rows"]:
+            assert set(row) == {"id", "name", "kind", "owned", "memorized"}, row
+        # po zapamiętaniu czaru (który jest w ekwipunku) status musi to widzieć
+        owned = [r for r in st["rows"] if r["owned"] and not r["memorized"]]
+        if owned:
+            SP.memorize(sf, 0, owned[0]["name"])
+            st2 = SP.status(sf, 0)
+            again = next(r for r in st2["rows"] if r["id"] == owned[0]["id"])
+            assert again["memorized"], again
 
 
 def main():

@@ -1,161 +1,202 @@
 # Rezur Saves Configurator
 
-Konfigurator i naprawiacz save'ów **Elden Ring** (PC, Steam, `ER0000.sl2`):
-diagnostyka błędów (m.in. słynna zawieszka Torrenta po Alt+F4), automatyczne
-naprawy, kopiowanie postaci między slotami, patcher SteamID, raporty.
-Zbudowany na zweryfikowanym od podstaw formacie zapisu (v250–261, 1.16-era).
+Unofficial **Elden Ring** (PC / Steam, `ER0000.sl2`) save configurator and repair tool, built on a
+format implementation verified byte-by-byte against real saves (v250–261, 1.16-era):
 
-**Status:** v0.1.0 — **backend kompletny** (CLI, bez GUI). Silnik: czytanie/pisanie
-formatu, diagnostyka, naprawy, edycja statów/runów/itemów/flag, ekwipunek (dodaj/usuń/ilość/przenieś),
-EQ postaci (22 gniazda), broń (poziom/affinity/AoW), czary, wygląd, teleport,
-nazwane flagi świata (22 grupy: bossowie, mapy, cookbooki…; **nazwy po angielsku z lokacjami** —
-japońskie nazwy z datamine'u przetłumaczone), masowe nadawanie kategorii,
-kopiowanie/podmiana/czyszczenie slotów, transfer postaci. **Zaufanie do pliku:** kopie
-GOLD (niekasowalne) + przypinane + rotacja, auto-kopiec `watch` przy grze, zapis atomowy
-z weryfikacją kandydata przed podmianą, wersja patcha per postać z ostrzeżeniem `patch_old`.
-**Świadomość banów:** `rezur risk` — skan danych niemożliwych (staty, ulepszenia broni,
-ilości), znacznik „plik modyfikowany" (dziennik edycji) i gotowa droga powrotu do GOLD.
-**Stany bezpieczne (staging):** `stage → pending → apply/discard` — edycje na kopii roboczej,
-jeden backup przy zatwierdzeniu, historia operacji w `rezur log`.
-**GUI (F6):** `python -m rezur gui` — natywne okno pywebview (WebView2) w stylu
-engineering-series (czarna anoda + pomarańcz, LCD dot-matrix, zero suwaków): postacie,
-doktor, staty, ekwipunek, założone, świat, czary, wygląd, teleport, ryzyko, kopie,
-historia, ustawienia — każda edycja przez kopię roboczą, na dole pasek zmian.
-**Wyszukiwanie na żywo:** lista filtruje się w trakcie pisania (ekwipunek, świat), a pola
-dodawania itemu / czarów / zakładania podpowiadają pozycje z podświetlonym trafieniem.
-**Czary:** pod 14 gniazdami jest lista wszystkich 213 czarów (nazwa z tabel gry) z filtrem
-na żywo i odznakami „w ekwipunku / zapamiętany" — klikasz ZAPAMIĘTAJ i zmiana leci do kolejki.
-**Język GUI:** domyślnie **angielski**; przełącznik `EN/PL` w nagłówku (pill) i w
-Ustawieniach — zapisywany w configu (`ui_lang`), okno przeładowuje się samo.
-Most JS↔silnik ma audyt: `python tests/bridge_audit.py` (każde wywołanie API na kopii save'a).
+- **diagnostics + repairs** — section checksums, player hash, profile summary, weather/region
+  desync, DLC fields, inventory counters, and the infamous **Torrent hang** (`hp=0` while
+  `state=ACTIVE`, the classic Alt+F4 / crash bug)
+- **editing** — stats / runes / name, items (add, remove, quantity, move, weapon upgrade, affinity,
+  Ash of War), the full 22-slot loadout, spells (14 memory slots), appearance, teleport, and
+  ~4 200 named world flags (bosses, maps, cookbooks, colosseums, summoning pools, invasion regions)
+- **file safety** — one GOLD copy per file, tagged backups with rotation, pinned backups, atomic
+  write with candidate verification **before** the original is replaced, staging-first edits, and
+  an edit journal that powers an honest "this file was modified" marker
+- **CLI + GUI** — ~34 subcommands and a native pywebview / WebView2 window (13 panels); both are
+  thin adapters over the same engine
 
-## Szybki start
+Everything runs **100% offline** — no network calls, no telemetry. The save file never leaves the machine.
+
+![Characters](docs/screenshots/01-characters.png)
+
+| Doctor — diagnostics with one-click repairs | Inventory — live filter, staged edits |
+|---|---|
+| ![Doctor](docs/screenshots/02-doctor.png) | ![Inventory](docs/screenshots/04-inventory.png) |
+
+| World — ~4 200 named flags with locations | Spells — full catalogue to pick from |
+|---|---|
+| ![World](docs/screenshots/05-world.png) | ![Spells](docs/screenshots/06-spells.png) |
+
+| Stats — no sliders: hold `+`/`−` or type a value | Backups — GOLD, pins, rotation |
+|---|---|
+| ![Stats](docs/screenshots/03-stats.png) | ![Backups](docs/screenshots/07-backups.png) |
+
+<p align="center"><img src="docs/screenshots/08-teleport.png" width="70%" alt="Teleport"></p>
+
+## Quick start
 
 ```bash
-cd %USERPROFILE%\Desktop\ER-Save-Lab
+git clone https://github.com/Rezurmas/rezur.git
+cd rezur
 
-python -m rezur info                      # postacie + stan kontenera
-python -m rezur doctor                    # diagnostyka (czyta, nie pisze)
-python -m rezur fix                       # co da się naprawić (dry-run)
-python -m rezur fix --apply               # napraw wszystko (backup automatycznie)
+python -m rezur info                      # characters + container state
+python -m rezur doctor                    # diagnostics (read-only)
+python -m rezur fix                       # what can be repaired (dry-run)
+python -m rezur fix --apply               # repair everything (auto-backup first)
 python -m rezur fix --only torrent --apply
 
-python -m rezur stats --slot 0            # staty/runy/imie (dry-run)
+python -m rezur stats --slot 0            # stats / runes / name (dry-run)
 python -m rezur stats --slot 0 --set vigor=60,mind=40 --runes 5000000 --apply
-python -m rezur item --find uchigatana    # szukaj w bazie itemów
+python -m rezur item --find uchigatana    # search the item database
 python -m rezur item --slot 0 --add "Uchigatana" --upgrade 5 --apply
-python -m rezur item --slot 0 --remove "Uchigatana"           # usuń z ekwipunku
-python -m rezur item --slot 0 --set-qty "Larval Tear=12"      # ustaw ilość
+python -m rezur item --slot 0 --remove "Uchigatana"
+python -m rezur item --slot 0 --set-qty "Larval Tear=12"
 python -m rezur item --slot 0 --move "Larval Tear" --to storage
-python -m rezur inventory --slot 0 --equipped                 # co założone
-python -m rezur equipment --slot 0                            # pełne EQ (22 gniazda)
+python -m rezur inventory --slot 0        # held items (--storage = chest)
+python -m rezur equipment --slot 0        # full 22-slot loadout
 python -m rezur equip --slot 0 --item "Uchigatana" --at 0 --apply
 python -m rezur unequip --slot 0 --at 0 --apply
-python -m rezur item --slot 0 --set-upgrade "Uchigatana=10" --apply     # poziom broni
-python -m rezur item --slot 0 --affinity "Uchigatana=Blood" --apply     # affinity
-python -m rezur item --slot 0 --aow "Uchigatana=Bloody Slash" --apply   # Ash of War
-python -m rezur spells --slot 0                                         # czary (--memorize/--forget/--clear)
-python -m rezur spells --slot 0 --list [--filter heal]                  # katalog czarów: stan „w ekwipunku / zapamiętany"
-python -m rezur appearance --slot 0                                     # gender / typ ciała / dar
-python -m rezur teleport --slot 0 --to roundtable --apply               # teleport (limgrave/liurnia/altus)
-python -m rezur world --groups                                          # 22 grupy nazwanych flag
-python -m rezur world --slot 0 --group boss_defeat --filter Godrick     # podgląd stanu
+python -m rezur item --slot 0 --set-upgrade "Uchigatana=10" --apply
+python -m rezur item --slot 0 --affinity "Uchigatana=Blood" --apply
+python -m rezur item --slot 0 --aow "Uchigatana=Bloody Slash" --apply
+python -m rezur spells --slot 0                          # 14 memory slots
+python -m rezur spells --slot 0 --list --filter heal     # spell catalogue + state
+python -m rezur appearance --slot 0                      # gender / body type / gift
+python -m rezur teleport --slot 0 --to roundtable --apply
+python -m rezur world --groups                           # 25 named flag groups
+python -m rezur world --slot 0 --group boss_defeat --filter Godrick
 python -m rezur world --slot 0 --group boss_defeat --set "Godrick" --state 1 --apply
-python -m rezur unlock --slot 0 --what maps --apply                     # masowo: weapons/armors/…/tears
-python -m rezur inventory --slot 0        # ekwipunek (--storage = skrzynia)
+python -m rezur unlock --slot 0 --what maps --apply      # bulk unlocks
 python -m rezur flags --slot 0 --get 600003
 python -m rezur flags --slot 0 --set 600003:1 --apply
-python -m rezur graces --list             # regiony łask
+python -m rezur graces --list                            # grace regions
 python -m rezur graces --slot 0 [--region "Limgrave"] --apply
 
-python -m rezur copy --from 2 --to 3      # kopiowanie postaci (dry-run)
 python -m rezur copy --from 2 --to 3 --apply [--clear-source]
-python -m rezur swap --a 1 --b 2 --apply  # podmień postacie miejscami
-python -m rezur clear --slot 3 --apply    # wyczyść slot
-python -m rezur export --slot 0 --out lmfh.json
-python -m rezur import --to 3 --in lmfh.json --apply
+python -m rezur swap --a 1 --b 2 --apply                 # swap two characters
+python -m rezur clear --slot 3 --apply                   # wipe a slot
+python -m rezur export --slot 0 --out character.json
+python -m rezur import --to 3 --in character.json --apply
 python -m rezur steamid --set 7656119xxxxxxxxxx [--apply]
-python -m rezur backups                   # kopie obok save'a (markery GOLD/PIN)
-python -m rezur backups --gold            # niekasowalna kopia GOLD (powstaje raz na plik)
-python -m rezur backups --pin NAZWA       # przypnij kopię (rotacja jej nie ruszy)
-python -m rezur backups --restore NAZWA [--apply]
-python -m rezur watch [--interval 600]    # auto-kopie: start gry + co interwał (Ctrl+C kończy)
-python -m rezur watch --once              # jeden przebieg kontrolny
-python -m rezur risk [--slot N] [--json]  # ryzyko online: dane niemożliwe + znacznik modyfikacji + powrót do GOLD
-python -m rezur stage stats --slot 0 --set vigor=61   # edytuj w kopii roboczej (bez ryzyka)
-python -m rezur pending [--diff] [--undo] # zmiany oczekujące: licznik, podgląd sekcji, cofnij ostatnią
-python -m rezur apply                     # zatwierdź: 1 backup + 1 zapis + wpis w historii
-python -m rezur discard                   # odrzuć: oryginał nietknięty
-python -m rezur log [--json]              # historia operacji (dziennik edycji)
-python -m rezur find "uchi" [--json]      # szukaj: itemy, flagi świata, łaski, lokacje
-python -m rezur gui [--save PLIK]         # OKNO GUI (pywebview/WebView2), język: EN (domyślny) / PL
-python -m rezur gui --selftest            # test dymny okna: most, 13 paneli, przełączenie EN→PL→EN (~30 s)
-python -m rezur config                    # backup_retention / auto_doctor / guard_live / watch_interval / ui_lang
-python -m rezur list-fixes                # lista napraw
+python -m rezur backups                                  # backups next to the save (GOLD/PIN markers)
+python -m rezur backups --gold                           # undeletable GOLD copy (once per file)
+python -m rezur backups --pin NAME                       # pin a backup (rotation skips it)
+python -m rezur backups --restore NAME [--apply]
+python -m rezur watch [--interval 600]                   # auto-backups: game start + interval
+python -m rezur watch --once                             # one check
+python -m rezur risk [--slot N] [--json]                 # online-risk scan + return path to GOLD
+python -m rezur stage stats --slot 0 --set vigor=61      # edit the work copy (zero risk)
+python -m rezur pending [--diff] [--undo]                # pending changes: count, diff, undo last
+python -m rezur apply                                    # commit: 1 backup + 1 write + journal entry
+python -m rezur discard                                  # drop the draft, original untouched
+python -m rezur log [--json]                             # edit history
+python -m rezur find "uchi" [--json]                     # items, world flags, graces, locations
+python -m rezur gui [--save FILE]                        # native window (pywebview / WebView2)
+python -m rezur gui --selftest                           # headless smoke test of the window
+python -m rezur config                                   # retention / guard_live / ui_lang / …
+python -m rezur list-fixes                               # registered repairs
 
-# audyty (poza CLI):
-python tests/bridge_audit.py              # most GUI↔silnik: 49 wywołań API na kopii save'a (izolowany config)
-python tests/run_all.py                   # 47 testów na kopiach prawdziwych save'ów
-python tests/smoke_cli.py                 # każda komenda CLI (132 wywołania)
+# audits (outside the CLI):
+python tests/run_all.py         # 48 tests on copies of real saves (cross-checked vs a reference parser)
+python tests/smoke_cli.py       # every CLI command (135 invocations) on a save copy
+python tests/bridge_audit.py    # GUI bridge: every API call (51) on a save copy, isolated config
 ```
 
-Bez `--save` narzędzie bierze najnowszy save z `%APPDATA%\EldenRing\*\ER0000.sl2`.
+Without `--save` the tool picks the newest save from `%APPDATA%\EldenRing\*\ER0000.sl2`.
 
-## Struktura
+## GUI
+
+`python -m rezur gui` opens a WebView2 window (pywebview + pythonnet — works on Python 3.14).
+Thirteen panels — **characters · doctor · stats · inventory · loadout · world · spells ·
+appearance · teleport · risk · backups · history · settings** — plus a change bar at the bottom
+(`PREVIEW / UNDO / APPLY / DISCARD`). The style is deliberate: engineering-series hardware
+(black anodized body, a single orange accent, dot-matrix LCDs, no glows, **no sliders**).
+
+- every edit goes through a **work copy** (staging); read panels show the staged draft, so you
+  see the result before anything touches the original
+- **language: English by default**, Polish optional — `EN/PL` pill in the header or the SETTINGS
+  panel; the choice is stored as `ui_lang` in the config and the window reloads itself
+- **live search** — inventory and world lists filter as you type; item / spell / equip fields show
+  suggestions with the matched fragment highlighted (click, `Enter`, or `↑`/`↓`)
+- **spell catalogue** — all 213 sorceries and incantations with a live filter and
+  "in inventory / memorized" badges; `MEMORIZE` stages the change
+- writes are blocked while `eldenring.exe` is running (`guard_live`), and the GUI says so in a banner
+
+## Safety model
+
+- every write goes through `SaveFile.write()`: **GOLD** (once per file) → tagged backup with
+  rotation → `.tmp-rezur` + fsync → verification of the candidate (BND4 + every section MD5) →
+  `os.replace`; a bad candidate aborts with the original untouched and no temp file left behind
+- **GOLD** and **pinned** backups are never removed by rotation
+- the CLI is dry-run by default; `--apply` is required to write anything
+- `rezur watch` copies on game start and every `watch_interval` seconds; a copy taken mid-write
+  fails verification and is dropped instead of preserving a torn state
+- a truncated save (torn write) is rejected at load with an explicit message and a restore command
+- every successful modification appends to `<save>.rezur-journal.json`; `rezur risk` shows the
+  "modified by Rezur" marker and the exact command to return to GOLD
+- repairs are re-verified by a fresh diagnostic pass; `doctor` also flags characters saved under an
+  older game patch (`patch_old`)
+
+## Verification
+
+```bash
+python tests/run_all.py         # 48 tests
+python tests/smoke_cli.py       # 135 CLI invocations
+python tests/bridge_audit.py    # 51 GUI-bridge calls
+python -m rezur gui --selftest  # opens the real window: bridge, panels, live search, language switch
+```
+
+The GUI selftest prints, from a live WebView2 window:
+
+```
+[selftest] booted=True characters_loaded=3 title='REZUR — Saves Configurator'
+[selftest] bridge_methods=34 panels=13 lang='EN'
+[selftest] live-search INVENTORY: rows_before=100 rows_after_typing_seed=3
+[selftest] suggestions('mimi'): hits=14 first="Mimic's Veil"
+[selftest] SPELLS list: rows=213 after_typing_heal=7 first='Heal'
+[selftest] switch→pl: pill=ok tabs=POSTACIE|DOKTOR|STATY|…
+[selftest] switch→en: pill=ok tabs=CHARACTERS|…
+```
+
+## Project layout
 
 ```
 rezur/
-  core/    format: bnd4, sloty, sumy (MD5 + PlayerDataHash), profile, SaveFile, vault (GOLD/piny/rotacja),
-           journal (dziennik edycji → znacznik „modyfikowany")
-  risk.py  ryzyko online: dane niemożliwe (staty/ulepszenia/ilości) + znacznik + droga do GOLD
-  staging.py  zmiany oczekujące: kopia robocza + manifest + migawki (stage/pending/apply/discard/undo)
-  games/   rejestr gier (teraz: Elden Ring; struktura pod kolejne)
-  diag/    silnik diagnostyki (checks → Finding z kodem i przypisaną naprawą)
-  fixes/   rejestr napraw: torrent, checksums, playerhash, summary, weather, dlc, invcounters
-  ops/     staty/runy/imie, itemy (gaitem+inventory: dodaj/usuń/ilość/przenieś/upgrade/affinity/AoW),
-           EQ (22 gniazda), czary, wygląd, teleport, świat (nazwane flagi), masowe nadawanie,
-           kopie/podmiana/czyszczenie slotów, SteamID, transfer JSON, backupy, watch (auto-kopie przy grze)
-  report/  wyjście tekstowe i JSON
-  gui/     okno pywebview: api.py (most JS↔silnik), app.py (shell + selftest), web/ (index.html+style.css+app.js, i18n EN/PL)
-  api/     warstwa HTTP/JSON pod GUI (F6 — most do webview; placeholder)
-  cli.py   python -m rezur
-tests/     run_all.py — 47 testów na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
-           smoke_cli.py — przebieg KAŻDEJ komendy CLI (132 wywołania) na kopii save'a
-           bridge_audit.py — audyt mostu GUI↔silnik: każde wywołanie API (49) na kopii save'a
-ARCHITECTURE.md   frontend/backend, przepływy, roadmapa
+  core/        format: bnd4 container, slots, checksums (MD5 + PlayerDataHash), profiles,
+               SaveFile, vault (GOLD / pins / rotation), journal (edit log → "modified" marker)
+  risk.py      online-risk scan: impossible data (stats, upgrades, quantities) + GOLD path
+  staging.py   pending changes: work copy + manifest + per-op snapshots (stage/pending/apply/undo)
+  games/       game registry (Elden Ring for now; structure ready for more)
+  diag/        diagnostics engine (checks → Finding with a code and a linked fix)
+  fixes/       repairs: torrent, checksums, playerhash, summary, weather, dlc, invcounters
+  ops/         stats, items, loadout, spells, appearance, teleport, world flags, bulk grants,
+               slot copy / swap / clear, SteamID, JSON transfer, backups, watch
+  report/      text and JSON output
+  gui/         pywebview window: api.py (JS↔engine bridge), app.py (shell + selftest), web/ (i18n EN/PL)
+  cli.py       python -m rezur
+  data/db_er/  item, flag, spell and grace tables
+tests/         run_all.py · smoke_cli.py · bridge_audit.py
+docs/screenshots/
+tools/         fix_torrent, copy_slot, build_exe.cmd, sanitize_public.py, gh_login.sh
+packaging/     PyInstaller spec (one-file .exe)
 ```
 
-## Zasady bezpieczeństwa
+Technical details of the save format and the verified pitfalls: see `ARCHITECTURE.md`.
 
-- zapis **tylko** przez `SaveFile.write()`: GOLD (raz na plik) + backup z rotacją + zapis atomowy;
-  kandydat jest weryfikowany (BND4 + sumy MD5 wszystkich sekcji) ZANIM podmieni oryginał,
-- kopie GOLD i przypięte (`--pin`) są niekasowalne — rotacja je omija,
-- `rezur watch` robi auto-kopie przy starcie gry i co `watch_interval` sekund (weryfikacja odrzuca kopię zrobioną w trakcie zapisu gry),
-- CLI domyślnie w trybie dry-run; `--apply` wymagany do zapisu,
-- przy działającej grze zapis jest blokowany,
-- każda udana modyfikacja dopisuje wpis do dziennika (`<save>.rezur-journal.json`);
-  `rezur risk` pokazuje znacznik „plik modyfikowany" i dokładną komendę powrotu do GOLD,
-- urwany plik (torn write) jest wykrywany przy wczytaniu z jasnym komunikatem i drogą do kopii,
-- Rezur działa w 100% offline — zero połączeń sieciowych, zero telemetrii,
-- po naprawie automatyczna re-diagnostyka; `doctor` flaguje też postacie ze starego patcha gry (`patch_old`).
-
-## Pakowanie (.exe)
+## Packaging (.exe)
 
 ```cmd
 python -m pip install pyinstaller
-tools\build_exe.cmd          :: albo: python -m PyInstaller packaging\rezur.spec
-:: wynik: dist\rezur.exe (jednoplikowy, bez instalatora; dane db_er wkompilowane)
+tools\build_exe.cmd          :: or: python -m PyInstaller packaging\rezur.spec
+:: → dist\rezur.exe (single file, no installer; db_er data bundled)
 ```
 
-## Źródła danych
+## Data sources
 
-Tabele (itemy, broń, zbroje, flagi świata, czary, łaski) powstały na podstawie danych
-z gry i publicznych projektów społeczności — **ER-Save-Editor**, **EldenRing-SaveForge**,
-**ER-Save-Lib**, **er-save-manager**, **sl2-analyzer** — i były weryfikowane krzyżowo na
-realnych save'ach (era 1.16). Rezur nie zawiera ich kodu, tylko własne implementacje
-formatu i własne pliki danych.
+Item, flag, spell and grace tables were derived from the game's own data and from public community
+projects — **ER-Save-Editor**, **EldenRing-SaveForge**, **ER-Save-Lib**, **er-save-manager**,
+**sl2-analyzer** — and cross-checked against real saves (1.16-era). Rezur contains no code from
+those projects, only its own format implementation and its own data files.
 
-Nazwy, teksty i zawartość gry należą do **FromSoftware / Bandai Namco**. To nieoficjalne,
-hobbystyczne narzędzie do własnych zapisów — używaj na własną odpowiedzialność.
-
-Szczegóły techniczne formatu i zweryfikowane pułapki: skill `elden-ring-save-repair`.
+Game names, text and content belong to **FromSoftware / Bandai Namco**. This is an unofficial hobby
+tool for your own save files.

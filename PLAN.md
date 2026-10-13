@@ -1,5 +1,9 @@
 # ER Save Lab — plan projektu
 
+> **Note:** this is the internal project plan and it is kept in Polish. The public docs
+> (`README.md`, `ARCHITECTURE.md`) are in English. / *Plan wewnętrzny — po polsku; dokumentacja
+> publiczna (README, ARCHITECTURE) jest po angielsku.*
+
 **Cel:** własne narzędzie do czytania i modyfikowania plików zapisu Elden Ring (`ER0000.sl2`),
 zbudowane od zera, w Pythonie, z pełnym zrozumieniem formatu — nie "magic box", tylko kod,
 który oboje rozumiemy linia po linii.

@@ -1146,6 +1146,7 @@ def t_gui_i18n_and_wiring():
     chrome = ["status", "toasts", "busy", "busyTxt", "modal", "mbox", "pendN", "pendW",
               "btnApply", "btnDiscard", "btnUndo", "btnPreview", "ledOk", "ledFile", "ledMd5",
               "ledGame", "txtFile", "txtMd5", "txtGame", "txtVer", "gameBanner", "railPath",
+              "pillFile", "pillMd5", "pillGame", "pillAuto", "txtAuto",
               "ctx", "empty", "emptyNote", "emptySub", "btnPick", "btnPick2", "btnRecent",
               "bannerLead", "bannerTxt", "pillLang"]
     miss = [c for c in chrome if f'id="{c}"' not in html]

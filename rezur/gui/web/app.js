@@ -109,6 +109,9 @@ const I18N = {
   en: {
     tabs: { postacie: "CHARACTERS", doktor: "DOCTOR", staty: "STATS", ekwipunek: "INVENTORY", eq: "LOADOUT", swiat: "WORLD", czary: "SPELLS", wyglad: "APPEARANCE", teleport: "TELEPORT", ryzyko: "RISK", kopie: "BACKUPS", log: "HISTORY", ustawienia: "SETTINGS" },
     noFile: "NO FILE", gameStop: "GAME: STOP", gameRun: "GAME: RUNNING",
+    autoCopy: "AUTO COPY",
+    titleFile: "loaded save file", titleMd5: "section checksums", titleGame: "game state",
+    titleAuto: "a backup is made on every write", titleLang: "language / język",
     bannerLead: "WARNING", bannerTxt: "eldenring.exe is running — writing to the live save is blocked · edit the staging draft, apply after the game closes",
     pendingChange: "CHANGE", pendingChanges: "CHANGES",
     ready: "READY", pickFile: "PICK FILE…", pickFile2: "PICK .SL2 FILE", openRecent: "OPEN LAST / NEWEST",
@@ -205,6 +208,9 @@ const I18N = {
   pl: {
     tabs: { postacie: "POSTACIE", doktor: "DOKTOR", staty: "STATY", ekwipunek: "EKWIPUNEK", eq: "ZAŁOŻONE", swiat: "ŚWIAT", czary: "CZARY", wyglad: "WYGLĄD", teleport: "TELEPORT", ryzyko: "RYZYKO", kopie: "KOPIE", log: "HISTORIA", ustawienia: "USTAWIENIA" },
     noFile: "BRAK PLIKU", gameStop: "GRA: STOP", gameRun: "GRA: DZIAŁA",
+    autoCopy: "KOPIA AUTO",
+    titleFile: "wczytany plik", titleMd5: "sumy sekcji", titleGame: "stan gry",
+    titleAuto: "backup przy każdym zapisie", titleLang: "język / language",
     bannerLead: "UWAGA", bannerTxt: "eldenring.exe działa — zapis do żywego save'a zablokowany · edytuj kopię roboczą (staging), zastosuj po zamknięciu gry",
     pendingChange: "ZMIANA", pendingChanges: "ZMIAN",
     ready: "READY", pickFile: "WSKAŻ PLIK…", pickFile2: "WSKAŻ PLIK .SL2", openRecent: "OTWÓRZ OSTATNI / NAJNOWSZY",
@@ -1309,6 +1315,12 @@ function applyLangChrome() {
     tb.classList.toggle("on", key === S.tab);
   });
   $("#pillLang").textContent = LANG.toUpperCase();
+  $("#txtAuto").textContent = t("autoCopy");
+  $("#pillFile").title = t("titleFile");
+  $("#pillMd5").title = t("titleMd5");
+  $("#pillGame").title = t("titleGame");
+  $("#pillAuto").title = t("titleAuto");
+  $("#pillLang").title = t("titleLang");
   $("#btnPick").textContent = t("pickFile");
   $("#btnPick2").textContent = t("pickFile2");
   $("#btnRecent").textContent = t("openRecent");

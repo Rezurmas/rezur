@@ -18,3 +18,11 @@ dist/
 *.copybak-*
 *.steambak-*
 *.tmp-rezur
+
+# zdjęcia produktowe (materiały referencyjne, nie do repo)
+design-refs/tx6.webp
+design-refs/ep133.webp
+design-refs/op1field.webp
+design-refs/rise2.png
+
+# demo-save do zrzutów

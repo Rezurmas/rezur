@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>REZUR · TEST BENCH</title>
+<style>
+  /* ============ REZUR ENGINEERING SERIES — test bench ============
+     język: CNC aluminium + czarne wells + silkscreen + dot-matrix,
+     promienie 0–2px, ZERO poświat, akcent pomarańczowy punktowo. */
+  :root{
+    --alu:#D5D3CD; --alu-hi:#E9E7E1; --alu-lo:#B4B2AB; --panel:#E2E0D9;
+    --ink:#171816; --mut:#63625B;
+    --dark:#17181A; --dark2:#1F2023;
+    --lcd:#0A0B0A; --lcdtxt:#F2F1EA; --amber:#FFA028;
+    --orange:#F0501E; --led-g:#4CD07D; --led-r:#E03B2E; --led-a:#FFB020; --led-off:#6E6D67;
+    --line:rgba(23,24,22,.34); --line2:rgba(23,24,22,.16);
+    --f:"Bahnschrift","Segoe UI Variable Display","Segoe UI",sans-serif;
+    --fm:"Cascadia Mono","Consolas","Courier New",monospace;
+  }
+  .anod{ /* czarna anodyzacja — drugi wariant wykończenia */
+    --alu:#1E1F22; --alu-hi:#2B2C30; --alu-lo:#121316; --panel:#26272B;
+    --ink:#ECEBE5; --mut:#8E8D86;
+    --line:rgba(240,240,235,.22); --line2:rgba(240,240,235,.10);
+    --led-off:#55565A;
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{height:auto}
+  body{
+    width:1150px; padding:26px 26px 30px;
+    background:var(--alu); color:var(--ink); font-family:var(--f);
+    background-image:radial-gradient(rgba(0,0,0,.05) 1px,transparent 1.1px);
+    background-size:7px 7px;
+    -webkit-font-smoothing:antialiased; user-select:none;
+  }
+  .mono{font-family:var(--fm)}
+  .cap{font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--mut)}
+  .lcd{
+    background:var(--lcd); border:1px solid var(--line); border-radius:1px;
+    color:var(--lcdtxt); font-family:var(--fm); position:relative; overflow:hidden;
+  }
+  .lcd::after{ /* siatka dot-matrix nad treścią */
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background-image:radial-gradient(rgba(255,255,255,.10) 0.8px, transparent 1px);
+    background-size:3px 3px;
+  }
+
+  /* ---------- chassis ---------- */
+  .chassis{
+    background:var(--alu); border:1px solid var(--line);
+    border-radius:3px; padding:18px 18px 14px; position:relative;
+    box-shadow: 0 2px 0 var(--alu-lo), 0 3px 0 var(--line2); /* twarda krawędź, nie poświata */
+  }
+  .screw{position:absolute;width:11px;height:11px;border-radius:50%;
+    background:var(--alu-hi);border:1px solid var(--line)}
+  .screw::after{content:"";position:absolute;left:1px;right:1px;top:4.5px;height:1px;background:var(--line)}
+  .screw.tl{left:8px;top:8px}.screw.tr{right:8px;top:8px}
+  .screw.bl{left:8px;bottom:8px}.screw.br{right:8px;bottom:8px}
+
+  /* ---------- header ---------- */
+  .head{display:flex;align-items:flex-start;gap:18px;padding:2px 10px 14px;border-bottom:1px solid var(--line)}
+  .brand{line-height:.95}
+  .brand b{font-size:23px; font-weight:600; letter-spacing:.10em}
+  .brand .sub{font-size:9.5px; letter-spacing:.30em; color:var(--mut); text-transform:uppercase; margin-top:5px}
+  .hatch{
+    align-self:center; height:12px; flex:0 0 130px;
+    background:repeating-linear-gradient(45deg, var(--ink) 0 2px, transparent 2px 5px);
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  }
+  .head .mid{flex:1; display:flex; gap:22px; align-items:center; justify-content:flex-end}
+  .leds{display:flex;gap:9px;align-items:center}
+  .led{width:6px;height:6px;border-radius:50%;background:var(--led-off);box-shadow:none}
+  .led.g{background:var(--led-g)} .led.a{background:var(--led-a)} .led.r{background:var(--led-r)} .led.o{background:var(--orange)}
+  .grille{width:56px;height:18px;
+    background-image:radial-gradient(var(--mut) 1px, transparent 1.1px);background-size:4px 4px;
+    border:1px solid var(--line2); opacity:.75}
+  .metal{font-size:10px;letter-spacing:.14em;color:var(--mut);font-family:var(--fm)}
+
+  /* ---------- body layout ---------- */
+  .body{display:flex;gap:0;margin-top:0;align-items:stretch}
+  .rail{flex:0 0 128px;border-right:1px solid var(--line);padding:14px 0 8px 2px;display:flex;flex-direction:column;gap:2px}
+  .tab{
+    display:flex;align-items:center;gap:8px;cursor:pointer;
+    padding:9px 10px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+  .tab .dot{width:5px;height:5px;border-radius:50%;background:var(--led-off)}
+  .tab.on{color:var(--ink);background:var(--panel);border:1px solid var(--line);border-right:none;border-radius:2px 0 0 2px}
+  .tab.on .dot{background:var(--orange)}
+  .rail .foot{margin-top:auto;padding:10px;display:flex;align-items:center;gap:8px}
+  .pwr{width:16px;height:16px;border-radius:50%;border:1px solid var(--line);background:var(--alu-hi)}
+  .pwr.on::after{content:"";display:block;width:6px;height:6px;border-radius:50%;background:var(--led-g);margin:4px}
+
+  .work{flex:1;padding:16px 4px 4px 20px;min-height:560px}
+
+  /* ---------- sekcja: character cards ---------- */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{border:1px solid var(--line);border-radius:2px;background:var(--panel);padding:10px 11px 9px;position:relative;cursor:pointer}
+  .card .slot{font-size:9px;letter-spacing:.2em;color:var(--mut);font-family:var(--fm)}
+  .card h3{font-size:16px;font-weight:600;letter-spacing:.02em;margin:6px 0 8px;white-space:nowrap;overflow:hidden}
+  .card .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+  .card .lcd{padding:3px 7px;font-size:11px;letter-spacing:.06em}
+  .card .meta{font-size:9.5px;color:var(--mut);font-family:var(--fm);margin-top:8px;letter-spacing:.02em}
+  .card .indic{position:absolute;top:10px;right:10px;display:flex;gap:5px;align-items:center}
+  .card.sel{background:var(--dark);color:var(--lcdtxt);border-color:var(--dark)}
+  .card.sel .slot,.card.sel .meta{color:#9C9C93}
+  .card.sel .lcd{border-color:var(--line2)}
+
+  /* ---------- pasek przyrządów ---------- */
+  .bench{display:flex;gap:26px;align-items:flex-end;margin:20px 0 2px;padding:16px 14px 12px;
+    border:1px solid var(--line);border-radius:2px;background:var(--panel)}
+  .unit{display:flex;flex-direction:column;gap:7px;align-items:center}
+  .unit .cap{text-align:center}
+  .fader{width:38px;height:150px;position:relative;background:var(--dark);border:1px solid var(--line);border-radius:2px}
+  .fader .fill{position:absolute;left:18px;width:2px;background:var(--orange);bottom:4px}
+  .fader .capk{position:absolute;left:5px;width:26px;height:14px;background:var(--alu-hi);
+    border:1px solid var(--line);border-radius:2px}
+  .fader .capk::after{content:"";position:absolute;left:2px;right:2px;top:6px;height:1px;background:var(--line)}
+  .readout{min-width:64px;text-align:center;padding:3px 6px;font-size:12px}
+  .knob{width:46px;height:46px;border-radius:50%;background:var(--alu-hi);border:1px solid var(--line);position:relative;cursor:grab}
+  .knob::after{content:"";position:absolute;left:50%;top:4px;width:2px;height:16px;background:var(--orange);
+    border-radius:1px;transform-origin:50% 19px}
+  .knob i{position:absolute;inset:5px;border:1px solid var(--line2);border-radius:50%}
+  .ticks{position:absolute;inset:-7px;border-radius:50%;
+    background:conic-gradient(var(--mut) 0 1deg, transparent 1deg 36deg);opacity:.5;-webkit-mask:radial-gradient(circle,transparent 60%,black 61%);}
+  .sw{width:44px;height:22px;border:1px solid var(--line);border-radius:2px;background:var(--dark);position:relative;cursor:pointer}
+  .sw .lever{position:absolute;top:2px;left:2px;width:19px;height:16px;background:var(--alu-hi);border:1px solid var(--line);border-radius:1px;transition:left .09s steps(2)}
+  .sw.on .lever{left:21px;background:var(--orange);border-color:var(--orange)}
+  .swrow{display:flex;align-items:center;gap:9px}
+  .keyrow{display:flex;gap:6px;align-items:flex-end}
+  .key{
+    min-width:58px;padding:13px 10px 11px;text-align:center;
+    background:var(--alu-hi);border:1px solid var(--line);border-radius:2px;
+    font-size:10px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;
+    box-shadow:0 2px 0 var(--alu-lo);position:relative}
+  .key:active,.key.down{transform:translateY(2px);box-shadow:none;background:var(--dark);color:var(--lcdtxt)}
+  .key.orange{background:var(--orange);border-color:#8E2D0F;color:#1A0D06;box-shadow:0 2px 0 #8E2D0F}
+  .key.silk::before{content:attr(data-silk);position:absolute;top:-15px;left:0;right:0;
+    font-size:8px;letter-spacing:.2em;color:var(--mut);text-transform:uppercase}
+  .hazard{padding:5px;background:repeating-linear-gradient(45deg, var(--ink) 0 3px, var(--orange) 3px 6px);border-radius:2px}
+  .hazard .key{margin:0;background:var(--dark);color:var(--lcdtxt);box-shadow:0 2px 0 #000}
+  .danger{padding:9px 12px;border-radius:2px;display:flex;align-items:center;gap:12px;
+    background:repeating-linear-gradient(45deg, var(--ink) 0 6px, var(--orange) 6px 12px)}
+  .danger .inner{background:var(--dark);color:var(--lcdtxt);padding:6px 12px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-family:var(--fm);border-radius:1px}
+
+  /* ---------- LCD / dot matrix ---------- */
+  .biglcd{margin-top:18px;padding:12px 16px;font-size:13px;letter-spacing:.10em;text-transform:uppercase}
+  .biglcd .l1{color:var(--lcdtxt)} .biglcd .am{color:var(--amber)} .biglcd .dim{color:#8A8A80}
+  .cursor{display:inline-block;width:8px;height:13px;background:var(--lcdtxt);vertical-align:-2px;margin-left:2px;animation:blink 1.1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  /* ---------- tabela ekwipunku ---------- */
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);text-align:left;
+    padding:6px 8px;border-bottom:1px solid var(--line)}
+  td{padding:6px 8px;border-bottom:1px solid var(--line2)}
+  td.mono,th.mono{font-family:var(--fm);letter-spacing:.02em}
+  tr:hover td{background:var(--dark);color:var(--lcdtxt)}
+  tr:hover td.mono{color:var(--amber)}
+  .findings .row{display:flex;align-items:center;gap:12px;padding:9px 4px;border-bottom:1px solid var(--line2)}
+  .sev{width:8px;height:8px;border-radius:50%}
+  .sev.err{background:var(--led-r)} .sev.war{background:var(--led-a)} .sev.ok{background:var(--led-g)}
+
+  .footer{margin-top:20px;padding-top:10px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center}
+  .finishbtn{display:flex;gap:6px}
+  .fbtn{padding:7px 12px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;
+    border:1px solid var(--line);border-radius:2px;background:var(--alu-hi);box-shadow:0 2px 0 var(--alu-lo)}
+  .fbtn:active{transform:translateY(2px);box-shadow:none}
+  .fbtn.on{background:var(--dark);color:var(--lcdtxt)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="chassis" id="chassis">
+  <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+
+  <!-- HEADER -->
+  <div class="head">
+    <div class="brand">
+      <b>REZUR</b>
+      <div class="sub">saves configurator · engineering series</div>
+    </div>
+    <div class="hatch" title="hazard"></div>
+    <div class="mid">
+      <div class="grille" title="speaker / wentylacja — motyw"></div>
+      <div class="metal">MODEL RZR–01 · FW 0.1.0 · NO. 0042</div>
+      <div class="leds">
+        <span class="led g" title="zapis: OK"></span>
+        <span class="led a" title="ostrzeżenie"></span>
+        <span class="led" title="brak"></span>
+        <span class="led o" title="aktywna operacja"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+    <div class="rail">
+      <div class="tab on" data-tab="postacie"><span class="dot"></span>POSTACIE</div>
+      <div class="tab" data-tab="doktor"><span class="dot"></span>DOKTOR</div>
+      <div class="tab" data-tab="ekwipunek"><span class="dot"></span>EKWIPUNEK</div>
+      <div class="tab" data-tab="eq"><span class="dot"></span>EQ</div>
+      <div class="tab" data-tab="swiat"><span class="dot"></span>ŚWIAT</div>
+      <div class="tab" data-tab="kopie"><span class="dot"></span>KOPIE</div>
+      <div class="foot"><span class="pwr on"></span><span class="cap">power</span></div>
+    </div>
+
+    <div class="work">
+      <!-- ===== PANEL: POSTACIE ===== -->
+      <section id="tab-postacie">
+        <div class="cap" style="margin-bottom:9px">kontener 12/12 md5 · steamid 76561199197611189</div>
+        <div class="cards">
+          <div class="card sel">
+            <div class="slot mono">SLOT 00 · AKTYWNA</div>
+            <h3>lmfh test</h3>
+            <div class="row">
+              <div class="lcd">LVL 162 · 71.7H</div>
+              <span class="indic"><span class="led g"></span></span>
+            </div>
+            <div class="meta">M60_48_41_00 · RM 3,403,551</div>
+          </div>
+          <div class="card">
+            <div class="slot mono">SLOT 01</div>
+            <h3>hajime</h3>
+            <div class="row">
+              <div class="lcd">LVL 36 · 12.8H</div>
+              <span class="indic"><span class="led g"></span></span>
+            </div>
+            <div class="meta">M60_48_37_00 · RM 211,158</div>
+          </div>
+          <div class="card">
+            <div class="slot mono">SLOT 02</div>
+            <h3>annesee</h3>
+            <div class="row">
+              <div class="lcd">LVL 54 · 13.9H</div>
+              <span class="indic"><span class="led a"></span></span>
+            </div>
+            <div class="meta">M60_43_38_00 · RM 494,950</div>
+          </div>
+        </div>
+
+        <!-- pasek przyrządów -->
+        <div class="bench">
+          <div class="unit">
+            <span class="cap">runy</span>
+            <div class="fader" data-pct="62" data-read="620"><div class="fill"></div><div class="capk"></div></div>
+            <div class="readout lcd">620</div>
+          </div>
+          <div class="unit">
+            <span class="cap">vigor</span>
+            <div class="fader" data-pct="92" data-read="99"><div class="fill"></div><div class="capk"></div></div>
+            <div class="readout lcd">99</div>
+          </div>
+          <div class="unit">
+            <span class="cap">mind</span>
+            <div class="fader" data-pct="28" data-read="28"><div class="fill"></div><div class="capk"></div></div>
+            <div class="readout lcd">28</div>
+          </div>
+          <div class="unit">
+            <span class="cap">pokrętło</span>
+            <div class="knob" id="knob"><i></i><span class="ticks"></span></div>
+            <div class="readout lcd" id="ro4">0°</div>
+          </div>
+          <div class="unit" style="gap:7px">
+            <div class="swrow"><div class="sw on"><span class="lever"></span></div><span class="cap">auto</span></div>
+            <div class="swrow"><div class="sw"><span class="lever"></span></div><span class="cap">live</span></div>
+          </div>
+          <div class="keyrow" style="margin-left:auto; margin-bottom:6px">
+            <div class="key silk" data-silk="zapis">SAVE</div>
+            <div class="key silk" data-silk="odczyt">LOAD</div>
+            <div class="key silk" data-silk="kopia">BACKUP</div>
+            <div class="hazard" style="position:relative;margin-top:17px">
+              <div class="key">FIX</div>
+              <span class="cap" style="position:absolute;top:-17px;left:0;right:0;text-align:center">naprawa</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="biglcd lcd">
+          <div class="l1">SLOT 00 · SAVE OK · TORRENT <span class="am">INACTIVE</span> · FLAGS 4199 · <span class="dim">READY</span><span class="cursor"></span></div>
+        </div>
+
+        <div class="danger" style="margin-top:16px">
+          <div class="inner">uwaga — eldenring.exe działa · zapis zablokowany</div>
+        </div>
+      </section>
+
+      <!-- ===== PANEL: DOKTOR ===== -->
+      <section id="tab-doktor" class="hidden">
+        <div class="cap" style="margin-bottom:9px">diagnostyka · 1 błąd / 2 ostrzeżenia</div>
+        <div class="findings">
+          <div class="row"><span class="sev err"></span><span class="mono" style="min-width:74px">TORRENT</span>
+            <span style="flex:1">koń: hp=0 przy state=ACTIVE → zawieszka wczytywania</span>
+            <div class="hazard"><div class="key">FIX</div></div></div>
+          <div class="row"><span class="sev war"></span><span class="mono" style="min-width:74px">WEATHER</span>
+            <span style="flex:1">area_id=60 ≠ region mapy 11</span>
+            <div class="hazard"><div class="key">FIX</div></div></div>
+          <div class="row"><span class="sev ok"></span><span class="mono" style="min-width:74px">MD5</span>
+            <span style="flex:1">12/12 sum sekcji OK</span><span class="cap">bez akcji</span></div>
+        </div>
+        <div class="keyrow" style="margin-top:18px">
+          <div class="key silk" data-silk="podgląd zmian">PREVIEW</div>
+          <div class="key orange" data-silk="wykonaj + backup">APPLY ALL</div>
+        </div>
+      </section>
+
+      <!-- ===== PANEL: EKWIPUNEK ===== -->
+      <section id="tab-ekwipunek" class="hidden">
+        <div class="cap" style="margin-bottom:9px">slot 00 · przy sobie · 74 pozycje</div>
+        <table>
+          <tr><th class="mono" style="width:110px">handle</th><th style="width:70px">ilość</th><th>nazwa</th><th class="mono" style="width:130px">kategoria</th></tr>
+          <tr><td class="mono">0x808000A1</td><td class="mono">1</td><td>Blood Uchigatana +19</td><td class="mono">weapon</td></tr>
+          <tr><td class="mono">0x80800155</td><td class="mono">1</td><td>Rivers of Blood +9</td><td class="mono">weapon</td></tr>
+          <tr><td class="mono">0xB0001FF9</td><td class="mono">12</td><td>Larval Tear</td><td class="mono">goods</td></tr>
+          <tr><td class="mono">0x90800147</td><td class="mono">1</td><td>White Reed Armor</td><td class="mono">armor</td></tr>
+          <tr><td class="mono">0xA000139C</td><td class="mono">1</td><td>Blessed Dew Talisman</td><td class="mono">talisman</td></tr>
+        </table>
+        <div class="keyrow" style="margin-top:16px;gap:8px">
+          <div class="key silk" data-silk="dodaj z bazy">ADD</div>
+          <div class="key silk" data-silk="usuń wpis">REMOVE</div>
+          <div class="key silk" data-silk="przenieś">MOVE</div>
+          <div class="key silk" data-silk="+ poziom">UPGRADE</div>
+        </div>
+      </section>
+
+      <!-- ===== pozostałe zakładki (placeholdery) ===== -->
+      <section id="tab-eq" class="hidden"><div class="cap">EQ — 22 gniazda (demo później)</div>
+        <div class="biglcd lcd" style="margin-top:12px"><div class="l1">WEAPON 0..5 · ARMOR 12..16 · TALISMAN 17..21<span class="cursor"></span></div></div></section>
+      <section id="tab-swiat" class="hidden"><div class="cap">ŚWIAT — 22 grupy flag (demo później)</div>
+        <div class="biglcd lcd" style="margin-top:12px"><div class="l1">BOSS 48 · MAPS 19 · COOKBOOK 60 · <span class="am">SELECT</span><span class="cursor"></span></div></div></section>
+      <section id="tab-kopie" class="hidden"><div class="cap">KOPIE — 7 backupów (demo później)</div>
+        <div class="biglcd lcd" style="margin-top:12px"><div class="l1">EDITBAK · WORLDBak · TPBak · <span class="dim">RESTORE</span><span class="cursor"></span></div></div></section>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span class="metal">CNC ALUMINIUM · 2K MOLDING · MADE BY P FOR HE</span>
+    <div class="finishbtn">
+      <div class="fbtn" id="anodBtn">anodize: silver</div>
+      <div class="fbtn">scale 1:1</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- nawigacja
+  const tabs=[...document.querySelectorAll('.tab')];
+  tabs.forEach(t=>t.addEventListener('click',()=>{
+    tabs.forEach(x=>x.classList.remove('on')); t.classList.add('on');
+    document.querySelectorAll('.work > section').forEach(s=>s.classList.add('hidden'));
+    document.getElementById('tab-'+t.dataset.tab).classList.remove('hidden');
+  }));
+  // --- keycapy (chwilowe wciśnięcie)
+  document.querySelectorAll('.key,.fbtn').forEach(k=>{
+    k.addEventListener('pointerdown',()=>k.classList.add('down'));
+    ['pointerup','pointerleave'].forEach(e=>k.addEventListener(e,()=>k.classList.remove('down')));
+  });
+  // --- przełączniki
+  document.querySelectorAll('.sw').forEach(s=>s.addEventListener('click',()=>s.classList.toggle('on')));
+  // --- fadery (przeciąganie; data-pct = pozycja, data-read = tekst LCD)
+  function setFader(f,pct){
+    pct=Math.max(0,Math.min(100,pct));
+    const travel=f.clientHeight-14-8;      // margines 4px góra/dół, cap 14px
+    const bottom=4+pct/100*travel;
+    f.querySelector('.capk').style.bottom=bottom+'px';
+    f.querySelector('.fill').style.height=(bottom+7)+'px';
+    const ro=f.parentElement.querySelector('.readout');
+    if(ro&&f.dataset.live)ro.textContent=Math.round(pct);
+  }
+  document.querySelectorAll('.fader').forEach(f=>{
+    const pct=parseFloat(f.dataset.pct||'50');
+    setFader(f,pct);
+    const ro=f.parentElement.querySelector('.readout');
+    if(ro)ro.textContent=f.dataset.read||String(Math.round(pct));
+    const move=ev=>{const r=f.getBoundingClientRect(); f.dataset.live="1";
+      setFader(f,(1-(ev.clientY-r.top-7)/(r.height-14))*100);};
+    f.addEventListener('pointerdown',e=>{f.setPointerCapture(e.pointerId);move(e);
+      f.onpointermove=move;});
+    f.addEventListener('pointerup',()=>f.onpointermove=null);
+  });
+  // --- pokrętło
+  const knob=document.getElementById('knob'), ro4=document.getElementById('ro4');
+  let ang=0, drag=false;
+  knob.style.transform='rotate(0deg)';
+  knob.addEventListener('pointerdown',e=>{drag=true;knob.setPointerCapture(e.pointerId);});
+  window.addEventListener('pointermove',e=>{if(!drag)return;
+    ang=(ang+e.movementX*2+540)%360;
+    knob.style.transform='rotate('+ang+'deg)'; ro4.textContent=ang+'°';});
+  window.addEventListener('pointerup',()=>drag=false);
+  // --- anodize
+  document.getElementById('anodBtn').addEventListener('click',e=>{
+    const on=document.body.classList.toggle('anod');
+    e.currentTarget.textContent='anodize: '+(on?'black':'silver');
+  });
+</script>
+</body>
+</html>

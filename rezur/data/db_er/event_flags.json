@@ -556,12 +556,12 @@
  "boss_defeat": [
   [
    9100,
-   "Godrick the Grafted",
-   "Stormveil Castle"
+   "Margit, the Fell Omen",
+   "Stormhill — Stormveil approach"
   ],
   [
    9101,
-   "Margit, the Fell Omen",
+   "Godrick the Grafted",
    "Stormveil Castle"
   ],
   [
@@ -572,27 +572,27 @@
   [
    9104,
    "Morgott, the Omen King",
-   "Leyndell"
+   "Leyndell, Royal Capital"
   ],
   [
    9105,
-   "Godfrey, First Elden Lord",
-   "Leyndell"
+   "Godfrey, First Elden Lord (Golden Shade)",
+   "Leyndell, Royal Capital"
   ],
   [
    9106,
    "Sir Gideon Ofnir, the All-Knowing",
-   "Leyndell"
+   "Leyndell, Capital of Ash"
   ],
   [
    9107,
-   "Hoarah Loux",
-   "Leyndell"
+   "Hoarah Loux, Warrior",
+   "Leyndell, Capital of Ash"
   ],
   [
    9108,
    "Astel, Naturalborn of the Void",
-   "Lake of Rot"
+   "Grand Cloister (below Lake of Rot)"
   ],
   [
    9109,
@@ -602,197 +602,197 @@
   [
    9111,
    "Lichdragon Fortissax",
-   ""
+   "Deeproot Depths"
   ],
   [
    9112,
-   "Mohg",
-   ""
+   "Mohg, Lord of Blood",
+   "Mohgwyn Palace"
   ],
   [
    9115,
    "Dragonlord Placidusax",
-   ""
+   "Crumbling Farum Azula"
   ],
   [
    9116,
-   "Maliketh",
-   ""
+   "Maliketh, the Black Blade",
+   "Crumbling Farum Azula"
   ],
   [
    9118,
-   "Rennala",
-   ""
+   "Rennala, Queen of the Full Moon",
+   "Academy of Raya Lucaria"
   ],
   [
    9119,
-   "Loretta",
-   ""
+   "Loretta, Knight of the Haligtree",
+   "Miquella's Haligtree"
   ],
   [
    9120,
-   "Malenia",
-   ""
+   "Malenia, Blade of Miquella",
+   "Miquella's Haligtree"
   ],
   [
    9122,
    "Rykard, Lord of Blasphemy",
-   ""
+   "Volcano Manor"
   ],
   [
    9123,
    "Elden Beast",
-   ""
+   "Leyndell — Elden Throne"
   ],
   [
    9130,
    "Starscourge Radahn",
-   ""
+   "Redmane Castle"
   ],
   [
    9131,
    "Fire Giant",
-   ""
+   "Flame Peak, Mountaintops of the Giants"
   ],
   [
    9133,
    "Regal Ancestor Spirit",
-   ""
+   "Nokron, Eternal City — Ancestral Woods"
   ],
   [
    9134,
-   "Dragonkin Soldier",
-   "Lake of Rot"
+   "Mimic Tear",
+   "Nokron, Eternal City"
   ],
   [
    9135,
-   "Fia's Champion",
+   "Fia's Champions",
    "Deeproot Depths"
   ],
   [
    9182,
    "Elemer of the Briar",
-   ""
+   "The Shaded Castle — Altus Plateau"
   ],
   [
    9184,
    "Commander Niall",
-   ""
+   "Castle Sol — Mountaintops of the Giants"
   ],
   [
    9102,
-   "ボス撃破 エジンバラ奥",
-   ""
+   "Boss defeated — 'Edinburgh' (inner)",
+   "internal datamine codename, no community mapping"
   ],
   [
    9110,
-   "ボス撃破 王都のガーゴイルタッグ",
-   ""
+   "Valiant Gargoyles",
+   "Siofra Aqueduct (Nokron)"
   ],
   [
    9113,
-   "ボス撃破 地下迷宮箱舟",
-   ""
+   "Boss defeated — underground labyrinth (ark)",
+   "internal datamine name (Nokron area, unconfirmed)"
   ],
   [
    9114,
-   "ボス撃破 神肌タッグチーム",
-   ""
+   "Godskin Duo",
+   "Crumbling Farum Azula"
   ],
   [
    9117,
-   "ボス撃破 神肌ガリ",
-   ""
+   "Red Wolf of Radagon",
+   "Academy of Raya Lucaria"
   ],
   [
    9121,
-   "ボス撃破 火山牢中ボス",
-   ""
+   "Godskin Noble",
+   "Volcano Manor"
   ],
   [
    9124,
-   "ボス撃破",
-   ""
+   "Boss defeated — final battle slot",
+   "unnamed in source; Leyndell final arena (Radagon slot?)"
   ],
   [
    9125,
-   "ボス撃破 王都地下下水ボス",
-   ""
+   "Mohg, the Omen",
+   "Subterranean Shunning-Grounds (Leyndell)"
   ],
   [
    9126,
-   "ボス撃破 断崖坑道",
-   ""
+   "Magma Wyrm Makar",
+   "Ruin-Strewn Precipice"
   ],
   [
    9127,
-   "ボス撃破 チュートリアル",
-   ""
+   "Soldier of Godrick",
+   "Cave of Knowledge (Stranded Graveyard)"
   ],
   [
    9128,
-   "ボス撃破 チュートリアルEX",
-   ""
+   "Ulcerated Tree Spirit",
+   "Fringefolk Hero's Grave (Stranded Graveyard)"
   ],
   [
    9129,
-   "ボス撃破",
-   ""
+   "Abductor Virgins",
+   "Volcano Manor"
   ],
   [
    9132,
-   "ボス撃破 祖霊（弱）",
-   ""
+   "Ancestor Spirit",
+   "Siofra River — Hallowhorn Grounds"
   ],
   [
    9140,
-   "ボス撃破 DLC予約枠",
-   ""
+   "Divine Beast Dancing Lion (DLC reserved slot)",
+   "Belurat, Tower Settlement — Gravesite Plain (DLC)"
   ],
   [
    9170,
-   "ボス撃破 m34_10 神の塔１",
-   ""
+   "Divine Tower — slot 1 (m34_10)",
+   "Divine Tower activation flag (community order: 1 Limgrave)"
   ],
   [
    9171,
-   "ボス撃破 m34_11 神の塔２",
-   ""
+   "Divine Tower — slot 2 (m34_11)",
+   "Divine Tower activation flag (community order: 2 Liurnia)"
   ],
   [
    9172,
-   "ボス撃破 m34_12 神の塔３",
-   ""
+   "Divine Tower — slot 3 (m34_12)",
+   "Divine Tower activation flag (community order: 3 West Altus)"
   ],
   [
    9173,
-   "ボス撃破 m34_13 神の塔４",
-   ""
+   "Godskin Apostle",
+   "Divine Tower of Caelid"
   ],
   [
    9174,
-   "ボス撃破 m34_14 神の塔５",
-   ""
+   "Fell Twins",
+   "Divine Tower of East Altus"
   ],
   [
    9175,
-   "ボス撃破 m34_15 神の塔６",
-   ""
+   "Divine Tower — slot 6 (m34_15)",
+   "Divine Tower activation flag (community order: 6 Isolated Tower)"
   ],
   [
    9180,
-   "ボス撃破 m60_00 砦（緑）",
-   ""
+   "Leonine Misbegotten",
+   "Castle Morne — Weeping Peninsula"
   ],
   [
    9181,
-   "ボス撃破 m60_00 砦（湖）",
-   ""
+   "Royal Knight Loretta",
+   "Carian Manor — Liurnia of the Lakes"
   ],
   [
    9183,
-   "ボス撃破 m60_00 砦（平原）",
-   ""
+   "Crucible Knight & Misbegotten Warrior",
+   "Redmane Castle"
   ]
  ],
  "boss_weapon": [
@@ -20618,193 +20618,193 @@
  "spirit_ash_recipe": [
   [
    750000,
-   "レシピ解禁 バディレシピ入手",
-   ""
+   "Recipe unlock: Torrent (buddy) recipes acquired",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750001,
-   "レシピ解禁 土葬スケルトン（元山賊）",
-   ""
+   "Recipe unlock: burial skeletons (former bandits)",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750002,
-   "レシピ解禁 オオカミ",
-   ""
+   "Recipe unlock: wolves",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750003,
-   "レシピ解禁",
-   ""
+   "Recipe unlock: (unnamed in source)",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750004,
-   "レシピ解禁 墓暴きの貴人×4",
-   ""
+   "Recipe unlock: grave-robbing nobles ×4",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750005,
-   "レシピ解禁 墓暴きの貴人",
-   ""
+   "Recipe unlock: grave-robbing noble",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750006,
-   "レシピ解禁",
-   ""
+   "Recipe unlock: (unnamed in source)",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750007,
-   "レシピ解禁",
-   ""
+   "Recipe unlock: (unnamed in source)",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750008,
-   "レシピ解禁",
-   ""
+   "Recipe unlock: (unnamed in source)",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750009,
-   "レシピ解禁 霊クラゲ",
-   ""
+   "Recipe unlock: spirit jellyfish",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750010,
-   "レシピ解禁 ボーラスの猟犬",
-   ""
+   "Recipe unlock: bloodhound hound (Voras)",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750500,
-   "## ベース素材Lv0帯",
-   ""
+   "— section: base materials, tier 0 —",
+   "source section header (not a real flag)"
   ],
   [
    750510,
-   "## ベース素材Lv1帯",
-   ""
+   "— section: base materials, tier 1 —",
+   "source section header (not a real flag)"
   ],
   [
    750511,
-   "レシピ解禁 おまじない系Lv1",
-   ""
+   "Recipe unlock: charm (incantation-like) recipes, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750512,
-   "レシピ解禁 調香系Lv1",
-   ""
+   "Recipe unlock: perfume recipes, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750513,
-   "レシピ解禁 モノ系Lv1",
-   ""
+   "Recipe unlock: pot/item recipes, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750514,
-   "レシピ解禁 バディ系Lv1",
-   ""
+   "Recipe unlock: buddy (Torrent) recipes, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750515,
-   "レシピ解禁 装備系Lv1",
-   ""
+   "Recipe unlock: equipment recipes, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750516,
-   "レシピ解禁 矢弾系Lv1",
-   ""
+   "Recipe unlock: arrow & bolt recipes, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750517,
-   "レシピ解禁 エンチャ系Lv1",
-   ""
+   "Recipe unlock: enchantment recipes, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750518,
-   "レシピ解禁 バフ系Lv1",
-   ""
+   "Recipe unlock: buff recipes, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750519,
-   "レシピ解禁 状態異常回復系Lv1",
-   ""
+   "Recipe unlock: status-cure recipes, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750520,
-   "## ベース素材Lv2帯",
-   ""
+   "— section: base materials, tier 2 —",
+   "source section header (not a real flag)"
   ],
   [
    750521,
-   "レシピ解禁 おまじない系Lv2",
-   ""
+   "Recipe unlock: charm (incantation-like) recipes, tier 2",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750522,
-   "レシピ解禁 調香系Lv2",
-   ""
+   "Recipe unlock: perfume recipes, tier 2",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750523,
-   "レシピ解禁 モノ系Lv2",
-   ""
+   "Recipe unlock: pot/item recipes, tier 2",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750524,
-   "レシピ解禁 バディ系Lv2",
-   ""
+   "Recipe unlock: buddy (Torrent) recipes, tier 2",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750525,
-   "レシピ解禁 装備系Lv2",
-   ""
+   "Recipe unlock: equipment recipes, tier 2",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750526,
-   "レシピ解禁 矢弾系Lv2",
-   ""
+   "Recipe unlock: arrow & bolt recipes, tier 2",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750527,
-   "レシピ解禁 エンチャ系Lv2",
-   ""
+   "Recipe unlock: enchantment recipes, tier 2",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750528,
-   "レシピ解禁 バフ系Lv2",
-   ""
+   "Recipe unlock: buff recipes, tier 2",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750529,
-   "レシピ解禁 状態異常回復系Lv2",
-   ""
+   "Recipe unlock: status-cure recipes, tier 2",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750610,
-   "## ベース素材Lv1帯 B帯",
-   ""
+   "— section: base materials, tier 1, group B —",
+   "source section header (not a real flag)"
   ],
   [
    750611,
-   "レシピ解禁 肉食動物の肉Lv1",
-   ""
+   "Recipe unlock: carnivore meat, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750612,
-   "レシピ解禁 草食動物の肉Lv1",
-   ""
+   "Recipe unlock: herbivore meat, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750613,
-   "レシピ解禁 草食動物の肝Lv1",
-   ""
+   "Recipe unlock: herbivore liver, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750614,
-   "レシピ解禁 鳥の肉Lv1",
-   ""
+   "Recipe unlock: bird meat, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ],
   [
    750615,
-   "レシピ解禁 亀の肉Lv1",
-   ""
+   "Recipe unlock: turtle meat, tier 1",
+   "recipe/unlock flag (crafting-related) — no fixed map location"
   ]
  ],
  "talisman_pouch": [
@@ -20827,188 +20827,188 @@
  "tutorial_seen": [
   [
    710000,
-   "[TUT]イベント：カメラ",
-   ""
+   "Tutorial: Camera controls",
+   "Cave of Knowledge popup — Stranded Graveyard (game start)"
   ],
   [
    710010,
-   "[TUT]イベント：アイテム使用",
-   ""
+   "Tutorial: Using items",
+   "Cave of Knowledge popup — Stranded Graveyard"
   ],
   [
    710020,
-   "[TUT]イベント：篝火",
-   ""
+   "About Sites of Grace",
+   "first Site of Grace — Stranded Graveyard"
   ],
   [
    710030,
-   "[TUT]イベント：ロック",
-   ""
+   "Tutorial: Locking on",
+   "Cave of Knowledge popup"
   ],
   [
    710040,
-   "[TUT]イベント：基本攻撃(弱)",
-   ""
+   "Tutorial: Light attack",
+   "Cave of Knowledge popup"
   ],
   [
    710050,
-   "[TUT]イベント：基本攻撃(強)",
-   ""
+   "Tutorial: Strong attack",
+   "Cave of Knowledge popup"
   ],
   [
    710060,
-   "[TUT]イベント：魔術",
-   ""
+   "About Sorceries and Incantations",
+   "first spell equipped or cast (anywhere)"
   ],
   [
    710070,
-   "[TUT]イベント：ローリング",
-   ""
+   "About Dodging",
+   "Cave of Knowledge popup (roll)"
   ],
   [
    710080,
-   "[TUT]イベント：ジャンプ",
-   ""
+   "Tutorial: Jumping",
+   "Cave of Knowledge popup"
   ],
   [
    710090,
-   "[TUT]イベント：ダッシュ",
-   ""
+   "Tutorial: Sprinting",
+   "Cave of Knowledge popup"
   ],
   [
    710100,
-   "[TUT]イベント：武器の持ち換え",
-   ""
+   "About Wielding Armaments",
+   "first two-handing / swapping armaments"
   ],
   [
    710110,
-   "[TUT]イベント：ロック切り替え",
-   ""
+   "Tutorial: Switching lock-on targets",
+   "Cave of Knowledge popup"
   ],
   [
    710120,
-   "[TUT]イベント：ガード",
-   ""
+   "About Guarding",
+   "Cave of Knowledge popup (message before Soldier of Godrick)"
   ],
   [
    710130,
-   "[TUT]イベント：弓の使い方",
-   ""
+   "About Bows",
+   "first bow equipped (e.g. Shortbow from the Nomadic Merchant, Limgrave)"
   ],
   [
    710140,
-   "[TUT]イベント：しゃがみ",
-   ""
+   "About Crouching",
+   "first crouch (anywhere)"
   ],
   [
    710150,
-   "[TUT]イベント：致命の一撃",
-   ""
+   "Tutorial: Critical hits",
+   "first backstab/riposte"
   ],
   [
    710160,
-   "[TUT]イベント：ジャンプ攻撃/溜め/ガードカウンター",
-   ""
+   "About Guard Counters",
+   "Cave of Knowledge — message before the boss (jump attack / charge / guard counter)"
   ],
   [
    710500,
-   "[TUT]イベント：地図",
-   ""
+   "About the Map",
+   "first Map Fragment — monument by the road north of the Church of Elleh (Map: Limgrave, West)"
   ],
   [
    710510,
-   "[TUT]イベント：篝火の導き",
-   ""
+   "About Guidance of Grace",
+   "any Site of Grace (first rest — The First Step)"
   ],
   [
    710520,
-   "[TUT]イベント：騎乗",
-   ""
+   "About Horseback Riding",
+   "after Melina gives the Spectral Steed Whistle (rest at a Limgrave grace)"
   ],
   [
    710530,
-   "[TUT]イベント：死亡",
-   ""
+   "About Death",
+   "your first death"
   ],
   [
    710540,
-   "[TUT]イベント：リトライポイント",
-   ""
+   "About Stakes of Marika",
+   "first death near a Stake of Marika (boss arenas, Stormveil)"
   ],
   [
    710550,
-   "[TUT]イベント：バディ",
-   ""
+   "About Summoning Spirits",
+   "after Renna gives the Spirit Calling Bell — Church of Elleh (night)"
   ],
   [
    710560,
-   "[TUT]イベント：素材収集",
-   ""
+   "About Materials",
+   "first crafting material gathered (Limgrave)"
   ],
   [
    710570,
-   "[TUT]イベント：アイテム作成(基本)",
-   ""
+   "About Item Crafting",
+   "after buying the Crafting Kit from Kalé — Church of Elleh"
   ],
   [
    710580,
-   "[TUT]イベント：アイテム作成(壺)",
-   ""
+   "About Containers",
+   "first pot crafted (needs a pot cookbook, e.g. Nomadic Warrior's Cookbook [1])"
   ],
   [
    710590,
-   "[TUT]イベント：エリクサー",
-   ""
+   "About Flask of Wondrous Physick",
+   "Flask of Wondrous Physick — Third Church of Marika (Mistwood, east Limgrave)"
   ],
   [
    710600,
-   "[TUT]イベント：魔石(アーツ換装)",
-   ""
+   "About Adding Skills",
+   "Whetstone Knife — cellar chest at Gatefront Ruins (Limgrave); apply Ashes of War at any grace"
   ],
   [
    710610,
-   "[TUT]イベント：遠見台",
-   ""
+   "About Birdseye Telescopes",
+   "any Birdseye Telescope (e.g. Weeping Peninsula / Liurnia coast)"
   ],
   [
    710620,
-   "[TUT]イベント：大ジャンプ",
-   ""
+   "About Spiritspring Jumping",
+   "any Spiritspring while riding Torrent (first: Agheel Lake, Limgrave)"
   ],
   [
    710630,
-   "[TUT]イベント：グループ報酬",
-   ""
+   "About Vanquishing Enemy Groups",
+   "clearing a whole enemy camp/group (e.g. Gatefront Ruins)"
   ],
   [
    710640,
-   "[TUT]イベント：エストスカラベ",
-   ""
+   "About Teardrop Scarabs",
+   "destroying a Teardrop Scarab (red ones refill flasks; Limgrave has several)"
   ],
   [
    710650,
-   "[TUT]イベント：マルチプレイ(召喚)",
-   ""
+   "About Summoning Other Players",
+   "online — first summon-sign interaction (any area)"
   ],
   [
    710660,
-   "[TUT]イベント：マルチプレイ(協力)",
-   ""
+   "About Cooperative Multiplayer",
+   "online — first co-op summon (any area)"
   ],
   [
    710670,
-   "[TUT]イベント：マルチプレイ(敵対)",
-   ""
+   "About Competitive Multiplayer",
+   "online — first duel / colosseum"
   ],
   [
    710680,
-   "[TUT]イベント：マルチプレイ(侵入)",
-   ""
+   "About Invasion Multiplayer",
+   "online — first invasion (any area)"
   ],
   [
    710690,
-   "[TUT]イベント：サインだまり",
-   ""
+   "About Summoning Pools",
+   "touching a Summoning Pool stake (e.g. Church of Elleh / dungeon entrances)"
   ]
  ],
  "whetblade": [

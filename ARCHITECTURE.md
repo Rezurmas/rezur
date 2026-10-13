@@ -102,7 +102,7 @@ ER-Save-Lab/
 │   │   └── jsonout.py            eksport JSON (dla GUI/API)
 │   └── api/
 │       └── server.py             FastAPI (placeholder F6 + kontrakt w docstringu)
-├── tests/run_all.py              testy na kopiach realnych save'ów (43 testy)
+├── tests/run_all.py              testy na kopiach realnych save'ów (47 testów)
 ├── tools/                        narzędzia bojowe (fix_torrent, copy_slot, build_exe.cmd)
 ├── packaging/rezur.spec          PyInstaller → dist\rezur.exe (onefile)
 ├── references/                   6 sklonowanych repo (materiał źródłowy, do nauki)
@@ -183,8 +183,10 @@ Kontrakt (F6): szczegółowa lista endpointów — docstring w `rezur/api/server
   na kopii save'a w izolowanym `%APPDATA%` (49 wywołań: load/doctor/risk/staging/apply/
   backupy/restore/config/panele) i raportuje wynik; kod wyjścia ≠0 gdy coś nie działa.
 - **Testy strażnicze:** `t_ui_lang_default_and_switch` (EN domyślnie, zapis wyboru, śmieci
-  odrzucane) i `t_gui_i18n_and_wiring` (klucze EN/PL zgodne, każdy `t(...)` ma tłumaczenie,
-  każdy uchwyt JS istnieje w HTML, 13 zakładek = 13 paneli i etykiety w obu językach).
+  odrzucane), `t_gui_i18n_and_wiring` (klucze EN/PL zgodne, każdy `t(...)` ma tłumaczenie,
+  każdy uchwyt JS istnieje w HTML, 13 zakładek = 13 paneli i etykiety w obu językach) oraz
+  `t_db_no_cjk_names` (baza flag bez japońskich nazw z datamine'u; przypięte 9100=Margit,
+  9101=Godrick, 9134=Mimic Tear + bossowie mają niepuste lokacje).
 
 ### Stany aplikacji (kontrakt dla GUI — „żeby nic nie zaskakiwało")
 

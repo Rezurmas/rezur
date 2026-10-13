@@ -1161,6 +1161,37 @@ def t_gui_i18n_and_wiring():
             assert re.search(rf"^    tabs: \{{.*\b{t}:", d, re.M), f"brak etykiety zakładki {t} ({name})"
 
 
+@test
+def t_db_no_cjk_names():
+    """Baza flag nie może wracać do japońskich nazw z datamine'u (mamy tłumaczenia + lokacje)."""
+    import re
+
+    cjk = re.compile(r"[\u3000-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uff00-\uffef]")
+    root = Path(__file__).resolve().parent.parent / "rezur" / "data" / "db_er"
+    bad = []
+    for name in ("event_flags.json", "event_flags_extra.json"):
+        p = root / name
+        if not p.is_file():
+            continue
+        hits = sorted({m.group(0) for m in cjk.finditer(p.read_text(encoding="utf-8"))})
+        if hits:
+            bad.append((name, hits))
+    assert not bad, f"japońskie znaki w bazie: {bad}"
+
+    import json as _json
+
+    d = _json.loads((root / "event_flags.json").read_text(encoding="utf-8"))
+    boss = {r[0]: r for r in d["boss_defeat"]}
+    assert boss[9100][1].startswith("Margit"), boss[9100]      # wcześniej zamienione z Godrickiem
+    assert boss[9101][1].startswith("Godrick"), boss[9101]
+    assert boss[9134][1] == "Mimic Tear", boss[9134]
+    for fid in (9100, 9112, 9130, 9184):
+        assert boss[fid][2], f"boss {fid} bez lokacji"
+    tut = {r[0]: r for r in d["tutorial_seen"]}
+    assert tut[710610][1] == "About Birdseye Telescopes", tut[710610]
+    assert tut[710570][1] == "About Item Crafting", tut[710570]
+
+
 def main():
     ok = fail = 0
     for t in _tests:

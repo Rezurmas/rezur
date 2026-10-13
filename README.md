@@ -8,7 +8,8 @@ Zbudowany na zweryfikowanym od podstaw formacie zapisu (v250–261, 1.16-era).
 **Status:** v0.1.0 — **backend kompletny** (CLI, bez GUI). Silnik: czytanie/pisanie
 formatu, diagnostyka, naprawy, edycja statów/runów/itemów/flag, ekwipunek (dodaj/usuń/ilość/przenieś),
 EQ postaci (22 gniazda), broń (poziom/affinity/AoW), czary, wygląd, teleport,
-nazwane flagi świata (22 grupy: bossowie, mapy, cookbooki…), masowe nadawanie kategorii,
+nazwane flagi świata (22 grupy: bossowie, mapy, cookbooki…; **nazwy po angielsku z lokacjami** —
+japońskie nazwy z datamine'u przetłumaczone), masowe nadawanie kategorii,
 kopiowanie/podmiana/czyszczenie slotów, transfer postaci. **Zaufanie do pliku:** kopie
 GOLD (niekasowalne) + przypinane + rotacja, auto-kopiec `watch` przy grze, zapis atomowy
 z weryfikacją kandydata przed podmianą, wersja patcha per postać z ostrzeżeniem `patch_old`.
@@ -89,7 +90,7 @@ python -m rezur list-fixes                # lista napraw
 
 # audyty (poza CLI):
 python tests/bridge_audit.py              # most GUI↔silnik: 49 wywołań API na kopii save'a (izolowany config)
-python tests/run_all.py                   # 46 testów na kopiach prawdziwych save'ów
+python tests/run_all.py                   # 47 testów na kopiach prawdziwych save'ów
 python tests/smoke_cli.py                 # każda komenda CLI (132 wywołania)
 ```
 
@@ -113,7 +114,7 @@ rezur/
   gui/     okno pywebview: api.py (most JS↔silnik), app.py (shell + selftest), web/ (index.html+style.css+app.js, i18n EN/PL)
   api/     warstwa HTTP/JSON pod GUI (F6 — most do webview; placeholder)
   cli.py   python -m rezur
-tests/     run_all.py — 46 testów na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
+tests/     run_all.py — 47 testów na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
            smoke_cli.py — przebieg KAŻDEJ komendy CLI (132 wywołania) na kopii save'a
            bridge_audit.py — audyt mostu GUI↔silnik: każde wywołanie API (49) na kopii save'a
 ARCHITECTURE.md   frontend/backend, przepływy, roadmapa

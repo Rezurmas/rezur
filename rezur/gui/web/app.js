@@ -1384,8 +1384,8 @@ function mockApi(name, args) {
     ({ slot, empty: false, parsed: true, name: nm, level: lvl, seconds: h * 3600, runes, stats, map_name: "m60_48_41_00", patch, patch_latest: latest, horse: bug ? "ACTIVE" : "INACTIVE", horse_bug: bug });
   const DATA = {
     info: {
-      ok: true, path: "C:\\Users\\Dawid\\AppData\\Roaming\\EldenRing\\76561199197611189\\ER0000.sl2",
-      file: "ER0000.sl2", size_mb: 29.0, steamid: "76561199197611189", load_ms: 287,
+      ok: true, path: "C:\\Users\\<user>\\AppData\\Roaming\\EldenRing\\76561198000000000\\ER0000.sl2",
+      file: "ER0000.sl2", size_mb: 29.0, steamid: "76561198000000000", load_ms: 287,
       md5: { ok: 12, total: 12 }, game_running: false, live: true, staged: true,
       characters: [
         c(0, "lmfh test", 162, 71.7, 3403551, [99, 28, 18, 30, 50, 60, 70, 50], 230, false, false),

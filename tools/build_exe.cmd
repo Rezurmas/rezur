@@ -16,4 +16,4 @@ if errorlevel 1 (
 )
 echo.
 echo Gotowe: dist\rezur.exe
-echo Test:   dist\rezur.exe info --save "%%APPDATA%%\EldenRing\76561199197611189\ER0000.sl2"
+echo Test:   dist\rezur.exe info --save "%%APPDATA%%\EldenRing\76561198000000000\ER0000.sl2"

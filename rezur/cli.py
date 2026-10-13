@@ -546,7 +546,7 @@ def cmd_steamid(args):
     path = _resolve_save(args)
     raw = str(args.set).strip()
     if not (raw.isdigit() and len(raw) == 17):
-        print("SteamID64 to 17 cyfr, np. 76561199197611189")
+        print("SteamID64 to 17 cyfr, np. 76561198000000000")
         return 2
     sf = SaveFile(path)
     new = int(raw)

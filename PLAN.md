@@ -4,7 +4,7 @@
 zbudowane od zera, w Pythonie, z pełnym zrozumieniem formatu — nie "magic box", tylko kod,
 który oboje rozumiemy linia po linii.
 
-**Root projektu:** `C:\Users\Dawid\Desktop\ER-Save-Lab\`
+**Root projektu:** `%USERPROFILE%\Desktop\ER-Save-Lab\`
 
 ```
 ER-Save-Lab/
@@ -33,7 +33,7 @@ ER-Save-Lab/
 | 2 | `annesee` | 54 | 13,9 h | 494 950 | 261 |
 | 3–9 | puste | | | | |
 
-Ścieżka save'a: `%APPDATA%\EldenRing\76561199197611189\ER0000.sl2` (SteamID64 = nazwa folderu).
+Ścieżka save'a: `%APPDATA%\EldenRing\76561198000000000\ER0000.sl2` (SteamID64 = nazwa folderu).
 
 ### F0.5 — zrobione przy okazji (2026-10-13, wieczór)
 

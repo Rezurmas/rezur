@@ -32,7 +32,7 @@ Most JS↔silnik ma audyt: `python tests/bridge_audit.py` (każde wywołanie API
 ## Szybki start
 
 ```bash
-cd C:\Users\Dawid\Desktop\ER-Save-Lab
+cd %USERPROFILE%\Desktop\ER-Save-Lab
 
 python -m rezur info                      # postacie + stan kontenera
 python -m rezur doctor                    # diagnostyka (czyta, nie pisze)

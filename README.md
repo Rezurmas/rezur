@@ -71,10 +71,11 @@ python -m rezur watch [--interval 600]    # auto-kopie: start gry + co interwał
 python -m rezur watch --once              # jeden przebieg kontrolny
 python -m rezur risk [--slot N] [--json]  # ryzyko online: dane niemożliwe + znacznik modyfikacji + powrót do GOLD
 python -m rezur stage stats --slot 0 --set vigor=61   # edytuj w kopii roboczej (bez ryzyka)
-python -m rezur pending [--diff]          # zmiany oczekujące: licznik + podgląd sekcji
+python -m rezur pending [--diff] [--undo] # zmiany oczekujące: licznik, podgląd sekcji, cofnij ostatnią
 python -m rezur apply                     # zatwierdź: 1 backup + 1 zapis + wpis w historii
 python -m rezur discard                   # odrzuć: oryginał nietknięty
 python -m rezur log [--json]              # historia operacji (dziennik edycji)
+python -m rezur find "uchi" [--json]      # szukaj: itemy, flagi świata, łaski, lokacje
 python -m rezur config                    # backup_retention / auto_doctor / guard_live / watch_interval
 python -m rezur list-fixes                # lista napraw
 ```
@@ -88,18 +89,18 @@ rezur/
   core/    format: bnd4, sloty, sumy (MD5 + PlayerDataHash), profile, SaveFile, vault (GOLD/piny/rotacja),
            journal (dziennik edycji → znacznik „modyfikowany")
   risk.py  ryzyko online: dane niemożliwe (staty/ulepszenia/ilości) + znacznik + droga do GOLD
-  staging.py  zmiany oczekujące: kopia robocza + manifest (stage/pending/apply/discard)
+  staging.py  zmiany oczekujące: kopia robocza + manifest + migawki (stage/pending/apply/discard/undo)
   games/   rejestr gier (teraz: Elden Ring; struktura pod kolejne)
   diag/    silnik diagnostyki (checks → Finding z kodem i przypisaną naprawą)
-  fixes/   rejestr napraw: torrent, checksums, playerhash, summary, weather, dlc
+  fixes/   rejestr napraw: torrent, checksums, playerhash, summary, weather, dlc, invcounters
   ops/     staty/runy/imie, itemy (gaitem+inventory: dodaj/usuń/ilość/przenieś/upgrade/affinity/AoW),
            EQ (22 gniazda), czary, wygląd, teleport, świat (nazwane flagi), masowe nadawanie,
            kopie/podmiana/czyszczenie slotów, SteamID, transfer JSON, backupy, watch (auto-kopie przy grze)
   report/  wyjście tekstowe i JSON
   api/     warstwa HTTP/JSON pod GUI (F6 — most do webview; placeholder)
   cli.py   python -m rezur
-tests/     run_all.py — 38 testów na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
-           smoke_cli.py — przebieg KAŻDEJ komendy CLI (125 wywołań) na kopii save'a
+tests/     run_all.py — 43 testy na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
+           smoke_cli.py — przebieg KAŻDEJ komendy CLI (131 wywołań) na kopii save'a
 ARCHITECTURE.md   frontend/backend, przepływy, roadmapa
 ```
 
@@ -113,6 +114,16 @@ ARCHITECTURE.md   frontend/backend, przepływy, roadmapa
 - przy działającej grze zapis jest blokowany,
 - każda udana modyfikacja dopisuje wpis do dziennika (`<save>.rezur-journal.json`);
   `rezur risk` pokazuje znacznik „plik modyfikowany" i dokładną komendę powrotu do GOLD,
+- urwany plik (torn write) jest wykrywany przy wczytaniu z jasnym komunikatem i drogą do kopii,
+- Rezur działa w 100% offline — zero połączeń sieciowych, zero telemetrii,
 - po naprawie automatyczna re-diagnostyka; `doctor` flaguje też postacie ze starego patcha gry (`patch_old`).
+
+## Pakowanie (.exe)
+
+```cmd
+python -m pip install pyinstaller
+tools\build_exe.cmd          :: albo: python -m PyInstaller packaging\rezur.spec
+:: wynik: dist\rezur.exe (jednoplikowy, bez instalatora; dane db_er wkompilowane)
+```
 
 Szczegóły techniczne formatu i zweryfikowane pułapki: skill `elden-ring-save-repair`.

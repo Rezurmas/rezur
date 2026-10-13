@@ -920,6 +920,134 @@ def t_staging_blocks_when_original_changed():
         staging.discard(p)
 
 
+@test
+def t_world_extra_groups_and_toggle():
+    from rezur.ops import world
+
+    g = world.groups()
+    assert g.get("colosseums") == 3, g.get("colosseums")
+    assert g.get("summoning_pools", 0) >= 150, g.get("summoning_pools")
+    assert g.get("invasion_regions", 0) >= 200, g.get("invasion_regions")
+
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        rows = world.view(sf, 2, "colosseums", limit=5)["entries"]
+        target = next((e for e in rows if e["value"] == 0), rows[0])
+        want = 0 if target["value"] == 1 else 1
+        rep = world.set_world(sf, 2, "colosseums", selector=str(target["id"]), value=want)
+        assert rep["set"] == 1, rep
+        sf.write(backup_tag="test")
+        chk = SaveFile(p)
+        r = P.roster(chk)
+        s = chk.slots()[2]
+        assert s.parse(r[2]["name"], r[2]["level"]), s.reason
+        assert s.get_flag(target["id"]) == want
+
+
+@test
+def t_invcounters_fix():
+    import struct as st
+
+    from rezur.core import inventory
+
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        sf = SaveFile(p)
+        r = P.roster(sf)
+        s = sf.slots()[0]
+        assert s.parse(r[0]["name"], r[0]["level"]), s.reason
+        inv = inventory.read(s.raw, s.offsets["inventory_held"], "held")
+        L = inv["layout"]
+        abs_off = s.abs_off + L["common_count"]
+        good = st.unpack_from("<I", sf.data, abs_off)[0]
+        st.pack_into("<I", sf.data, abs_off, good + 5)  # rozjazd licznika
+        sf.touch_slot(0)
+        sf.write(backup_tag="test")
+
+        sf2 = SaveFile(p)
+        fs = run_diagnostics(sf2)
+        assert any(f.code == "inv_counter_mismatch" for f in fs), [f.line() for f in fs]
+        res = F.apply_fixes(sf2, ["invcounters"], dry_run=False)
+        assert any(x.applied for x in res), res
+        sf2.write(backup_tag="test")
+        fs3 = run_diagnostics(SaveFile(p))
+        assert not any(f.code == "inv_counter_mismatch" for f in fs3), [f.line() for f in fs3]
+
+
+@test
+def t_torn_detected():
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "torn.sl2"
+        p.write_bytes(Path(src).read_bytes()[: 10 * 1024 * 1024])
+        msg = ""
+        try:
+            SaveFile(p)
+        except ValueError as ex:
+            msg = str(ex)
+        assert "urwan" in msg, msg or "SaveFile nie wykrył urwanego pliku"
+
+
+@test
+def t_staging_undo():
+    from rezur import staging
+
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        orig = p.read_bytes()
+        work = staging.begin(p)
+
+        def poke(n):
+            sf = SaveFile(work)
+            e = sf.slot_entries[0]
+            sf.data[e["off"] + 16 + 0x280000 - 1 - n] ^= 0xFF
+            sf.touch_slot(0)
+            sf.write(backup_tag="w")
+
+        snap1 = staging.make_snapshot(p)
+        poke(0)
+        staging.record_op(p, "stats", "op1", snap=snap1)
+        md5_1 = staging.md5_file(work)
+        snap2 = staging.make_snapshot(p)
+        poke(1)
+        staging.record_op(p, "stats", "op2", snap=snap2)
+        assert staging.op_count(p) == 2
+
+        res = staging.undo_last(p)
+        assert res["undone"]["summary"] == "op2" and res["left"] == 1, res
+        assert staging.md5_file(work) == md5_1, "cofnięcie nie przywróciło stanu sprzed op2"
+
+        res2 = staging.undo_last(p)
+        assert res2["left"] == 0
+        assert work.read_bytes() == orig, "po cofnięciu wszystkiego brudnopis != oryginał"
+
+        msg = ""
+        try:
+            staging.undo_last(p)
+        except ValueError as ex:
+            msg = str(ex)
+        assert "brak zmian" in msg, msg or "undo na pustym stosie nie zgłosił błędu"
+        staging.discard(p)
+
+
+@test
+def t_find_engine():
+    from rezur.core import items_db
+    from rezur.ops import world
+
+    hits = items_db.search("uchigatana", limit=10)
+    assert any("Uchigatana" in h[1] for h in hits), hits
+    assert world.search_names("godrick"), "brak trafień flag dla 'godrick'"
+    assert world.search_names("6100090"), "brak trafienia flagi po ID"
+
+
 def main():
     ok = fail = 0
     for t in _tests:

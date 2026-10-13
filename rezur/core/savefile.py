@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import struct
 import time
 from pathlib import Path
 
@@ -18,7 +19,20 @@ class SaveFile:
             raise ValueError(
                 "To nie jest jawny BND4 (PS4/zaszyfrowany save?) — Rezur obsługuje na razie PC .sl2."
             )
-        self.entries = bnd4.parse_entries(self.data)
+        try:
+            self.entries = bnd4.parse_entries(self.data)
+        except (struct.error, IndexError) as e:
+            raise ValueError(
+                "nie udało się rozłożyć kontenera BND4 — plik może być urwany "
+                "(torn write). Przywróć kopię: rezur backups --restore <nazwa> --apply"
+            ) from e
+        need = max(e["off"] + e["size"] for e in self.entries)
+        if need > len(self.data):
+            raise ValueError(
+                f"plik urwany: brakuje {need - len(self.data)} B "
+                f"(sekcje sięgają 0x{need:X}, plik ma {len(self.data)} B) — "
+                "przywróć kopię: rezur backups --restore <nazwa> --apply"
+            )
         # sekcje: 10 slotów + USER_DATA010 + USER_DATA011
         self.slot_entries = self.entries[:10]
         self.ud10_entry = next(e for e in self.entries if e["name"] == "USER_DATA010")

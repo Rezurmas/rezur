@@ -548,7 +548,7 @@ def _after_weapon_change(save, s, slot_idx, equipped_slots):
 def set_weapon_upgrade(save, slot_idx, handle, upgrade):
     """Ustawia stopień ulepszenia broni (item_id = baza + poziom)."""
     if not (0 <= upgrade <= 25):
-        raise ValueError("upgrade 0..25")
+        raise ValueError("poziom ulepszenia 0..25 (wyżej = broń niemożliwa dla skanera gry)")
     s = _parsed(save, slot_idx)
     e = _weapon_entry(s, handle)
     if e is None or (e["handle"] & 0xF0000000) != 0x80000000:

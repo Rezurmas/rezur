@@ -149,4 +149,25 @@ def run_diagnostics(save, expect_steamid=None):
         except (struct.error, IndexError):
             findings.append(Finding(INFO, "player_hash_unparsed", "nie udało się sprawdzić hasha", slot=i))
 
+        # liczniki ekwipunku (deklarowane vs realnie zajęte wpisy)
+        try:
+            from ..core import inventory
+
+            diffs = []
+            for loc, key in (("held", "inventory_held"), ("storage", "storage")):
+                inv = inventory.read(slot.raw, slot.offsets[key], loc)
+                for kind in ("common", "key"):
+                    declared = inv[f"{kind}_count"]
+                    actual = sum(1 for h, _q, _a in inv[f"{kind}_items"] if h)
+                    if declared != actual:
+                        diffs.append(f"{loc}/{kind}: {declared}≠{actual}")
+            if diffs:
+                findings.append(
+                    Finding(WARNING, "inv_counter_mismatch",
+                            "liczniki ekwipunku się nie zgadzają (" + ", ".join(diffs) + ")",
+                            slot=i, fix="invcounters")
+                )
+        except (struct.error, IndexError):
+            pass
+
     return findings

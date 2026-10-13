@@ -44,7 +44,7 @@ def set_stats(save, slot_idx, changes, resync_summary=True):
         if k not in STAT_NAMES:
             raise ValueError(f"nieznana statystyka {k!r} (dozwolone: {', '.join(STAT_NAMES)})")
         if not (1 <= v <= 99):
-            raise ValueError(f"{k}={v} poza zakresem 1..99")
+            raise ValueError(f"{k}={v} nie wchodzi — gra przyjmuje 1..99 na statystykę")
         stats[STAT_NAMES.index(k)] = v
     level = sum(stats) - 79
     if not (1 <= level <= 713):

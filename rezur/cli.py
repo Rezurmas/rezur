@@ -100,8 +100,30 @@ from .report import jsonout as J
 from .report import text as R
 
 
+def _remember_save(path):
+    try:
+        cfg = CONF.load()
+        if cfg.get("last_save") != str(path):
+            cfg["last_save"] = str(path)
+            CONF.save(cfg)
+    except OSError:
+        pass
+
+
+def _resolve_save(args):
+    """Kolejność: --save → zapamiętany last_save → najnowszy save w %APPDATA%."""
+    explicit = getattr(args, "save", None)
+    if explicit:
+        _remember_save(explicit)
+        return explicit
+    last = CONF.load().get("last_save")
+    if last and Path(last).is_file():
+        return last
+    return str(default_save_path())
+
+
 def _load(args):
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
     return SaveFile(path)
 
 
@@ -505,7 +527,7 @@ def cmd_graces(args):
 
 
 def cmd_copy(args):
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
     if args.apply and not _guard_game(path):
         return 3
     r = copy_character_file(
@@ -519,9 +541,13 @@ def cmd_copy(args):
 
 
 def cmd_steamid(args):
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
+    raw = str(args.set).strip()
+    if not (raw.isdigit() and len(raw) == 17):
+        print("SteamID64 to 17 cyfr, np. 76561199197611189")
+        return 2
     sf = SaveFile(path)
-    new = int(args.set)
+    new = int(raw)
     if not args.apply:
         print(f"obecny SteamID: {sf.steam_id()}  ->  po zmianie: {new}")
         print("DRY-RUN. dodaj --apply, aby wykonać.")
@@ -535,7 +561,7 @@ def cmd_steamid(args):
 
 
 def cmd_swap(args):
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
     if args.apply and not _guard_game(path):
         return 3
     r = swap_characters_file(path, args.a, args.b, apply=args.apply)
@@ -547,14 +573,16 @@ def cmd_swap(args):
 
 
 def cmd_clear(args):
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
     if args.apply and not _guard_game(path):
         return 3
     r = clear_character_file(path, args.slot, apply=args.apply)
     for k, v in r.items():
         print(f"  {k}: {v}")
     if not args.apply:
-        print("\nDRY-RUN. dodaj --apply, aby wykonać.")
+        print("\n[!] czyści postać z tego slotu (profil + slot + MD5) — bez --apply nic się nie dzieje;"
+              " przy --apply zadziała backup automatyczny")
+        print("DRY-RUN. dodaj --apply, aby wykonać.")
     return 0
 
 
@@ -774,7 +802,7 @@ def cmd_export(args):
 
 
 def cmd_import(args):
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
     if not args.apply:
         print(f"DRY-RUN: zaimportuję {args.file_in} → slot{args.to}")
         return 0
@@ -790,7 +818,7 @@ def cmd_import(args):
 
 
 def cmd_backups(args):
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
     if getattr(args, "gold", False):
         try:
             res = ensure_gold(path)
@@ -846,7 +874,7 @@ def cmd_backups(args):
 
 def cmd_watch(args):
     """Auto-kopiec: kopia przy starcie gry i co interwał, dopóki gra działa."""
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
     interval = args.interval if args.interval is not None else CONF.load().get("watch_interval", 600)
     if args.once:
         res = watch_once(path, interval=interval)
@@ -907,6 +935,54 @@ def cmd_risk(args):
     return 1 if res["verdict"] == "red" else 0
 
 
+def cmd_find(args):
+    """Szukajka po wszystkim: itemy, flagi świata (wszystkie grupy), łaski, lokacje."""
+    q = args.query
+    from .core import items_db
+    from .ops.flags import graces as graces_data
+    from .ops import world as world_ops
+
+    items = items_db.search(q, limit=args.limit)
+    flags = world_ops.search_names(q, limit=args.limit)
+    locs = [(k, v) for k, v in TELEPORT_LOCATIONS.items() if q.lower() in k.lower()]
+    try:
+        graces_hits = [
+            (region, gname)
+            for region, rows in graces_data().items()
+            for fid, gname in rows
+            if q.lower() in gname.lower()
+        ][: args.limit]
+    except OSError:
+        graces_hits = []
+
+    if args.json:
+        print(json.dumps({
+            "query": q, "items": items, "flags": flags,
+            "graces": graces_hits, "locations": locs,
+        }, ensure_ascii=False, indent=2))
+        return 0
+
+    print(f"ITEMY ({len(items)}):")
+    for fid, name, cat in items[:20]:
+        print(f"  0x{fid:08X}  {name}  [{cat}]")
+    if not items:
+        print("  (brak)")
+    print(f"\nFLAGI ŚWIATA ({len(flags)}):")
+    for group, fid, name in flags[:20]:
+        print(f"  {fid:>8}  {name}  [{group}]")
+    if not flags:
+        print("  (brak)")
+    if graces_hits:
+        print(f"\nŁASKI ({len(graces_hits)}):")
+        for region, gname in graces_hits[:12]:
+            print(f"  {gname}  [{region}]")
+    if locs:
+        print(f"\nLOKACJE TELEPORTU ({len(locs)}): " + ", ".join(k for k, _ in locs))
+    if not (items or flags or graces_hits or locs):
+        print("\nnic nie pasuje — szukaj po fragmencie nazwy (np. 'uchi', 'godrick', 'map')")
+    return 0
+
+
 STAGEABLE = {
     "fix", "stats", "item", "equip", "unequip", "spells", "appearance", "teleport",
     "world", "unlock", "flags", "graces", "copy", "swap", "clear", "steamid", "import",
@@ -915,7 +991,7 @@ STAGEABLE = {
 
 def cmd_stage(args):
     """Edytuj w kopii roboczej (oryginał nietknięty) — zmiany oczekujące."""
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
     rest = list(args.rest)
     if not rest or rest[0].startswith("-"):
         print("użycie: rezur stage <komenda edycji> [opcje...]")
@@ -932,24 +1008,37 @@ def cmd_stage(args):
         print(f"nie ma pliku: {path}")
         return 2
     before = staging.md5_file(work)
+    snap = staging.make_snapshot(path)
     argv = [cmd, "--save", str(work), *op_args]
     if "--apply" not in argv:
         argv.append("--apply")
     print(f"staging → {work}")
     rc = main(argv)
     if rc != 0:
+        staging.drop_snapshot(path, snap)
         print("(komenda nie przeszła — nic nie doliczam)")
         return rc
     if staging.md5_file(work) == before:
+        staging.drop_snapshot(path, snap)
         print("bez zmian danych — nic nie doliczam do zmian oczekujących.")
         return 0
-    n = staging.record_op(path, cmd, " ".join(op_args) or "(bez opcji)")
-    print(f"→ zmiany oczekujące: {n}   (`rezur apply` zatwierdza, `rezur discard` odrzuca)")
+    n = staging.record_op(path, cmd, " ".join(op_args) or "(bez opcji)", snap=snap)
+    print(f"→ zmiany oczekujące: {n}   (`rezur apply` zatwierdza, `rezur discard` odrzuca,"
+          " `rezur pending --undo` cofa ostatnią)")
     return 0
 
 
 def cmd_pending(args):
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
+    if args.undo:
+        try:
+            res = staging.undo_last(path)
+        except ValueError as e:
+            print(f"nie ma czego cofnąć: {e}")
+            return 2
+        u = res["undone"]
+        print(f"cofnięto: [{u['op']}] {u['summary']}   (pozostało zmian: {res['left']})")
+        return 0
     man = staging.load_manifest(path)
     if not man:
         print("brak zmian oczekujących — edytuj przez: rezur stage <komenda> ...")
@@ -957,6 +1046,9 @@ def cmd_pending(args):
     print(f"ZMIANY OCZEKUJĄCE: {len(man['ops'])} (od {man['created']})")
     for i, op in enumerate(man["ops"], 1):
         print(f"  {i:>2d}. [{op['ts']}] {op['op']}: {op['summary']}")
+    last = man["ops"][-1] if man["ops"] else None
+    if last and last.get("snap"):
+        print("  (ostatnią zmianę cofniesz: rezur pending --undo)")
     if staging.original_changed(path):
         print("  !! oryginał zmienił się od rozpoczęcia stagingu (gra zapisała?) — apply wymaga --force")
     if args.diff:
@@ -977,7 +1069,7 @@ def cmd_pending(args):
 
 
 def cmd_apply(args):
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
     if staging.op_count(path) == 0:
         print("brak zmian oczekujących — edytuj przez: rezur stage <komenda> ...")
         return 2
@@ -998,7 +1090,7 @@ def cmd_apply(args):
 
 
 def cmd_discard(args):
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
     res = staging.discard(path)
     if res["ops"]:
         print(f"odrzucono {res['ops']} zmian — oryginał nietknięty.")
@@ -1010,7 +1102,7 @@ def cmd_discard(args):
 
 
 def cmd_log(args):
-    path = args.save or str(default_save_path())
+    path = _resolve_save(args)
     from .core import journal
 
     es = journal.load(path)["entries"]
@@ -1278,6 +1370,7 @@ def main(argv=None):
     sp = sub.add_parser("pending", help="zmiany oczekujące: licznik + podgląd")
     add_save(sp)
     sp.add_argument("--diff", action="store_true", help="pokaż zmienione sekcje (bajt w bajt)")
+    sp.add_argument("--undo", action="store_true", help="cofnij ostatnią zmianę oczekującą")
     sp.set_defaults(func=cmd_pending)
 
     sp = sub.add_parser("apply", help="zatwierdź zmiany oczekujące (1 backup + 1 zapis)")
@@ -1294,6 +1387,13 @@ def main(argv=None):
     add_save(sp)
     sp.add_argument("--json", action="store_true")
     sp.set_defaults(func=cmd_log)
+
+    sp = sub.add_parser("find", help="szukaj: itemy, flagi świata, łaski, lokacje")
+    add_save(sp)
+    sp.add_argument("query", help="fragment nazwy (np. uchi, godrick, map)")
+    sp.add_argument("--limit", type=int, default=40)
+    sp.add_argument("--json", action="store_true")
+    sp.set_defaults(func=cmd_find)
 
     sp = sub.add_parser("config", help="konfiguracja Rezura")
     sp.add_argument("--set", default=None, help="klucz=wartość")

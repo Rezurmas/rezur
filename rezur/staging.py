@@ -58,6 +58,67 @@ def md5_file(path):
     return h.hexdigest()
 
 
+SNAP_MAX = 6  # ile migawek („cofnij pojedynczą zmianę") trzymamy na brudnopis
+
+
+def _snaps(save_path):
+    return sorted(staging_dir().glob(f"{_key(save_path)}.op*.sl2"))
+
+
+def make_snapshot(save_path):
+    """Migawka brudnopisu PRZED zmianą (dla `pending --undo`). Zwraca nazwę pliku."""
+    man = load_manifest(save_path)
+    if man is None:
+        raise ValueError("brak zmian oczekujących")
+    work = work_path(save_path)
+    if not work.is_file():
+        raise ValueError("brak kopii roboczej")
+    seq = int(man.get("snap_seq", 0)) + 1
+    man["snap_seq"] = seq
+    _save_manifest(save_path, man)
+    snap = staging_dir() / f"{_key(save_path)}.op{seq}.sl2"
+    shutil.copy2(work, snap)
+    _rotate_snaps(save_path, man)
+    return snap.name
+
+
+def _rotate_snaps(save_path, man):
+    snaps = _snaps(save_path)
+    drop = {s.name for s in snaps[:-SNAP_MAX]}
+    for s in snaps[:-SNAP_MAX]:
+        try:
+            s.unlink()
+        except OSError:
+            pass
+    if drop:
+        for op in man.get("ops", []):
+            if op.get("snap") in drop:
+                op["snap"] = None
+        _save_manifest(save_path, man)
+
+
+def drop_snapshot(save_path, name):
+    p = staging_dir() / name
+    if p.is_file():
+        p.unlink()
+
+
+def undo_last(save_path):
+    """Cofa OSTATNIĄ zmianę oczekującą (przywraca migawkę sprzed niej)."""
+    man = load_manifest(save_path)
+    if not man or not man["ops"]:
+        raise ValueError("brak zmian oczekujących")
+    last = man["ops"][-1]
+    snap = last.get("snap")
+    if not snap or not (staging_dir() / snap).is_file():
+        raise ValueError("ta zmiana jest zbyt stara do cofnięcia (migawka obcięta)")
+    shutil.copy2(staging_dir() / snap, work_path(save_path))
+    (staging_dir() / snap).unlink()
+    man["ops"].pop()
+    _save_manifest(save_path, man)
+    return {"undone": last, "left": len(man["ops"])}
+
+
 def load_manifest(save_path):
     p = manifest_path(save_path)
     if not p.is_file():
@@ -92,18 +153,22 @@ def begin(save_path):
         "created": time.strftime("%Y-%m-%d %H:%M:%S"),
         "orig_size": st.st_size,
         "orig_mtime": st.st_mtime,
+        "snap_seq": 0,
         "ops": [],
     })
     return work
 
 
-def record_op(save_path, op, summary):
+def record_op(save_path, op, summary, snap=None):
     """Dopisuje zmianę oczekującą do manifestu. Zwraca licznik."""
     man = load_manifest(save_path)
     if man is None:
         begin(save_path)
         man = load_manifest(save_path)
-    man["ops"].append({"ts": time.strftime("%H:%M:%S"), "op": op, "summary": summary})
+    entry = {"ts": time.strftime("%H:%M:%S"), "op": op, "summary": summary}
+    if snap:
+        entry["snap"] = snap
+    man["ops"].append(entry)
     _save_manifest(save_path, man)
     return len(man["ops"])
 
@@ -126,10 +191,10 @@ def original_changed(save_path):
 
 
 def discard(save_path):
-    """Kasuje brudnopis (bez dotykania oryginału). Zwraca {ops, removed}."""
+    """Kasuje brudnopis + migawki (bez dotykania oryginału). Zwraca {ops, removed}."""
     n = op_count(save_path)
     removed = False
-    for p in (work_path(save_path), manifest_path(save_path)):
+    for p in (work_path(save_path), manifest_path(save_path), *_snaps(save_path)):
         if p.is_file():
             p.unlink()
             removed = True

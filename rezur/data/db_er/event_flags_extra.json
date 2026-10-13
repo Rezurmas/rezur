@@ -1,0 +1,1883 @@
+{
+ "colosseums": [
+  [
+   60370,
+   "Royal Colosseum",
+   "colosseum"
+  ],
+  [
+   60350,
+   "Caelid Colosseum",
+   "colosseum"
+  ],
+  [
+   60360,
+   "Limgrave Colosseum",
+   "colosseum"
+  ]
+ ],
+ "summoning_pools": [
+  [
+   10000040,
+   "Basen przywołań 10000040",
+   "summoning pool"
+  ],
+  [
+   10000041,
+   "Basen przywołań 10000041",
+   "summoning pool"
+  ],
+  [
+   10000042,
+   "Basen przywołań 10000042",
+   "summoning pool"
+  ],
+  [
+   10000043,
+   "Basen przywołań 10000043",
+   "summoning pool"
+  ],
+  [
+   10000044,
+   "Basen przywołań 10000044",
+   "summoning pool"
+  ],
+  [
+   10000045,
+   "Basen przywołań 10000045",
+   "summoning pool"
+  ],
+  [
+   11000040,
+   "Basen przywołań 11000040",
+   "summoning pool"
+  ],
+  [
+   11000041,
+   "Basen przywołań 11000041",
+   "summoning pool"
+  ],
+  [
+   11000042,
+   "Basen przywołań 11000042",
+   "summoning pool"
+  ],
+  [
+   11000043,
+   "Basen przywołań 11000043",
+   "summoning pool"
+  ],
+  [
+   11000044,
+   "Basen przywołań 11000044",
+   "summoning pool"
+  ],
+  [
+   11050040,
+   "Basen przywołań 11050040",
+   "summoning pool"
+  ],
+  [
+   11050041,
+   "Basen przywołań 11050041",
+   "summoning pool"
+  ],
+  [
+   12010040,
+   "Basen przywołań 12010040",
+   "summoning pool"
+  ],
+  [
+   12010041,
+   "Basen przywołań 12010041",
+   "summoning pool"
+  ],
+  [
+   12010042,
+   "Basen przywołań 12010042",
+   "summoning pool"
+  ],
+  [
+   12010043,
+   "Basen przywołań 12010043",
+   "summoning pool"
+  ],
+  [
+   12010044,
+   "Basen przywołań 12010044",
+   "summoning pool"
+  ],
+  [
+   12010045,
+   "Basen przywołań 12010045",
+   "summoning pool"
+  ],
+  [
+   12010046,
+   "Basen przywołań 12010046",
+   "summoning pool"
+  ],
+  [
+   12020040,
+   "Basen przywołań 12020040",
+   "summoning pool"
+  ],
+  [
+   12020041,
+   "Basen przywołań 12020041",
+   "summoning pool"
+  ],
+  [
+   12020042,
+   "Basen przywołań 12020042",
+   "summoning pool"
+  ],
+  [
+   12020043,
+   "Basen przywołań 12020043",
+   "summoning pool"
+  ],
+  [
+   12020044,
+   "Basen przywołań 12020044",
+   "summoning pool"
+  ],
+  [
+   12020045,
+   "Basen przywołań 12020045",
+   "summoning pool"
+  ],
+  [
+   12020046,
+   "Basen przywołań 12020046",
+   "summoning pool"
+  ],
+  [
+   12030040,
+   "Basen przywołań 12030040",
+   "summoning pool"
+  ],
+  [
+   12030041,
+   "Basen przywołań 12030041",
+   "summoning pool"
+  ],
+  [
+   12030042,
+   "Basen przywołań 12030042",
+   "summoning pool"
+  ],
+  [
+   12030043,
+   "Basen przywołań 12030043",
+   "summoning pool"
+  ],
+  [
+   12030044,
+   "Basen przywołań 12030044",
+   "summoning pool"
+  ],
+  [
+   12050040,
+   "Basen przywołań 12050040",
+   "summoning pool"
+  ],
+  [
+   12050041,
+   "Basen przywołań 12050041",
+   "summoning pool"
+  ],
+  [
+   12050042,
+   "Basen przywołań 12050042",
+   "summoning pool"
+  ],
+  [
+   12070040,
+   "Basen przywołań 12070040",
+   "summoning pool"
+  ],
+  [
+   12070041,
+   "Basen przywołań 12070041",
+   "summoning pool"
+  ],
+  [
+   13000040,
+   "Basen przywołań 13000040",
+   "summoning pool"
+  ],
+  [
+   13000041,
+   "Basen przywołań 13000041",
+   "summoning pool"
+  ],
+  [
+   13000042,
+   "Basen przywołań 13000042",
+   "summoning pool"
+  ],
+  [
+   13000043,
+   "Basen przywołań 13000043",
+   "summoning pool"
+  ],
+  [
+   13000044,
+   "Basen przywołań 13000044",
+   "summoning pool"
+  ],
+  [
+   13000045,
+   "Basen przywołań 13000045",
+   "summoning pool"
+  ],
+  [
+   13000046,
+   "Basen przywołań 13000046",
+   "summoning pool"
+  ],
+  [
+   13000047,
+   "Basen przywołań 13000047",
+   "summoning pool"
+  ],
+  [
+   14000040,
+   "Basen przywołań 14000040",
+   "summoning pool"
+  ],
+  [
+   14000041,
+   "Basen przywołań 14000041",
+   "summoning pool"
+  ],
+  [
+   14000042,
+   "Basen przywołań 14000042",
+   "summoning pool"
+  ],
+  [
+   14000043,
+   "Basen przywołań 14000043",
+   "summoning pool"
+  ],
+  [
+   15000040,
+   "Basen przywołań 15000040",
+   "summoning pool"
+  ],
+  [
+   15000041,
+   "Basen przywołań 15000041",
+   "summoning pool"
+  ],
+  [
+   15000042,
+   "Basen przywołań 15000042",
+   "summoning pool"
+  ],
+  [
+   15000044,
+   "Basen przywołań 15000044",
+   "summoning pool"
+  ],
+  [
+   15000045,
+   "Basen przywołań 15000045",
+   "summoning pool"
+  ],
+  [
+   15000046,
+   "Basen przywołań 15000046",
+   "summoning pool"
+  ],
+  [
+   15000047,
+   "Basen przywołań 15000047",
+   "summoning pool"
+  ],
+  [
+   15000049,
+   "Basen przywołań 15000049",
+   "summoning pool"
+  ],
+  [
+   16000040,
+   "Basen przywołań 16000040",
+   "summoning pool"
+  ],
+  [
+   16000041,
+   "Basen przywołań 16000041",
+   "summoning pool"
+  ],
+  [
+   16000042,
+   "Basen przywołań 16000042",
+   "summoning pool"
+  ],
+  [
+   16000043,
+   "Basen przywołań 16000043",
+   "summoning pool"
+  ],
+  [
+   16000044,
+   "Basen przywołań 16000044",
+   "summoning pool"
+  ],
+  [
+   19000040,
+   "Basen przywołań 19000040",
+   "summoning pool"
+  ],
+  [
+   30000040,
+   "Basen przywołań 30000040",
+   "summoning pool"
+  ],
+  [
+   30010040,
+   "Basen przywołań 30010040",
+   "summoning pool"
+  ],
+  [
+   30020040,
+   "Basen przywołań 30020040",
+   "summoning pool"
+  ],
+  [
+   30110040,
+   "Basen przywołań 30110040",
+   "summoning pool"
+  ],
+  [
+   30040040,
+   "Basen przywołań 30040040",
+   "summoning pool"
+  ],
+  [
+   30050040,
+   "Basen przywołań 30050040",
+   "summoning pool"
+  ],
+  [
+   30030040,
+   "Basen przywołań 30030040",
+   "summoning pool"
+  ],
+  [
+   30060040,
+   "Basen przywołań 30060040",
+   "summoning pool"
+  ],
+  [
+   30080040,
+   "Basen przywołań 30080040",
+   "summoning pool"
+  ],
+  [
+   30090040,
+   "Basen przywołań 30090040",
+   "summoning pool"
+  ],
+  [
+   30100040,
+   "Basen przywołań 30100040",
+   "summoning pool"
+  ],
+  [
+   30120040,
+   "Basen przywołań 30120040",
+   "summoning pool"
+  ],
+  [
+   30070040,
+   "Basen przywołań 30070040",
+   "summoning pool"
+  ],
+  [
+   30140040,
+   "Basen przywołań 30140040",
+   "summoning pool"
+  ],
+  [
+   30150040,
+   "Basen przywołań 30150040",
+   "summoning pool"
+  ],
+  [
+   30160040,
+   "Basen przywołań 30160040",
+   "summoning pool"
+  ],
+  [
+   30170040,
+   "Basen przywołań 30170040",
+   "summoning pool"
+  ],
+  [
+   30180040,
+   "Basen przywołań 30180040",
+   "summoning pool"
+  ],
+  [
+   30190040,
+   "Basen przywołań 30190040",
+   "summoning pool"
+  ],
+  [
+   30200040,
+   "Basen przywołań 30200040",
+   "summoning pool"
+  ],
+  [
+   31020040,
+   "Basen przywołań 31020040",
+   "summoning pool"
+  ],
+  [
+   31010040,
+   "Basen przywołań 31010040",
+   "summoning pool"
+  ],
+  [
+   31000040,
+   "Basen przywołań 31000040",
+   "summoning pool"
+  ],
+  [
+   31030040,
+   "Basen przywołań 31030040",
+   "summoning pool"
+  ],
+  [
+   31150040,
+   "Basen przywołań 31150040",
+   "summoning pool"
+  ],
+  [
+   31170040,
+   "Basen przywołań 31170040",
+   "summoning pool"
+  ],
+  [
+   31040040,
+   "Basen przywołań 31040040",
+   "summoning pool"
+  ],
+  [
+   31050040,
+   "Basen przywołań 31050040",
+   "summoning pool"
+  ],
+  [
+   31060040,
+   "Basen przywołań 31060040",
+   "summoning pool"
+  ],
+  [
+   31070040,
+   "Basen przywołań 31070040",
+   "summoning pool"
+  ],
+  [
+   31090040,
+   "Basen przywołań 31090040",
+   "summoning pool"
+  ],
+  [
+   31180040,
+   "Basen przywołań 31180040",
+   "summoning pool"
+  ],
+  [
+   31190040,
+   "Basen przywołań 31190040",
+   "summoning pool"
+  ],
+  [
+   31210040,
+   "Basen przywołań 31210040",
+   "summoning pool"
+  ],
+  [
+   31100040,
+   "Basen przywołań 31100040",
+   "summoning pool"
+  ],
+  [
+   31200040,
+   "Basen przywołań 31200040",
+   "summoning pool"
+  ],
+  [
+   31110040,
+   "Basen przywołań 31110040",
+   "summoning pool"
+  ],
+  [
+   31120040,
+   "Basen przywołań 31120040",
+   "summoning pool"
+  ],
+  [
+   31220040,
+   "Basen przywołań 31220040",
+   "summoning pool"
+  ],
+  [
+   32000040,
+   "Basen przywołań 32000040",
+   "summoning pool"
+  ],
+  [
+   32010040,
+   "Basen przywołań 32010040",
+   "summoning pool"
+  ],
+  [
+   32020040,
+   "Basen przywołań 32020040",
+   "summoning pool"
+  ],
+  [
+   32040040,
+   "Basen przywołań 32040040",
+   "summoning pool"
+  ],
+  [
+   32050040,
+   "Basen przywołań 32050040",
+   "summoning pool"
+  ],
+  [
+   32070040,
+   "Basen przywołań 32070040",
+   "summoning pool"
+  ],
+  [
+   32080040,
+   "Basen przywołań 32080040",
+   "summoning pool"
+  ],
+  [
+   32110040,
+   "Basen przywołań 32110040",
+   "summoning pool"
+  ],
+  [
+   34100040,
+   "Basen przywołań 34100040",
+   "summoning pool"
+  ],
+  [
+   34110040,
+   "Basen przywołań 34110040",
+   "summoning pool"
+  ],
+  [
+   34120040,
+   "Basen przywołań 34120040",
+   "summoning pool"
+  ],
+  [
+   34120041,
+   "Basen przywołań 34120041",
+   "summoning pool"
+  ],
+  [
+   34130040,
+   "Basen przywołań 34130040",
+   "summoning pool"
+  ],
+  [
+   35000040,
+   "Basen przywołań 35000040",
+   "summoning pool"
+  ],
+  [
+   35000041,
+   "Basen przywołań 35000041",
+   "summoning pool"
+  ],
+  [
+   35000042,
+   "Basen przywołań 35000042",
+   "summoning pool"
+  ],
+  [
+   39200040,
+   "Basen przywołań 39200040",
+   "summoning pool"
+  ],
+  [
+   39200041,
+   "Basen przywołań 39200041",
+   "summoning pool"
+  ],
+  [
+   1060410040,
+   "Basen przywołań 1060410040",
+   "summoning pool"
+  ],
+  [
+   1060420040,
+   "Basen przywołań 1060420040",
+   "summoning pool"
+  ],
+  [
+   1060430040,
+   "Basen przywołań 1060430040",
+   "summoning pool"
+  ],
+  [
+   1060430041,
+   "Basen przywołań 1060430041",
+   "summoning pool"
+  ],
+  [
+   1060430042,
+   "Basen przywołań 1060430042",
+   "summoning pool"
+  ],
+  [
+   1060430043,
+   "Basen przywołań 1060430043",
+   "summoning pool"
+  ],
+  [
+   1060440040,
+   "Basen przywołań 1060440040",
+   "summoning pool"
+  ],
+  [
+   1060330040,
+   "Basen przywołań 1060330040",
+   "summoning pool"
+  ],
+  [
+   1060340040,
+   "Basen przywołań 1060340040",
+   "summoning pool"
+  ],
+  [
+   1060340041,
+   "Basen przywołań 1060340041",
+   "summoning pool"
+  ],
+  [
+   1060340043,
+   "Basen przywołań 1060340043",
+   "summoning pool"
+  ],
+  [
+   1060350040,
+   "Basen przywołań 1060350040",
+   "summoning pool"
+  ],
+  [
+   1060380040,
+   "Basen przywołań 1060380040",
+   "summoning pool"
+  ],
+  [
+   1035530040,
+   "Basen przywołań 1035530040",
+   "summoning pool"
+  ],
+  [
+   1036520040,
+   "Basen przywołań 1036520040",
+   "summoning pool"
+  ],
+  [
+   1036540040,
+   "Basen przywołań 1036540040",
+   "summoning pool"
+  ],
+  [
+   1036540041,
+   "Basen przywołań 1036540041",
+   "summoning pool"
+  ],
+  [
+   1037530040,
+   "Basen przywołań 1037530040",
+   "summoning pool"
+  ],
+  [
+   1038520040,
+   "Basen przywołań 1038520040",
+   "summoning pool"
+  ],
+  [
+   1039540040,
+   "Basen przywołań 1039540040",
+   "summoning pool"
+  ],
+  [
+   1040530040,
+   "Basen przywołań 1040530040",
+   "summoning pool"
+  ],
+  [
+   1042540040,
+   "Basen przywołań 1042540040",
+   "summoning pool"
+  ],
+  [
+   1044530040,
+   "Basen przywołań 1044530040",
+   "summoning pool"
+  ],
+  [
+   1045520040,
+   "Basen przywołań 1045520040",
+   "summoning pool"
+  ],
+  [
+   1046400040,
+   "Basen przywołań 1046400040",
+   "summoning pool"
+  ],
+  [
+   1047400040,
+   "Basen przywołań 1047400040",
+   "summoning pool"
+  ],
+  [
+   1048370040,
+   "Basen przywołań 1048370040",
+   "summoning pool"
+  ],
+  [
+   1049380040,
+   "Basen przywołań 1049380040",
+   "summoning pool"
+  ],
+  [
+   1049380041,
+   "Basen przywołań 1049380041",
+   "summoning pool"
+  ],
+  [
+   1050400040,
+   "Basen przywołań 1050400040",
+   "summoning pool"
+  ],
+  [
+   1051360040,
+   "Basen przywołań 1051360040",
+   "summoning pool"
+  ],
+  [
+   1051370040,
+   "Basen przywołań 1051370040",
+   "summoning pool"
+  ],
+  [
+   1051400040,
+   "Basen przywołań 1051400040",
+   "summoning pool"
+  ],
+  [
+   1052410040,
+   "Basen przywołań 1052410040",
+   "summoning pool"
+  ],
+  [
+   1047510840,
+   "Basen przywołań 1047510840",
+   "summoning pool"
+  ],
+  [
+   1053570840,
+   "Basen przywołań 1053570840",
+   "summoning pool"
+  ],
+  [
+   1052530840,
+   "Basen przywołań 1052530840",
+   "summoning pool"
+  ],
+  [
+   1052570840,
+   "Basen przywołań 1052570840",
+   "summoning pool"
+  ],
+  [
+   1051570840,
+   "Basen przywołań 1051570840",
+   "summoning pool"
+  ],
+  [
+   1051570841,
+   "Basen przywołań 1051570841",
+   "summoning pool"
+  ],
+  [
+   1049560840,
+   "Basen przywołań 1049560840",
+   "summoning pool"
+  ],
+  [
+   1049570840,
+   "Basen przywołań 1049570840",
+   "summoning pool"
+  ]
+ ],
+ "invasion_regions": [
+  [
+   6100090,
+   "Church of Dragon Communion",
+   "map=Limgrave · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6100000,
+   "The First Step, Church of Elleh",
+   "map=Limgrave · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6100001,
+   "Seaside Ruins",
+   "map=Limgrave · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6100004,
+   "Mistwood Outskirts, Fort Haight West",
+   "map=Limgrave · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6100002,
+   "Agheel Lake North, Murkwater Coast, Gatefront Ruins",
+   "map=Limgrave · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6100003,
+   "Summonwater Village Outskirts",
+   "map=Limgrave · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6100010,
+   "Waypoint Ruins Cellar",
+   "map=Limgrave · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3002001,
+   "Stormfoot Catacombs",
+   "map=Limgrave · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3004001,
+   "Murkwater Catacombs",
+   "map=Limgrave · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3103001,
+   "Groveside Cave",
+   "map=Limgrave · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3115001,
+   "Coastal Cave",
+   "map=Limgrave · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3100001,
+   "Murkwater Cave",
+   "map=Limgrave · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3117001,
+   "Highroad Cave",
+   "map=Limgrave · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3201001,
+   "Limgrave Tunnels",
+   "map=Limgrave · open=0 dungeon=1 boss=0"
+  ],
+  [
+   1800090,
+   "Cave of Knowledge",
+   "map=StrandedGraveyard · open=0 dungeon=1 boss=0"
+  ],
+  [
+   1800001,
+   "Stranded Graveyard",
+   "map=StrandedGraveyard · open=0 dungeon=1 boss=0"
+  ],
+  [
+   6101000,
+   "Stormhill",
+   "map=Stormhill · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6101010,
+   "Margit, the Fell Omen",
+   "map=Stormhill · open=0 dungeon=0 boss=1"
+  ],
+  [
+   3011001,
+   "Deathtouched Catacombs",
+   "map=Stormhill · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3410090,
+   "Divine Tower of Limgrave",
+   "map=Stormhill · open=0 dungeon=0 boss=0"
+  ],
+  [
+   6102001,
+   "Castle Morne",
+   "map=WeepingPeninsula · open=0 dungeon=0 boss=1"
+  ],
+  [
+   6102020,
+   "Morne Moangrave",
+   "map=WeepingPeninsula · open=0 dungeon=0 boss=1"
+  ],
+  [
+   6102000,
+   "Weeping Peninsula East",
+   "map=WeepingPeninsula · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6102002,
+   "Weeping Peninsula West",
+   "map=WeepingPeninsula · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3001001,
+   "Impaler's Catacombs",
+   "map=WeepingPeninsula · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3000001,
+   "Tombsward Catacombs",
+   "map=WeepingPeninsula · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3101001,
+   "Earthbore Cave",
+   "map=WeepingPeninsula · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3102001,
+   "Tombsward Cave",
+   "map=WeepingPeninsula · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3200001,
+   "Morne Tunnel",
+   "map=WeepingPeninsula · open=0 dungeon=1 boss=0"
+  ],
+  [
+   1000001,
+   "Stormveil Main Gate, Stormveil Cliffside",
+   "map=StormveilCastle · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1000006,
+   "Gateside Chamber",
+   "map=StormveilCastle · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1000003,
+   "Rampart Tower",
+   "map=StormveilCastle · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1000005,
+   "Liftside Chamber, Secluded Cell",
+   "map=StormveilCastle · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1000000,
+   "Godrick the Grafted",
+   "map=StormveilCastle · open=0 dungeon=0 boss=1"
+  ],
+  [
+   6200001,
+   "Liurnia South-East",
+   "map=LiurniaOfTheLakes · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6200004,
+   "Liurnia East",
+   "map=LiurniaOfTheLakes · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6200008,
+   "Behind Caria Manor",
+   "map=LiurniaOfTheLakes · open=0 dungeon=0 boss=0"
+  ],
+  [
+   3105090,
+   "Slumbering Wolf's Shack",
+   "map=LiurniaOfTheLakes · open=0 dungeon=0 boss=0"
+  ],
+  [
+   6200000,
+   "Liurnia South",
+   "map=LiurniaOfTheLakes · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6200002,
+   "Liurnia South-West",
+   "map=LiurniaOfTheLakes · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6200005,
+   "Liurnia West",
+   "map=LiurniaOfTheLakes · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6200003,
+   "Kingsrealm Ruins",
+   "map=LiurniaOfTheLakes · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6200007,
+   "Main Caria Manor Gate",
+   "map=LiurniaOfTheLakes · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6200007,
+   "Caria Manor",
+   "map=LiurniaOfTheLakes · open=0 dungeon=0 boss=0"
+  ],
+  [
+   6200007,
+   "Manor Lower Level",
+   "map=LiurniaOfTheLakes · open=0 dungeon=0 boss=0"
+  ],
+  [
+   6200010,
+   "Royal Moongazing Grounds",
+   "map=LiurniaOfTheLakes · open=0 dungeon=0 boss=0"
+  ],
+  [
+   6200006,
+   "The Ravine",
+   "map=LiurniaOfTheLakes · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3006001,
+   "Cliffbottom Catacombs",
+   "map=LiurniaOfTheLakes · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3003001,
+   "Road's End Catacombs",
+   "map=LiurniaOfTheLakes · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3005001,
+   "Black Knife Catacombs",
+   "map=LiurniaOfTheLakes · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3104001,
+   "Stillwater Cave",
+   "map=LiurniaOfTheLakes · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3105001,
+   "Lakeside Crystal Cave",
+   "map=LiurniaOfTheLakes · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3106001,
+   "Academy Crystal Cave",
+   "map=LiurniaOfTheLakes · open=0 dungeon=1 boss=0"
+  ],
+  [
+   1400011,
+   "Main Academy Gate",
+   "map=LiurniaOfTheLakes · open=0 dungeon=0 boss=0"
+  ],
+  [
+   3202001,
+   "Raya Lucaria Crystal Tunnel",
+   "map=LiurniaOfTheLakes · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3411090,
+   "Divine Tower of Liurnia",
+   "map=LiurniaOfTheLakes · open=0 dungeon=0 boss=0"
+  ],
+  [
+   6201000,
+   "Bellum Highway",
+   "map=BellumHighway · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6200090,
+   "Grand Lift of Dectus, Jarburg",
+   "map=BellumHighway · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3920002,
+   "Ruin-Strewn Precipice",
+   "map=RuinStrewnPrecipice · open=0 dungeon=0 boss=0"
+  ],
+  [
+   3920003,
+   "Ruin-Strewn Precipice Overlook",
+   "map=RuinStrewnPrecipice · open=0 dungeon=0 boss=1"
+  ],
+  [
+   3920000,
+   "Magma Wyrm Makar",
+   "map=RuinStrewnPrecipice · open=0 dungeon=0 boss=1"
+  ],
+  [
+   6202000,
+   "Moonlight Altar",
+   "map=MoonlightAltar · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1400013,
+   "Church of the Cuckoo",
+   "map=AcademyOfRayaLucaria · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1400015,
+   "Schoolhouse Classroom",
+   "map=AcademyOfRayaLucaria · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1400010,
+   "Debate Parlor",
+   "map=AcademyOfRayaLucaria · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1400000,
+   "Raya Lucaria Grand Library",
+   "map=AcademyOfRayaLucaria · open=0 dungeon=0 boss=1"
+  ],
+  [
+   6300005,
+   "Rampartside Path",
+   "map=AltusPlateau · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6300000,
+   "Stormcaller Church, Lux Ruins",
+   "map=AltusPlateau · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6300001,
+   "The Shaded Castle",
+   "map=AltusPlateau · open=0 dungeon=0 boss=0"
+  ],
+  [
+   6300002,
+   "Altus Highway Junction",
+   "map=AltusPlateau · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6300030,
+   "Castellan's Hall",
+   "map=AltusPlateau · open=0 dungeon=0 boss=0"
+  ],
+  [
+   6300003,
+   "Forest-Spanning Greatbridge",
+   "map=AltusPlateau · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3012001,
+   "Unsightly Catacombs",
+   "map=AltusPlateau · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3008001,
+   "Sainted Hero's Grave",
+   "map=AltusPlateau · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3119001,
+   "Sage's Cave",
+   "map=AltusPlateau · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3118001,
+   "Perfumer's Grotto",
+   "map=AltusPlateau · open=0 dungeon=1 boss=0"
+  ],
+  [
+   6300004,
+   "Dominula, Windmill Village, Road of Iniquity Side Path",
+   "map=AltusPlateau · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3204001,
+   "Old Altus Tunnel",
+   "map=AltusPlateau · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3205001,
+   "Altus Tunnel",
+   "map=AltusPlateau · open=0 dungeon=1 boss=0"
+  ],
+  [
+   6302000,
+   "Ninth Mt. Gelmir Campsite",
+   "map=MtGelmir · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6302001,
+   "Road of Iniquity",
+   "map=MtGelmir · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6302002,
+   "Seethewater Terminus, Primeval Sorcerer Azur",
+   "map=MtGelmir · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3007001,
+   "Wyndham Catacombs",
+   "map=MtGelmir · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3009001,
+   "Gelmir Hero's Grave",
+   "map=MtGelmir · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3107001,
+   "Seethewater Cave",
+   "map=MtGelmir · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3109001,
+   "Volcano Cave",
+   "map=MtGelmir · open=0 dungeon=1 boss=0"
+  ],
+  [
+   6301000,
+   "Capital Outskirts",
+   "map=CapitalOutskirts · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6301090,
+   "Capital Rampart",
+   "map=CapitalOutskirts · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3013091,
+   "Auriza Side Tomb",
+   "map=CapitalOutskirts · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3010001,
+   "Auriza Hero's Grave",
+   "map=CapitalOutskirts · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3412011,
+   "Sealed Tunnel",
+   "map=CapitalOutskirts · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3412090,
+   "Divine Tower of West Altus",
+   "map=CapitalOutskirts · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1600012,
+   "Volcano Manor",
+   "map=VolcanoManor · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1600014,
+   "Prison Town Church",
+   "map=VolcanoManor · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1600010,
+   "Temple of Eiglay",
+   "map=VolcanoManor · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1600016,
+   "Guest Hall",
+   "map=VolcanoManor · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1600006,
+   "Audience Pathway",
+   "map=VolcanoManor · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1600020,
+   "Abductor Virgin",
+   "map=VolcanoManor · open=0 dungeon=1 boss=0"
+  ],
+  [
+   1600022,
+   "Subterranean Inquisition Chamber",
+   "map=VolcanoManor · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1600000,
+   "Rykard, Lord of Blasphemy",
+   "map=VolcanoManor · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1100010,
+   "Erdtree Sanctuary",
+   "map=LeyndellRoyalCapital · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1100012,
+   "East Capital Rampart",
+   "map=LeyndellRoyalCapital · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1100015,
+   "Lower Capital Church",
+   "map=LeyndellRoyalCapital · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1100013,
+   "Avenue Balcony",
+   "map=LeyndellRoyalCapital · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1100001,
+   "Queen's Bedchamber",
+   "map=LeyndellRoyalCapital · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1100016,
+   "West Capital Rampart, Fortified Manor, First Floor",
+   "map=LeyndellRoyalCapital · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1100017,
+   "Divine Bridge",
+   "map=LeyndellRoyalCapital · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1100000,
+   "Elden Throne",
+   "map=LeyndellRoyalCapital · open=0 dungeon=0 boss=1"
+  ],
+  [
+   3500002,
+   "Underground Roadside",
+   "map=SubterraneanShunningGrounds · open=0 dungeon=0 boss=0"
+  ],
+  [
+   3500008,
+   "Forsaken Depths",
+   "map=SubterraneanShunningGrounds · open=0 dungeon=0 boss=1"
+  ],
+  [
+   3500010,
+   "Leyndell Catacombs",
+   "map=SubterraneanShunningGrounds · open=0 dungeon=0 boss=0"
+  ],
+  [
+   3500011,
+   "Leyndell Catacombs Part II",
+   "map=SubterraneanShunningGrounds · open=0 dungeon=0 boss=0"
+  ],
+  [
+   3500092,
+   "Frenzied Flame Proscription",
+   "map=SubterraneanShunningGrounds · open=0 dungeon=0 boss=0"
+  ],
+  [
+   3500000,
+   "Cathedral of the Forsaken",
+   "map=SubterraneanShunningGrounds · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1105011,
+   "Leyndell, Capital of Ash",
+   "map=LeyndellAshenCapital · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1105001,
+   "Queen's Bedchamber ",
+   "map=LeyndellAshenCapital · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1105092,
+   "Divine Bridge ",
+   "map=LeyndellAshenCapital · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1105000,
+   "Elden Throne ",
+   "map=LeyndellAshenCapital · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1900000,
+   "Fractured Marika",
+   "map=StonePlatform · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1900001,
+   "Elden Beast",
+   "map=StonePlatform · open=0 dungeon=0 boss=1"
+  ],
+  [
+   6400001,
+   "Central Caelid",
+   "map=Caelid · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6400000,
+   "Caelid North",
+   "map=Caelid · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6400002,
+   "Chamber Outside the Plaza",
+   "map=Caelid · open=0 dungeon=0 boss=1"
+  ],
+  [
+   6400010,
+   "Redmane Castle Plaza",
+   "map=Caelid · open=0 dungeon=0 boss=0"
+  ],
+  [
+   6400040,
+   "Starscourge Radahn",
+   "map=Caelid · open=0 dungeon=0 boss=1"
+  ],
+  [
+   3014001,
+   "Minor Erdtree Catacombs",
+   "map=Caelid · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3015001,
+   "Caelid Catacombs",
+   "map=Caelid · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3016001,
+   "War-Dead Catacombs",
+   "map=Caelid · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3120001,
+   "Abandoned Cave",
+   "map=Caelid · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3121001,
+   "Gaol Cave",
+   "map=Caelid · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3207001,
+   "Gael Tunnel",
+   "map=Caelid · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3207002,
+   "Gael Tunnel Part II",
+   "map=Caelid · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3207090,
+   "Rear Gael Tunnel Entrance",
+   "map=Caelid · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3208001,
+   "Sellia Crystal Tunnel",
+   "map=Caelid · open=0 dungeon=1 boss=0"
+  ],
+  [
+   6400020,
+   "Chair-Crypt of Sellia",
+   "map=Caelid · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6401000,
+   "Swamp of Aeonia",
+   "map=SwampOfAeonia · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6402000,
+   "Dragonbarrow",
+   "map=GreyollsDragonbarrow · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3111001,
+   "Sellia Hideaway",
+   "map=GreyollsDragonbarrow · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3110001,
+   "Dragonbarrow Cave",
+   "map=GreyollsDragonbarrow · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6402001,
+   "Bestial Sanctum",
+   "map=GreyollsDragonbarrow · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3413003,
+   "Divine Tower of Caelid: Center",
+   "map=GreyollsDragonbarrow · open=0 dungeon=0 boss=0"
+  ],
+  [
+   3413013,
+   "Divine Tower of Caelid: Basement",
+   "map=GreyollsDragonbarrow · open=0 dungeon=0 boss=1"
+  ],
+  [
+   3415090,
+   "Isolated Divine Tower",
+   "map=GreyollsDragonbarrow · open=0 dungeon=0 boss=0"
+  ],
+  [
+   6500000,
+   "Forbidden Lands",
+   "map=ForbiddenLands · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6500090,
+   "Grand Lift of Rold",
+   "map=ForbiddenLands · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3020001,
+   "Hidden Path to the Haligtree",
+   "map=ForbiddenLands · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3020002,
+   "Hidden Path to the Haligtree Part II",
+   "map=ForbiddenLands · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3414011,
+   "Divine Tower of East Altus",
+   "map=ForbiddenLands · open=0 dungeon=0 boss=0"
+  ],
+  [
+   6501000,
+   "Zamor Ruins",
+   "map=MountaintopsOfTheGiants · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6501001,
+   "Central Mountaintops",
+   "map=MountaintopsOfTheGiants · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6501002,
+   "Castle Sol",
+   "map=MountaintopsOfTheGiants · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3122001,
+   "Spiritcaller's Cave",
+   "map=MountaintopsOfTheGiants · open=0 dungeon=1 boss=0"
+  ],
+  [
+   6501003,
+   "Castle Sol Main Gate, Church of the Eclipse",
+   "map=MountaintopsOfTheGiants · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6501010,
+   "Castle Sol Rooftop",
+   "map=MountaintopsOfTheGiants · open=1 dungeon=0 boss=0"
+  ],
+  [
+   6502000,
+   "Giants' Gravepost, Foot of the Forge",
+   "map=FlamePeak · open=0 dungeon=0 boss=1"
+  ],
+  [
+   6502010,
+   "Fire Giant",
+   "map=FlamePeak · open=0 dungeon=0 boss=1"
+  ],
+  [
+   3018001,
+   "Giants' Mountaintop Catacombs",
+   "map=FlamePeak · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3017002,
+   "Giant-Conquering Hero's Grave",
+   "map=FlamePeak · open=0 dungeon=1 boss=0"
+  ],
+  [
+   6503000,
+   "Consecrated Snowfield",
+   "map=ConsecratedSnowfield · open=1 dungeon=0 boss=0"
+  ],
+  [
+   3019001,
+   "Consecrated Snowfield Catacombs",
+   "map=ConsecratedSnowfield · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3112001,
+   "Cave of the Forlorn",
+   "map=ConsecratedSnowfield · open=0 dungeon=1 boss=0"
+  ],
+  [
+   3211001,
+   "Yelough Anix Tunnel",
+   "map=ConsecratedSnowfield · open=0 dungeon=1 boss=0"
+  ],
+  [
+   1500011,
+   "Haligtree Canopy",
+   "map=MiquellasHaligtree · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1500012,
+   "Haligtree Town Plaza",
+   "map=MiquellasHaligtree · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1500010,
+   "Haligtree Promenade",
+   "map=MiquellasHaligtree · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1500001,
+   "Prayer Room",
+   "map=ElphaelBraceOfTheHaligtree · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1500002,
+   "Elphael Inner Wall, Drainage Channel",
+   "map=ElphaelBraceOfTheHaligtree · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1500003,
+   "Haligtree Roots",
+   "map=ElphaelBraceOfTheHaligtree · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1500000,
+   "Malenia, Goddess of Rot",
+   "map=ElphaelBraceOfTheHaligtree · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1201001,
+   "Ainsel River Well Depths",
+   "map=AinselRiver · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1201002,
+   "Ainsel River Downstream",
+   "map=AinselRiver · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1201003,
+   "Ainsel River Downstream Part II",
+   "map=AinselRiver · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1204000,
+   "Astel, Naturalborn of the Void",
+   "map=AinselRiver · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1201000,
+   "Dragonkin Soldier of Nokstella",
+   "map=AinselRiver · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1201011,
+   "Ainsel River Main",
+   "map=AinselRiverMain · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1201013,
+   "Nokstella, Eternal City",
+   "map=AinselRiverMain · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1201014,
+   "Nokstella Waterfall Basin",
+   "map=AinselRiverMain · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1201015,
+   "Lake of Rot Shoreside",
+   "map=LakeOfRot · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1201016,
+   "Grand Cloister",
+   "map=LakeOfRot · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1201017,
+   "Grand Cloister Part II",
+   "map=LakeOfRot · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1207026,
+   "Nokron, Eternal City",
+   "map=NokronEternalCity · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1202020,
+   "Mimic Tear",
+   "map=NokronEternalCity · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1202002,
+   "Ancestral Woods",
+   "map=NokronEternalCity · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1202007,
+   "Night's Sacred Ground",
+   "map=NokronEternalCity · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1202003,
+   "Aqueduct-Facing Cliffs",
+   "map=NokronEternalCity · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1202004,
+   "Aqueduct-Facing Cliffs Part II",
+   "map=NokronEternalCity · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1202000,
+   "Great Waterfall Basin",
+   "map=NokronEternalCity · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1205001,
+   "Palace Approach Ledge-Road",
+   "map=MohgwynPalace · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1205004,
+   "Dynasty Mausoleum Entrance",
+   "map=MohgwynPalace · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1205006,
+   "Dynasty Mausoleum Midpoint",
+   "map=MohgwynPalace · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1205000,
+   "Cocoon of the Empyrean",
+   "map=MohgwynPalace · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1207031,
+   "Siofra River Well Depths",
+   "map=SiofraRiver · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1202033,
+   "Siofra River Bank",
+   "map=SiofraRiver · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1202034,
+   "Worshippers' Woods",
+   "map=SiofraRiver · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1203001,
+   "Root-Facing Cliffs",
+   "map=DeeprootDepths · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1203002,
+   "Great Waterfall Crest Part II",
+   "map=DeeprootDepths · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1203003,
+   "Deeproot Depths",
+   "map=DeeprootDepths · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1203004,
+   "The Nameless Eternal City",
+   "map=DeeprootDepths · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1203005,
+   "Across the Roots",
+   "map=DeeprootDepths · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1203000,
+   "Prince of Death's Throne",
+   "map=DeeprootDepths · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1300012,
+   "Crumbling Beast Grave",
+   "map=CrumblingFarumAzula · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1300013,
+   "Crumbling Beast Grave Depths, Tempest-Facing Balcony",
+   "map=CrumblingFarumAzula · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1300017,
+   "Dragon Temple",
+   "map=CrumblingFarumAzula · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1300018,
+   "Dragon Temple Transept",
+   "map=CrumblingFarumAzula · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1300010,
+   "Dragon Temple Altar",
+   "map=CrumblingFarumAzula · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1300019,
+   "Dragon Temple Lift",
+   "map=CrumblingFarumAzula · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1300003,
+   "Dragon Temple Rooftop",
+   "map=CrumblingFarumAzula · open=0 dungeon=0 boss=0"
+  ],
+  [
+   1300020,
+   "Dragonlord Placidusax",
+   "map=CrumblingFarumAzula · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1300006,
+   "Beside the Great Bridge",
+   "map=CrumblingFarumAzula · open=0 dungeon=0 boss=1"
+  ],
+  [
+   1300000,
+   "Maliketh, the Black Blade",
+   "map=CrumblingFarumAzula · open=0 dungeon=0 boss=1"
+  ]
+ ]
+}

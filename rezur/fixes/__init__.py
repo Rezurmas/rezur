@@ -9,8 +9,10 @@ from .checksum import ChecksumFix, PlayerHashFix
 from .summary import SummaryFix
 from .weather import WeatherFix
 from .dlc import DLCFix
+from .invcounters import InvCountersFix
 
-_FIXES = [TorrentFix(), ChecksumFix(), PlayerHashFix(), SummaryFix(), WeatherFix(), DLCFix()]
+_FIXES = [TorrentFix(), ChecksumFix(), PlayerHashFix(), SummaryFix(), WeatherFix(), DLCFix(),
+          InvCountersFix()]
 _REGISTRY = {f.id: f for f in _FIXES}
 
 

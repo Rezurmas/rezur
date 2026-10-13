@@ -13,6 +13,7 @@ from ..core.resources import data_path
 from ..core.slots import SLOT_BODY, Slot
 
 _cache = None
+_EXTRA = "event_flags_extra.json"  # grupy spoza bazy głównej: colosseums, baseny, regiony inwazji
 
 
 def _db():
@@ -20,7 +21,27 @@ def _db():
     if _cache is None:
         with open(data_path("db_er", "event_flags.json"), encoding="utf-8") as f:
             _cache = json.load(f)
+        try:
+            with open(data_path("db_er", _EXTRA), encoding="utf-8") as f:
+                for k, v in json.load(f).items():
+                    _cache.setdefault(k, v)
+        except OSError:
+            pass
     return _cache
+
+
+def search_names(query, limit=60):
+    """Szuka fragmentu nazwy po WSZYSTKICH grupach flag. [(grupa, id, nazwa)]."""
+    q = (query or "").lower()
+    out = []
+    for group, rows in _db().items():
+        for row in rows:
+            fid, name = row[0], row[1]
+            if q in name.lower() or q == str(fid):
+                out.append((group, fid, name))
+                if len(out) >= limit:
+                    return out
+    return out
 
 
 def groups():

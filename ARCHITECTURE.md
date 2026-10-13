@@ -102,8 +102,9 @@ ER-Save-Lab/
 │   │   └── jsonout.py            eksport JSON (dla GUI/API)
 │   └── api/
 │       └── server.py             FastAPI (placeholder F6 + kontrakt w docstringu)
-├── tests/run_all.py              testy na kopiach realnych save'ów (8 sztuk)
-├── tools/                        pierwsze narzędzia bojowe (fix_torrent, copy_slot)
+├── tests/run_all.py              testy na kopiach realnych save'ów (43 testy)
+├── tools/                        narzędzia bojowe (fix_torrent, copy_slot, build_exe.cmd)
+├── packaging/rezur.spec          PyInstaller → dist\rezur.exe (onefile)
 ├── references/                   6 sklonowanych repo (materiał źródłowy, do nauki)
 ├── backups/                      historia save'ów (fixture'y testów)
 ├── PLAN.md                       plan projektu ER Save Lab (F0→F7)
@@ -205,6 +206,7 @@ Kontrakt (F6): szczegółowa lista endpointów — docstring w `rezur/api/server
 | F4 | świat: event flags, łaski, bossy | `core/flags.py`, `ops/flags.py` | ✅ |
 | F5 | transfer: import/eksport postaci (JSON), cross-save | `ops/transfer.py` | ✅ |
 | F5b | zaufanie: vault (GOLD/piny), watch, risk, staging + log | `core/vault.py`, `ops/watch.py`, `risk.py`, `staging.py` | ✅ |
+| F5c | luki: torn-write, liczniki ekwipunku, grupy colosseum/baseny/regiony, `find`, cofanie zmian | `core/savefile.py`, `fixes/invcounters.py`, `db_er/event_flags_extra.json`, `cli.find`, `staging.undo` | ✅ |
 | F6 | GUI: lokalny webview (pywebview / WebView2) + API JSON | `api/`, `web/` | plan — start na GO od He |
 | F7 | pakowanie: `.exe` / pywebview / skróty | `packaging/` | plan |
 

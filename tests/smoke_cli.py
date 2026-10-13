@@ -25,7 +25,7 @@ SUBS = (
     "info", "doctor", "fix", "stats", "item", "inventory", "equipment", "equip", "unequip",
     "spells", "appearance", "teleport", "world", "unlock", "flags", "graces", "copy", "swap",
     "clear", "steamid", "export", "import", "backups", "watch", "risk",
-    "stage", "pending", "apply", "discard", "log", "config", "list-fixes",
+    "stage", "pending", "apply", "discard", "log", "find", "config", "list-fixes",
 )
 
 
@@ -148,8 +148,13 @@ def build(P, out_json, ash, region):
     add("log")
     raw("stage stats --set vigor=63",
         ["stage", "--save", P, "stats", "--slot", "2", "--set", "vigor=63"])
+    add("pending", "--undo")
+    add("pending")
     add("discard")
     add("pending")
+    add("find", "uchi")
+    add("find", "godrick")
+    add("find", "map", "--json")
 
     add("backups", "--restore", "nie-ma-takiej-kopii", rcs=(2,))
 

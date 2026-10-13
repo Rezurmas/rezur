@@ -11,6 +11,7 @@ Uwaga o argv: `--save` jest opcją PODKOMENDY, więc zawsze:
 """
 
 import glob
+import os
 import re
 import shutil
 import subprocess
@@ -170,6 +171,10 @@ def main():
     shutil.copy2(FIXED, sp)
     P = str(sp)
     out_json = str(Path(td) / "char.json")
+
+    # izolacja: własny %APPDATA% (config + staging) — smoke nie rusza ustawień użytkownika
+    os.environ["APPDATA"] = str(Path(td) / "appdata")
+    Path(os.environ["APPDATA"]).mkdir(parents=True, exist_ok=True)
 
     sys.path.insert(0, str(ROOT))
     from rezur.core import items_db

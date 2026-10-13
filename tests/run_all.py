@@ -1048,6 +1048,47 @@ def t_find_engine():
     assert world.search_names("6100090"), "brak trafienia flagi po ID"
 
 
+@test
+def t_gui_api_flow():
+    from rezur.gui.api import GuiApi
+
+    api = GuiApi()
+    src = fixture(FIXED_GLOB)
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "ER0000.sl2"
+        shutil.copy2(src, p)
+        info = api.load(str(p))
+        assert "error" not in info, info
+        assert info["md5"]["ok"] == info["md5"]["total"] == 12, info["md5"]
+        names = {c.get("name") for c in info["characters"]}
+        assert "annesee" in names, names
+
+        d = api.doctor(str(p))
+        assert "findings" in d, d
+        rr = api.risk_scan(str(p))
+        assert rr.get("verdict") in ("green", "yellow", "red"), rr
+
+        inv = api.inventory(str(p), 2, "held", search="map")
+        assert inv["total"] >= 1 and all("map" in e["name"].lower() for e in inv["rows"]), inv
+
+        st = api.stage(str(p), ["stats", "--slot", "0", "--set", "vigor=61"])
+        assert "error" not in st, st
+        assert api.pending(str(p))["count"] == 1
+        pv = api.preview(str(p))
+        assert pv["changed"], pv
+        res = api.apply(str(p), force=False)
+        assert res.get("md5_ok") == 12, res
+        assert api.pending(str(p))["count"] == 0
+        bk = api.backups(str(p))
+        assert any(b["gold"] for b in bk["rows"]), bk
+
+        st2 = api.stage(str(p), ["stats", "--slot", "0", "--set", "vigor=62"])
+        assert "error" not in st2, st2
+        un = api.undo(str(p))
+        assert un.get("left") == 0, un
+        api.discard(str(p))
+
+
 def main():
     ok = fail = 0
     for t in _tests:

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>REZUR — Saves Configurator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="win">
+  <header class="head">
+    <span class="screw tl"></span><span class="screw tr"></span>
+    <div class="brand"><b>REZUR</b><div class="sub">saves configurator · engineering series</div></div>
+    <div class="hatch"></div>
+    <div class="mid">
+      <span class="pill" title="wczytany plik"><span class="led" id="ledFile"></span><span id="txtFile">BRAK PLIKU</span></span>
+      <span class="pill" title="sumy sekcji"><span class="led" id="ledMd5"></span><span id="txtMd5">MD5 —/—</span></span>
+      <span class="pill" title="stan gry"><span class="led" id="ledGame"></span><span id="txtGame">GRA: STOP</span></span>
+      <span class="pill" title="backup przy każdym zapisie"><span class="led o" style="width:5px;height:5px"></span>KOPIA AUTO</span>
+      <span class="metal" id="txtVer">FW —</span>
+    </div>
+  </header>
+
+  <div class="banner hidden" id="gameBanner">
+    <b>UWAGA</b> eldenring.exe działa — zapis do żywego savea zablokowany · edytuj kopię roboczą (staging), zastosuj po zamknięciu gry
+  </div>
+
+  <div class="mid2">
+    <nav class="rail" id="rail">
+      <div class="tab" data-tab="postacie"><span class="dot"></span>POSTACIE</div>
+      <div class="tab" data-tab="doktor"><span class="dot"></span>DOKTOR</div>
+      <div class="tab" data-tab="staty"><span class="dot"></span>STATY</div>
+      <div class="tab" data-tab="ekwipunek"><span class="dot"></span>EKWIPUNEK</div>
+      <div class="tab" data-tab="eq"><span class="dot"></span>ZAŁOŻONE</div>
+      <div class="tab" data-tab="swiat"><span class="dot"></span>ŚWIAT</div>
+      <div class="tab" data-tab="czary"><span class="dot"></span>CZARY</div>
+      <div class="tab" data-tab="wyglad"><span class="dot"></span>WYGLĄD</div>
+      <div class="tab" data-tab="teleport"><span class="dot"></span>TELEPORT</div>
+      <div class="tab" data-tab="ryzyko"><span class="dot"></span>RYZYKO</div>
+      <div class="tab" data-tab="kopie"><span class="dot"></span>KOPIE</div>
+      <div class="tab" data-tab="log"><span class="dot"></span>HISTORIA</div>
+      <div class="tab" data-tab="ustawienia"><span class="dot"></span>USTAWIENIA</div>
+      <div class="railfoot">
+        <button class="key small" id="btnPick">WSKAŻ PLIK…</button>
+        <div class="path" id="railPath">—</div>
+      </div>
+    </nav>
+
+    <main class="work" id="work">
+      <div class="ctx" id="ctx"><span>WYBIERZ PLIK, ABY ZACZĄĆ</span></div>
+      <section id="panel-postacie" class="panel"></section>
+      <section id="panel-doktor" class="panel hidden"></section>
+      <section id="panel-staty" class="panel hidden"></section>
+      <section id="panel-ekwipunek" class="panel hidden"></section>
+      <section id="panel-eq" class="panel hidden"></section>
+      <section id="panel-swiat" class="panel hidden"></section>
+      <section id="panel-czary" class="panel hidden"></section>
+      <section id="panel-wyglad" class="panel hidden"></section>
+      <section id="panel-teleport" class="panel hidden"></section>
+      <section id="panel-ryzyko" class="panel hidden"></section>
+      <section id="panel-kopie" class="panel hidden"></section>
+      <section id="panel-log" class="panel hidden"></section>
+      <section id="panel-ustawienia" class="panel hidden"></section>
+    </main>
+  </div>
+
+  <footer class="stagebar">
+    <span class="led" id="ledOk"></span>
+    <div class="lcd status" id="status"><span>READY</span></div>
+    <div class="lcd pend" id="pendBox"><b id="pendN">0</b> <span id="pendW">ZMIAN</span></div>
+    <div class="keyrow">
+      <button class="key" id="btnPreview">PODGLĄD</button>
+      <button class="key" id="btnUndo">COFNIJ</button>
+      <button class="key orange" id="btnApply">ZASTOSUJ</button>
+      <span class="hazardbox"><button class="key hazardk" id="btnDiscard"><span>ODRZUĆ</span></button></span>
+    </div>
+  </footer>
+</div>
+
+<div class="overlay hidden" id="busy">
+  <div class="spin"></div>
+  <div class="lcd" id="busyTxt">WCZYTYWANIE…</div>
+</div>
+
+<div class="overlay hidden" id="empty">
+  <div class="emptybox">
+    <h2>REZUR — SAVES CONFIGURATOR</h2>
+    <div class="sub">wskaż plik ER0000.sl2, żeby zacząć</div>
+    <div class="inline">
+      <button class="key" id="btnPick2">WSKAŻ PLIK .SL2</button>
+      <button class="key" id="btnRecent">OTWÓRZ OSTATNI / NAJNOWSZY</button>
+    </div>
+    <div class="note" id="emptyNote" style="margin-top:18px">
+      typowa ścieżka: <span class="mono">%APPDATA%\EldenRing\&lt;steamid&gt;\ER0000.sl2</span><br>
+      edycje zawsze lądują najpierw w kopii roboczej — oryginał rusza dopiero przy ZASTOSUJ.
+    </div>
+  </div>
+</div>
+
+<div class="modal hidden" id="modal"><div class="mbox" id="mbox"></div></div>
+<div class="toasts" id="toasts"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -157,18 +157,22 @@ funkcje** co CLI; SSE `/api/events` niesie postęp (np. „dodano 240 itemów…
 
 Kontrakt (F6): szczegółowa lista endpointów — docstring w `rezur/api/server.py`.
 
-## 6. GUI (F6) — lokalny webview (pywebview), start na GO od He
+## 6. GUI (F6) — okno pywebview (WebView2), ZBUDOWANE
 
-- Decyzja He: Clay (C) odpuszczony; GUI „w webkitcie" → **pywebview**
-  (Windows: WebView2). UI = HTML+CSS+JS, bez build-stepu.
-- Okno natywne ładuje lokalny `web/index.html`; operacje przez lokalne API JSON
-  (te same funkcje co CLI: doctor, fixes, stats, items, equipment, slots, backupy).
-- Bind wyłącznie 127.0.0.1 + token w nagłówku; plik save'a nie opuszcza maszyny.
-- UI: karty postaci, panel ustaleń (finding → przycisk naprawy), ekwipunek + skrzynia,
-  panel EQ (22 gniazda: broń/zbroja/talizman), staty −/+ z auto-repeat (bez suwaków),
-  flagi/łaski, historia backupów. Tryb bezpieczny: zawsze najpierw podgląd zmian, potem zapis.
-- Zależność: `pip install pywebview` (bez kompilatora). Prace ruszają dopiero
-  na wyraźne polecenie He — teraz priorytetem jest backend.
+- `python -m rezur gui [--save PLIK]` → natywne okno WebView2; frontend w HTML/CSS/JS
+  (`rezur/gui/web/`), most `window.pywebview.api.*` do `rezur/gui/api.py` (ten sam proces,
+  bez HTTP i portów; `rezur/api/` pozostaje nieużywany).
+- **api.py** to cienka warstwa: te same funkcje co CLI; wszystkie EDYCJE przez staging;
+  czytanie paneli pokazuje BRUDNOPIS gdy istnieją zmiany oczekujące (`_live()`), więc UI
+  od razu pokazuje efekt edycji, a oryginał rusza dopiero na ZASTOSUJ.
+- Styl: engineering-series (bench `web/test-bench.html`) — czarna anoda `#1E1F22`,
+  pomarańcz `#F0501E` jako jedyny akcent, LCD dot-matrix, klawisze z twardym skokiem,
+  hazard tylko dla destrukcyjnych, **zero suwaków** (staty: −/+ z auto-repeat + wpis z klawiatury).
+- 13 paneli: POSTACIE · DOKTOR · STATY · EKWIPUNEK · ZAŁOŻONE · ŚWIAT · CZARY · WYGLĄD ·
+  TELEPORT · RYZYKO · KOPIE · HISTORIA · USTAWIENIA; pasek zmian na dole (PODGLĄD/COFNIJ/
+  ZASTOSUJ/ODRZUĆ), dialogi wprost (ZAPISZ/ODRZUĆ/WRÓĆ), blokada przy działającej grze.
+- `--selftest`: okno otwiera się, odpytuje `window.__rezurBooted` i zamyka — dymny test
+  mostu bez klikania (używane przy każdej zmianie).
 
 ### Stany aplikacji (kontrakt dla GUI — „żeby nic nie zaskakiwało")
 
@@ -207,7 +211,7 @@ Kontrakt (F6): szczegółowa lista endpointów — docstring w `rezur/api/server
 | F5 | transfer: import/eksport postaci (JSON), cross-save | `ops/transfer.py` | ✅ |
 | F5b | zaufanie: vault (GOLD/piny), watch, risk, staging + log | `core/vault.py`, `ops/watch.py`, `risk.py`, `staging.py` | ✅ |
 | F5c | luki: torn-write, liczniki ekwipunku, grupy colosseum/baseny/regiony, `find`, cofanie zmian | `core/savefile.py`, `fixes/invcounters.py`, `db_er/event_flags_extra.json`, `cli.find`, `staging.undo` | ✅ |
-| F6 | GUI: lokalny webview (pywebview / WebView2) + API JSON | `api/`, `web/` | plan — start na GO od He |
+| F6 | GUI: pywebview (WebView2) + most JS↔silnik, 13 paneli w stylu engineering-series | `gui/api.py`, `gui/app.py`, `gui/web/` | ✅ v0.2 |
 | F7 | pakowanie: `.exe` / pywebview / skróty | `packaging/` | plan |
 
 ## 9. Konwencje

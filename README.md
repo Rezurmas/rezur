@@ -16,7 +16,10 @@ z weryfikacją kandydata przed podmianą, wersja patcha per postać z ostrzeżen
 ilości), znacznik „plik modyfikowany" (dziennik edycji) i gotowa droga powrotu do GOLD.
 **Stany bezpieczne (staging):** `stage → pending → apply/discard` — edycje na kopii roboczej,
 jeden backup przy zatwierdzeniu, historia operacji w `rezur log`.
-GUI (F6): lokalny webview (pywebview) — **start dopiero na GO**; plan w `ARCHITECTURE.md`.
+**GUI (F6):** `python -m rezur gui` — natywne okno pywebview (WebView2) w stylu
+engineering-series (czarna anoda + pomarańcz, LCD dot-matrix, zero suwaków): postacie,
+doktor, staty, ekwipunek, założone, świat, czary, wygląd, teleport, ryzyko, kopie,
+historia, ustawienia — każda edycja przez kopię roboczą, na dole pasek zmian.
 
 ## Szybki start
 
@@ -76,6 +79,8 @@ python -m rezur apply                     # zatwierdź: 1 backup + 1 zapis + wpi
 python -m rezur discard                   # odrzuć: oryginał nietknięty
 python -m rezur log [--json]              # historia operacji (dziennik edycji)
 python -m rezur find "uchi" [--json]      # szukaj: itemy, flagi świata, łaski, lokacje
+python -m rezur gui [--save PLIK]         # OKNO GUI (pywebview/WebView2)
+python -m rezur gui --selftest            # test dymny: otwórz i zamknij po ~7 s
 python -m rezur config                    # backup_retention / auto_doctor / guard_live / watch_interval
 python -m rezur list-fixes                # lista napraw
 ```
@@ -97,10 +102,11 @@ rezur/
            EQ (22 gniazda), czary, wygląd, teleport, świat (nazwane flagi), masowe nadawanie,
            kopie/podmiana/czyszczenie slotów, SteamID, transfer JSON, backupy, watch (auto-kopie przy grze)
   report/  wyjście tekstowe i JSON
+  gui/     okno pywebview: api.py (most JS↔silnik), app.py (shell), web/ (index.html+style.css+app.js)
   api/     warstwa HTTP/JSON pod GUI (F6 — most do webview; placeholder)
   cli.py   python -m rezur
-tests/     run_all.py — 43 testy na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
-           smoke_cli.py — przebieg KAŻDEJ komendy CLI (131 wywołań) na kopii save'a
+tests/     run_all.py — 44 testy na kopiach prawdziwych save'ów (+ weryfikacja krzyżowa z parserem referencyjnym)
+           smoke_cli.py — przebieg KAŻDEJ komendy CLI (132 wywołań) na kopii save'a
 ARCHITECTURE.md   frontend/backend, przepływy, roadmapa
 ```
 

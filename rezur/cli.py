@@ -101,6 +101,8 @@ from .report import text as R
 
 
 def _remember_save(path):
+    if staging.is_work_path(path):
+        return
     try:
         cfg = CONF.load()
         if cfg.get("last_save") != str(path):
@@ -1122,6 +1124,12 @@ def cmd_log(args):
     return 0
 
 
+def cmd_gui(args):
+    from .gui.app import run
+
+    return run(args.save, selftest=getattr(args, "selftest", False))
+
+
 def cmd_config(args):
     if args.set:
         if "=" not in args.set:
@@ -1394,6 +1402,11 @@ def main(argv=None):
     sp.add_argument("--limit", type=int, default=40)
     sp.add_argument("--json", action="store_true")
     sp.set_defaults(func=cmd_find)
+
+    sp = sub.add_parser("gui", help="okno GUI (pywebview / WebView2)")
+    add_save(sp)
+    sp.add_argument("--selftest", action="store_true", help="otwórz i zamknij po 6 s")
+    sp.set_defaults(func=cmd_gui)
 
     sp = sub.add_parser("config", help="konfiguracja Rezura")
     sp.add_argument("--set", default=None, help="klucz=wartość")

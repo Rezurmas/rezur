@@ -25,7 +25,7 @@ SUBS = (
     "info", "doctor", "fix", "stats", "item", "inventory", "equipment", "equip", "unequip",
     "spells", "appearance", "teleport", "world", "unlock", "flags", "graces", "copy", "swap",
     "clear", "steamid", "export", "import", "backups", "watch", "risk",
-    "stage", "pending", "apply", "discard", "log", "find", "config", "list-fixes",
+    "stage", "pending", "apply", "discard", "log", "find", "gui", "config", "list-fixes",
 )
 
 

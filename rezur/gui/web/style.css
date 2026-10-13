@@ -1,0 +1,258 @@
+/* REZUR GUI — ENGINEERING SERIES
+   czarna anoda + pomarańcz, LCD dot-matrix, zero poświat, promienie ≤3px.
+   Wszystko na zmiennych — motyw spójny z bench (web/test-bench.html). */
+
+:root{
+  --alu:#1E1F22; --alu-hi:#2B2C30; --alu-lo:#121316; --panel:#26272B;
+  --ink:#ECEBE5; --mut:#8E8D86;
+  --dark:#17181A; --dark2:#1F2023;
+  --lcd:#0A0B0A; --lcdtxt:#F2F1EA; --amber:#FFA028;
+  --orange:#F0501E; --led-g:#4CD07D; --led-r:#E03B2E; --led-a:#FFB020; --led-off:#55565A;
+  --line:rgba(240,240,235,.22); --line2:rgba(240,240,235,.10);
+  --f:"Bahnschrift","Segoe UI Variable Display","Segoe UI",sans-serif;
+  --fm:"Cascadia Mono","Consolas","Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{
+  background:#101113; color:var(--ink); font-family:var(--f); font-size:13px;
+  -webkit-font-smoothing:antialiased; user-select:none; overflow:hidden;
+}
+.mono{font-family:var(--fm)}
+.hidden{display:none !important}
+.cap{font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--mut)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--dark)}
+::-webkit-scrollbar-thumb{background:var(--alu-hi);border:2px solid var(--dark)}
+::-webkit-scrollbar-thumb:hover{background:var(--mut)}
+
+/* ---------- okno ---------- */
+.win{display:flex;flex-direction:column;height:100vh;
+  background:var(--alu);
+  background-image:radial-gradient(rgba(255,255,255,.028) 1px,transparent 1.1px);
+  background-size:7px 7px;}
+
+/* ---------- nagłówek ---------- */
+.head{display:flex;align-items:center;gap:16px;padding:9px 14px 9px 16px;
+  border-bottom:1px solid var(--line); position:relative; flex:0 0 auto}
+.head .screw{position:absolute;width:9px;height:9px;border-radius:50%;
+  background:var(--alu-hi);border:1px solid var(--line)}
+.head .screw::after{content:"";position:absolute;left:1px;right:1px;top:3.5px;height:1px;background:var(--line)}
+.head .screw.tl{left:6px;top:6px}.head .screw.tr{right:6px;top:6px}
+.brand{line-height:.95;padding-left:14px}
+.brand b{font-size:20px;font-weight:600;letter-spacing:.10em}
+.brand .sub{font-size:8.5px;letter-spacing:.26em;color:var(--mut);text-transform:uppercase;margin-top:4px}
+.hatch{height:12px;flex:0 0 110px;
+  background:repeating-linear-gradient(45deg, var(--ink) 0 2px, transparent 2px 5px);
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line); opacity:.85}
+.head .mid{flex:1;display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:nowrap;overflow:hidden}
+.metal{font-size:9.5px;letter-spacing:.14em;color:var(--mut);font-family:var(--fm);white-space:nowrap}
+.pill{display:inline-flex;gap:7px;align-items:center;border:1px solid var(--line);
+  padding:4px 9px;font-size:9px;letter-spacing:.14em;font-family:var(--fm);
+  text-transform:uppercase;white-space:nowrap;max-width:290px;overflow:hidden}
+.pill span:last-child{overflow:hidden;text-overflow:ellipsis}
+.led{width:6px;height:6px;border-radius:50%;background:var(--led-off);flex:0 0 auto}
+.led.g{background:var(--led-g)} .led.a{background:var(--led-a)} .led.r{background:var(--led-r)} .led.o{background:var(--orange)}
+.led.blink{animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:.15}}
+
+.banner{flex:0 0 auto;margin:8px 14px 0;padding:8px 12px;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;font-family:var(--fm);color:#1A0D06;
+  background:repeating-linear-gradient(45deg, var(--orange) 0 8px, #8E2D0F 8px 16px);
+  border:1px solid var(--aline,#000)}
+.banner b{background:var(--dark);color:var(--lcdtxt);padding:2px 8px;margin-right:8px}
+
+/* ---------- korpus ---------- */
+.mid2{flex:1;display:flex;min-height:0}
+.rail{flex:0 0 158px;border-right:1px solid var(--line);padding:10px 0 8px 2px;
+  display:flex;flex-direction:column;gap:1px;overflow-y:auto}
+.tab{display:flex;align-items:center;gap:9px;cursor:pointer;padding:8px 10px;
+  font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--mut)}
+.tab .dot{width:5px;height:5px;border-radius:50%;background:var(--led-off)}
+.tab:hover{color:var(--ink)}
+.tab.on{color:var(--ink);background:var(--panel);border:1px solid var(--line);border-right:none;border-radius:2px 0 0 2px}
+.tab.on .dot{background:var(--orange)}
+.railfoot{margin-top:auto;padding:10px 10px 6px;display:flex;flex-direction:column;gap:7px}
+.railfoot .path{font-size:9px;color:#A9A8A0;font-family:var(--fm);word-break:break-all;letter-spacing:.02em}
+
+.work{flex:1;padding:14px 16px 18px;overflow-y:auto;min-width:0}
+.ctx{display:flex;align-items:center;gap:12px;padding:7px 11px;margin-bottom:12px;
+  border:1px solid var(--line);background:var(--panel);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--mut);font-family:var(--fm)}
+.ctx b{color:var(--ink);font-weight:600}
+.ctx .tag{border:1px solid var(--line);padding:1px 7px;font-size:9px;color:var(--ink)}
+.ctx .tag.warn{color:var(--led-a);border-color:var(--led-a)}
+.ctx .tag.stage{color:var(--orange);border-color:var(--orange)}
+
+h3.sect{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);
+  margin:14px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--line2)}
+h3.sect:first-child{margin-top:0}
+
+/* ---------- przyciski / klawisze ---------- */
+.key{
+  min-width:64px;padding:9px 12px;text-align:center;cursor:pointer;
+  background:var(--alu-hi);border:1px solid var(--line);border-radius:2px;
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);
+  font-family:var(--f); box-shadow:0 2px 0 var(--alu-lo); position:relative;
+  white-space:nowrap;
+}
+.key:hover{background:var(--panel)}
+.key:active,.key.down{transform:translateY(2px);box-shadow:none;background:var(--dark);color:var(--lcdtxt)}
+.key.orange{background:var(--orange);border-color:#8E2D0F;color:#1A0D06;box-shadow:0 2px 0 #8E2D0F}
+.key.orange:hover{background:#FF6A3A}
+.key.hazardk{border:none;padding:0;box-shadow:none;background:none}
+.key.hazardk>span{display:block;padding:7px 11px;background:var(--dark);color:var(--lcdtxt);
+  border:1px solid #000;margin:4px;font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.hazardbox{display:inline-block;border-radius:2px;box-shadow:0 2px 0 #000;
+  background:repeating-linear-gradient(45deg, var(--ink) 0 3px, var(--orange) 3px 6px)}
+.keyrow{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.key.small{padding:6px 9px;font-size:9px;min-width:0}
+.key:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none}
+
+/* ---------- LCD ---------- */
+.lcd{background:var(--lcd);border:1px solid var(--line);border-radius:1px;
+  color:var(--lcdtxt);font-family:var(--fm);position:relative;overflow:hidden}
+.lcd::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.09) .8px, transparent 1px);
+  background-size:3px 3px}
+.lcd>span,.lcd>*{position:relative;z-index:1}
+.lcdin{background:var(--lcd);border:1px solid var(--line);border-radius:1px;color:var(--lcdtxt);
+  font-family:var(--fm);font-size:12px;padding:6px 8px;outline:none;min-width:0;
+  position:relative;z-index:1}
+.lcdin:focus{border-color:var(--orange)}
+.lcdin::placeholder{color:#6b6b62}
+
+/* ---------- pasek stanu ---------- */
+.stagebar{flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:9px 14px;
+  border-top:1px solid var(--line);background:var(--alu)}
+.status{flex:1;min-width:120px;padding:6px 10px;font-size:11.5px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status .am{color:var(--amber)}
+.pend{padding:5px 9px;font-size:11px;letter-spacing:.1em;white-space:nowrap}
+.pend b{color:var(--amber)}
+.stagebar .keyrow{flex:0 0 auto}
+
+/* ---------- karty postaci ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.card{border:1px solid var(--line);border-radius:2px;background:var(--panel);padding:9px 11px;
+  position:relative;cursor:pointer}
+.card:hover{border-color:var(--mut)}
+.card .slot{font-size:8.5px;letter-spacing:.2em;color:var(--mut);font-family:var(--fm)}
+.card h4{font-size:15px;font-weight:600;letter-spacing:.02em;margin:5px 0 7px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .meta{font-size:9px;color:var(--mut);font-family:var(--fm);margin-top:7px;letter-spacing:.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .lcd{padding:3px 7px;font-size:10.5px;letter-spacing:.05em;display:inline-block}
+.card .indic{position:absolute;top:9px;right:9px;display:flex;gap:5px}
+.card.sel{background:var(--dark);color:var(--lcdtxt);border-color:var(--orange)}
+.card.sel .slot,.card.sel .meta{color:#9C9C93}
+.card.empty{opacity:.55}
+.card .pills{display:flex;gap:4px;position:absolute;top:8px;right:9px}
+.card .minitag{font-size:8px;font-family:var(--fm);border:1px solid var(--line);padding:1px 5px;color:var(--mut)}
+.card .minitag.wa{color:var(--led-a);border-color:var(--led-a)}
+
+/* ---------- ustalenia doktora ---------- */
+.frow{display:flex;align-items:center;gap:11px;padding:8px 6px;border-bottom:1px solid var(--line2)}
+.frow .sev{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.frow .sev.err{background:var(--led-r)} .frow .sev.war{background:var(--led-a)} .frow .sev.ok{background:var(--led-g)}
+.frow .fbody{flex:1;min-width:0}
+.frow .fmsg{font-size:12px;white-space:normal}
+.frow .fcode{font-size:8.5px;font-family:var(--fm);color:var(--mut);letter-spacing:.06em;margin-top:2px}
+
+/* ---------- tabele ---------- */
+table.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);text-align:left;
+  padding:6px 8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--alu)}
+.tbl td{padding:6px 8px;border-bottom:1px solid var(--line2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl td.grow{max-width:0;width:100%;white-space:nowrap}
+.tbl tr:hover td{background:var(--dark);color:var(--lcdtxt)}
+.tbl tr.sel td{background:var(--dark2);color:var(--lcdtxt)}
+.tbl .mono{font-family:var(--fm);letter-spacing:.02em}
+.tbl .acts{display:flex;gap:5px}
+.pager{display:flex;gap:8px;align-items:center;margin-top:9px;font-family:var(--fm);font-size:10px;color:var(--mut)}
+.pager .key{padding:5px 9px;font-size:9px}
+
+/* ---------- staty ---------- */
+.statmod{max-width:520px}
+.statrow{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.sname{font-size:10px;letter-spacing:.16em;color:var(--mut);width:104px;text-transform:uppercase}
+.sval{min-width:70px;padding:5px 10px;font-size:15px;text-align:right;font-family:var(--fm);
+  letter-spacing:.05em;position:relative}
+.sval.big{font-size:19px;color:var(--amber)}
+.stbtn{width:36px;height:32px;border:1px solid var(--line);background:var(--alu-hi);border-radius:2px;
+  display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:15px;
+  cursor:pointer;box-shadow:0 2px 0 var(--alu-lo);color:var(--ink)}
+.stbtn:hover{background:var(--panel)}
+.stbtn:active{transform:translateY(2px);box-shadow:none;background:var(--dark);color:var(--lcdtxt)}
+.statrow.lvl .sname{color:var(--ink)}
+.ednote{font-size:9px;color:var(--mut);font-family:var(--fm);letter-spacing:.04em}
+
+/* ---------- formularze ---------- */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:11px;max-width:340px}
+.field label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--mut)}
+.inline{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+select.lcdin,.lcdin.select{appearance:none}
+.toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+
+/* ---------- swiat: lista grup/flag ---------- */
+.worldrow{display:flex;align-items:center;gap:10px;padding:5px 6px;border-bottom:1px solid var(--line2)}
+.worldrow:hover{background:var(--dark2)}
+.worldrow .wid{font-family:var(--fm);font-size:10.5px;color:var(--mut);width:74px;flex:0 0 auto}
+.worldrow .wname{flex:1;min-width:0;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.worldrow .wdesc{font-size:9px;color:var(--mut);font-family:var(--fm);max-width:270px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.swbox{width:34px;height:18px;border:1px solid var(--line);border-radius:2px;background:var(--dark);
+  position:relative;cursor:pointer;flex:0 0 auto}
+.swbox i{position:absolute;top:2px;left:2px;width:14px;height:12px;background:var(--alu-hi);
+  border:1px solid var(--line);border-radius:1px}
+.swbox.on i{left:16px;background:var(--orange);border-color:var(--orange)}
+
+/* ---------- czary / EQ siatki ---------- */
+.grid{display:grid;gap:8px}
+.spellgrid{grid-template-columns:repeat(auto-fill,minmax(215px,1fr))}
+.cell{border:1px solid var(--line);background:var(--panel);border-radius:2px;padding:7px 9px}
+.cell .cslot{font-size:8.5px;font-family:var(--fm);color:var(--mut);letter-spacing:.15em}
+.cell .cname{font-size:12px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell.empty{opacity:.5}
+.cell .cact{display:flex;gap:5px;margin-top:6px}
+.eqgrid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.eqzone{font-size:9px;letter-spacing:.18em;color:var(--mut);text-transform:uppercase;margin:11px 0 6px}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;background:rgba(9,9,10,.72);display:flex;align-items:center;
+  justify-content:center;z-index:60}
+.mbox{width:min(560px,92vw);background:var(--panel);border:1px solid var(--line);
+  border-radius:3px;box-shadow:0 3px 0 #000;padding:0}
+.mbox .mhead{padding:11px 16px;border-bottom:1px solid var(--line);font-size:11px;
+  letter-spacing:.2em;text-transform:uppercase;font-family:var(--fm);display:flex;align-items:center;gap:10px}
+.mbox .mhead.warn{background:repeating-linear-gradient(45deg, var(--ink) 0 6px, var(--orange) 6px 12px);color:#1A0D06}
+.mbox .mhead.warn span{background:var(--dark);color:var(--lcdtxt);padding:2px 9px}
+.mbox .mbod{padding:14px 16px;font-size:13px;line-height:1.55;color:var(--ink)}
+.mbox .mbod .lcd{padding:8px 10px;margin-top:9px;font-size:11.5px;white-space:pre-wrap}
+.mbox .mact{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--line)}
+
+/* ---------- toasty / overlaye ---------- */
+.toasts{position:fixed;right:16px;bottom:74px;display:flex;flex-direction:column;gap:8px;z-index:70}
+.toast{border:1px solid var(--line);background:var(--dark);color:var(--lcdtxt);padding:9px 12px;
+  font-size:11.5px;font-family:var(--fm);max-width:380px;border-radius:2px;box-shadow:0 2px 0 #000}
+.toast.ok{border-left:3px solid var(--led-g)}
+.toast.err{border-left:3px solid var(--led-r)}
+.toast.info{border-left:3px solid var(--led-a)}
+.overlay{position:fixed;inset:0;background:rgba(10,10,11,.86);display:flex;
+  align-items:center;justify-content:center;z-index:50;flex-direction:column;gap:16px}
+.emptybox{width:min(640px,92vw);background:var(--panel);border:1px solid var(--line);
+  border-radius:3px;padding:26px 28px;box-shadow:0 3px 0 #000;text-align:left}
+.emptybox h2{font-size:17px;letter-spacing:.12em;margin-bottom:6px}
+.emptybox .sub{color:var(--mut);font-size:10px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:18px}
+.spin{width:34px;height:34px;border:3px solid var(--alu-hi);border-top-color:var(--orange);border-radius:50%;
+  animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overlay .lcd{padding:8px 14px;font-size:12px;letter-spacing:.12em}
+
+/* ---------- kopie / log ---------- */
+.mark{font-family:var(--fm);font-size:9px;letter-spacing:.12em;padding:1px 6px;border:1px solid var(--line)}
+.mark.gold{color:var(--amber);border-color:var(--amber)}
+.mark.pin{color:var(--orange);border-color:var(--orange)}
+.note{font-size:10px;color:var(--mut);font-family:var(--fm);line-height:1.6}
+.riskbar{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);
+  margin-bottom:10px;background:var(--panel);border-radius:2px}
+.riskbar .verdict{font-family:var(--fm);font-size:12px;letter-spacing:.14em}
+.riskbar.green .verdict{color:var(--led-g)} .riskbar.yellow .verdict{color:var(--led-a)} .riskbar.red .verdict{color:var(--led-r)}

@@ -4,6 +4,8 @@
 
 **`Rezur-v0.2.1-win64.zip`** — in the Assets section below.
 
+SHA-256 of the ZIP: `e4f9d799c2754aa5e84c8ff59b18cbc176441e7a98d7cb6974e3823a5a6bb4f6`
+
 1. unpack the ZIP anywhere (e.g. `C:\Rezur`),
 2. double-click **`START-REZUR.cmd`** → the configurator window opens.
 
@@ -31,8 +33,11 @@ instructions, in English and Polish, are in `HOW-TO-RUN.txt` inside the ZIP.
 - **repo cleanup** — English `README.md`/`ARCHITECTURE.md` with a screenshot gallery, MIT `LICENSE`,
   release tooling (`tools/make_release_zip.py`, `packaging/release/`), and the stale experimental
   HTTP bridge (`rezur/api/`) removed
-- verified by **49 behaviour tests**, **135 CLI smoke invocations**, **51 GUI-bridge calls** and a
+- verified by **50 behaviour tests**, **135 CLI smoke invocations**, **51 GUI-bridge calls** and a
   live-window selftest run against the packaged exe
+- end-to-end checks of the shipped file: **97/97** (`tests/exe_e2e.py` — every CLI subcommand, the
+  staging flow and the window, all on copies of real saves) and **20/20**
+  (`tests/gui_panels_check.py` — all 13 panels driven over CDP in a live window)
 
 ### Highlights
 
